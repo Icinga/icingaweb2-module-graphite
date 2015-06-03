@@ -1,0 +1,28 @@
+<?php
+$maxCnt = 0;
+foreach ($this->images as $base => $cpus) {
+    $maxCnt = max($maxCnt, count($cpus));
+}
+?>
+<div class="controls">
+<?= $this->tabs ?>
+<h1>CPUs</h1>
+</div>
+<div class="content">
+<table style="width: 100%;">
+<tr>
+  <th style="width: 15em;">&nbsp;</th>
+  <th>CPUs</th>
+</tr>
+<?php foreach ($this->images as $base => $cpus): ?>
+<tr>
+<th style="vertical-align: top; text-align: right; padding-right: 2em;"><?= $this->escape($base) ?></th>
+<td>
+<?php foreach ($cpus as $num => $img): ?>
+<div style="width: 53px; float: left;"><img src="<?= $img ?>" /><!--<br />CPU <?= $num ?>--></div>
+<?php endforeach ?>
+</td>
+</tr>
+<?php endforeach ?>
+</table>
+</div>

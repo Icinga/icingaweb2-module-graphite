@@ -1,0 +1,12 @@
+<div class="controls">
+<?= $this->tabs ?>
+</div>
+
+<div class="content">
+<?php foreach ($this->images as $base => $img): ?>
+<div style="width: 260px; float: left; margin-right: 5px;">
+<h3><?= $this->escape($base) ?></h3>
+<img src="<?= $img ?>" />
+</div>
+<?php endforeach ?>
+</div>
