@@ -16,6 +16,8 @@ class GraphDatasource
 
     protected $scaleToSeconds;
 
+    protected $stacked = false;
+
     public function __construct($path)
     {
         $this->path = $path;
@@ -42,6 +44,12 @@ class GraphDatasource
     public function setAlias($alias)
     {
         $this->alias = $alias;
+        return $this;
+    }
+
+    public function setStacked()
+    {
+        $this->stacked = true;
         return $this;
     }
 
@@ -74,6 +82,9 @@ class GraphDatasource
         }
         if ($this->alias !== null) {
             $target = $this->func('alias', $target, "'" . $this->alias . "'");
+        }
+        if ($this->stacked) {
+            $target = $this->func('stacked', $target);
         }
 
         return $url->getParams()->add('target', $target);
