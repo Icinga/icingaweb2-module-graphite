@@ -37,6 +37,43 @@ class GraphiteQuery
         return $this;
     }
 
+    public function listDistinct($placeholder)
+    {
+        $search = $this->getSearchPattern();
+        $totalLength = strlen($search);
+        $varLength = strlen($placeholder) + 1;
+        $pos = 0;
+        $found = false;
+
+        while (false !== ($pos = strpos($search, '$' . $placeholder, $pos + 1))) {
+            if ($pos + $varLength === $totalLength) {
+                $found = $search;
+                break;
+            }
+            if ($search[$pos + $varLength] === '.') {
+                $found = substr($search, 0, $pos + $varLength);
+                break;
+            }
+        }
+
+        if ($found === false) {
+            return array();
+        }
+
+        $pattern = $this->replaceRemainingVariables($found);
+        $metrics = $this->listMetrics($pattern);
+        $distinct = array();
+
+        foreach ($metrics as & $metric) {
+            $parts = explode('.', $metric);
+            $value = end($parts);
+            $distinct[$value] = $value;
+        }
+
+        ksort($distinct);
+        return $distinct;
+    }
+
     public function getSearchPattern()
     {
         return $this->searchPattern;
@@ -110,8 +147,14 @@ class GraphiteQuery
         return $charts;
     }
 
-    public function listMetrics()
+    public function listMetrics($filterString = null)
     {
-        return $this->web->listMetrics($this->toFilterString());
+        if ($filterString === null) {
+            $filterString = $this->toFilterString();
+        }
+
+        $metrics = $this->web->listMetrics($filterString);
+        asort($metrics);
+        return $metrics;
     }
 }
