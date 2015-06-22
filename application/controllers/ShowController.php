@@ -55,20 +55,50 @@ class Graphite_ShowController extends Controller
         $this->view->images = $imgs;
     }
 
-    protected function loadTemplates()
+    protected function getTemplatePath($templateName = null)
     {
-        $dir = $this->Module()->getConfigDir() . '/templates';
+        $path = $this->Module()->getConfigDir() . '/templates';
+
+        if ($templateName !== null) {
+            $path .= '/' . $templateName . '.conf';
+        }
+
+        return $path;
+    }
+
+    protected function loadTemplate($name)
+    {
+        return $this->loadTemplates($name);
+    }
+
+    protected function loadTemplates($name = null)
+    {
+        $dir = $this->getTemplatePath();
         $templates = array();
 
         foreach (new DirectoryIterator($dir) as $file) {
             if ($file->isDot()) continue;
             $filename = $file->getFilename();
             if (substr($filename, -5) === '.conf') {
-                $name = substr($filename, 0, -5);
-                $templates[$name] = GraphTemplate::load(
+                $tname = substr($filename, 0, -5);
+                if ($name !== null) {
+                    if ($name !== $tname) continue;
+                }
+                $templates[$tname] = GraphTemplate::load(
                     file_get_contents($file->getPathname())
                 );
             }
+        }
+
+        if ($name !== null) {
+            if (! array_key_exists($name, $templates)) {
+                throw new NotFoundError(
+                    'The desired template "%s" doesn\'t exist',
+                    $name
+                );
+            }
+
+            return $templates[$name];
         }
 
         ksort($templates);
