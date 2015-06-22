@@ -114,9 +114,15 @@ class GraphTemplate
         );
     }
 
-    public function getTitle($vars)
+    public function getTitle($vars = array())
     {
         return $this->fillVars($this->attributes['title'], $vars);
+    }
+
+    public function setTitle($title)
+    {
+        $this->attributes['title'] = $title;
+        return $this;
     }
 
     /**
