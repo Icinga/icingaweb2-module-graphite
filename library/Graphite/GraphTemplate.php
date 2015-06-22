@@ -3,6 +3,7 @@
 namespace Icinga\Module\Graphite;
 
 use Icinga\Exception\ConfigurationError;
+use Icinga\Exception\ProgrammingError;
 use Icinga\Module\Graphite\GraphDatasource;
 use Icinga\Web\Url;
 
@@ -35,6 +36,23 @@ class GraphTemplate
         $tmpl = new static;
         $tmpl->parse($string);
         return $tmpl;
+    }
+
+    public function getDatasources()
+    {
+        return $this->datasources;
+    }
+
+    public function getDatasource($name)
+    {
+        if (! array_key_exists($name, $this->datasources)) {
+            throw new ProgrammingError(
+                'Trying to access invalid datasource "%s"',
+                $name
+            );
+        }
+
+        return $this->datasources[$name];
     }
 
     public function getFilterString()
