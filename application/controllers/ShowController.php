@@ -78,7 +78,7 @@ class Graphite_ShowController extends Controller
     protected function tabs()
     {
         return $this->view->tabs = Widget::create('tabs')->add('host', array(
-            'label' => 'Graphite - Single Host',
+            'label' => $this->translate('Graphite - Single Host'),
             'url' => $this->getRequest()->getUrl()
         ));
     }
