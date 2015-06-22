@@ -14,8 +14,6 @@ class GraphiteQuery
 
     protected $searchPattern;
 
-    protected $variablePattern = '/\$(\w+)/';
-
     public function __construct(GraphiteWeb $web)
     {
         $this->web = $web;
@@ -114,42 +112,12 @@ class GraphiteQuery
         return $this->replaceRemainingVariables($this->search);
     }
 
-    public function extractVariableNames($pattern)
-    {
-        if (preg_match_all($this->variablePattern, $pattern, $m)) {
-            return $m[1];
-        }
-
-        return array();
-    }
-
-    protected function extractVars($string, $pattern)
-    {
-        $vars = array();
-        $varnames = $this->extractVariableNames($pattern);
-
-        if (! empty($varnames)) {
-            $parts = preg_split($this->variablePattern, $pattern);
-            foreach ($parts as $key => $val) {
-                $parts[$key] = preg_quote($val, '/');
-            }
-
-            $regex = '/' . implode('([^\.]+?)', $parts) . '/';
-            if (preg_match($regex, $string, $m)) {
-                array_shift($m);
-                $vars = array_combine($varnames, $m);
-            }
-        }
-
-        return $vars;
-    }
-
     public function getImages(GraphTemplate $template)
     {
         $charts = array();
 
         foreach ($this->listMetrics() as $metric) {
-            $vars = $this->extractVars($metric, $this->getSearchPattern());
+            $vars = GraphiteUtil::extractVars($metric, $this->getSearchPattern());
             $charts[] = new GraphiteChart($this->web, $template, $metric, $vars);
         }
 

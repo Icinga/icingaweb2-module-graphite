@@ -1,6 +1,7 @@
 <?php
 
 use Icinga\Exception\NotFoundError;
+use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\GraphiteWeb;
 use Icinga\Module\Graphite\GraphTemplate;
 use Icinga\Web\Controller;
@@ -67,7 +68,7 @@ class Graphite_ShowController extends Controller
 
         $base = $this->Config()->get('global', 'host_pattern');
 
-        $varnames = $this->graphiteWeb->select()->from($base)->extractVariableNames($base);
+        $varnames = GraphiteUtil::extractVariableNames($base);
         $varnames = array_combine($varnames, $varnames);
 
         $this->view->filterColumns = $optional + $varnames;
