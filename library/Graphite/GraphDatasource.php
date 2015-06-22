@@ -98,6 +98,11 @@ class GraphDatasource
         return $this->path;
     }
 
+    public function getPath()
+    {
+        return $this->path;
+    }
+
     public function getColor()
     {
         return $this->color;
