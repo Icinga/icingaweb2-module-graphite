@@ -12,3 +12,40 @@ div.images {
     }
 
 }
+
+ul.legend {
+  background: #eee;
+  list-style-type: none;
+  margin: 0;
+  padding: 1em;
+  border: 1px solid #aaa;
+  max-width: 40em;
+
+  li {
+    display: inline-block;
+    width: 13em;
+  }
+
+  li div.color {
+    width: 1em;
+    height: 1em;
+    border: 1px solid #666;
+    margin-right: 0.5em;
+    float: left;
+  }
+
+  li a {
+    color: inherit;
+  }
+
+  li.disabled {
+    div.color {
+      border-style: dotted;
+    }
+
+    a {
+      font-style: italic;
+      text-decoration: line-through;
+    }
+  }
+}

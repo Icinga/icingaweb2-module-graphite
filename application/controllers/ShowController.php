@@ -23,6 +23,100 @@ class Graphite_ShowController extends Controller
         $graphite = $this->graphiteWeb = new GraphiteWeb($this->baseUrl);
     }
 
+    public function overviewAction()
+    {
+        $this->view->disabledDatasources = $disabled = $this->params->getValues('disabled');
+
+        if ($disable = $this->params->get('disableDatasource')) {
+            $url = $this->getRequest()->getUrl()->without('disableDatasource');
+            if (! in_array($disable, $disabled)) {
+                $url->getParams()->add('disabled', $disable);
+
+            }
+            $this->redirectNow($url);
+        }
+
+        if ($enable = $this->params->get('enableDatasource')) {
+            $url = $this->getRequest()->getUrl()->without('enableDatasource')->without('disabled');
+            $params = $url->getParams();
+            foreach ($disabled as $key) {
+                if ($key !== $enable) {
+                    $params->add('disabled', $key);
+                }
+            }
+            
+            $this->redirectNow($url);
+        }
+
+        $this->view->tabs->add('overview', array(
+            'label' => $this->translate('Graphite - Overview'),
+            'url'   => $this->getRequest()->getUrl()
+        ))->activate('overview');
+
+        $this->view->filterColumn = $this->params->get('filterColumn');
+        $this->view->filterValue  = $this->params->get('filterValue');
+        $this->view->templateName = $this->params->get('templateName');
+
+        $optional = array(null => '- please choose -');
+
+        $this->view->templates = $optional;
+        foreach ($this->loadTemplates() as $type => $template) {
+            $this->view->templates[$type] = $template->getTitle();
+        }
+        asort($this->view->templates);
+
+        $base = $this->Config()->get('global', 'host_pattern');
+
+        $varnames = $this->graphiteWeb->select()->from($base)->extractVariableNames($base);
+        $varnames = array_combine($varnames, $varnames);
+
+        $this->view->filterColumns = $optional + $varnames;
+
+        if ($this->view->filterColumn) {
+            if (array_key_exists($this->view->filterColumn, $this->view->filterColumns)) {
+
+                $this->view->filterValues = $optional + $this->graphiteWeb->select()
+                    ->from($base)
+                    ->listDistinct($this->view->filterColumn);
+            }
+        }
+
+        if (! $this->view->filterColumn || ! $this->view->filterValue || ! $this->view->templateName) {
+            return;
+        }
+
+        $imgs = array();
+
+        $template = $this->loadTemplate($this->view->templateName);
+        foreach ($disabled as $key) {
+            $template->getDatasource($key)->disable();
+        }
+
+        // $template->setTitle('$hostname: ' . $template->getTitle());
+        $template->setTitle('$hostname');
+        $this->view->template = $template;
+
+        $query = $this->graphiteWeb
+            ->select()
+            ->from(
+                array('host' => $base),
+                $template->getFilterString()
+            )
+            ->where($this->view->filterColumn, $this->view->filterValue);
+
+        // TODO: $max  = $query->getMaxValue();
+        $imgs = $query->getImages($template);
+
+        foreach ($imgs as $img) {
+            $img->setStart($this->params->get('start', '-1hours'))
+                ->setWidth($this->params->get('width', '300'))
+                ->setHeight($this->params->get('height', '150'))
+                ->showLegend(false);
+        }
+
+        $this->view->images = $imgs;
+    }
+
     public function hostAction()
     {
         $hostname = $this->view->hostname = $this->params->get('host');
