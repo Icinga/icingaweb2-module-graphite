@@ -129,8 +129,10 @@ class GraphTemplate
         foreach ($this->attributes as $k => $v) {
             $params->add($k, $this->fillVars($v, $vars));
         }
-        foreach ($this->datasources as $ds) {
-            $ds->addToUrl($url, $metric);
+        foreach (array_reverse($this->datasources) as $ds) {
+            if ($ds->isEnabled()) {
+                $ds->addToUrl($url, $metric);
+            }
         }
 
         return $url;
