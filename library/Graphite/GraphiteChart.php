@@ -77,7 +77,7 @@ class GraphiteChart
             'width'          => $this->width,
             '_salt'          => time() . '.000',
             'from'           => $this->from,
-            'graphOnly'      => (string) ! $this->showLegend,
+            // 'graphOnly'      => (string) ! $this->showLegend,
             'hideLegend'     => (string) ! $this->showLegend,
             'hideGrid'       => 'true',
             'vTitle'         => 'Percent',
