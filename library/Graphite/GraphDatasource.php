@@ -42,6 +42,8 @@ class GraphDatasource
 
     protected $stacked = false;
 
+    protected $enabled = true;
+
     public function __construct($path)
     {
         $this->path = $path;
@@ -74,6 +76,17 @@ class GraphDatasource
     public function setStacked()
     {
         $this->stacked = true;
+        return $this;
+    }
+
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    public function disable()
+    {
+        $this->enabled = false;
         return $this;
     }
 
