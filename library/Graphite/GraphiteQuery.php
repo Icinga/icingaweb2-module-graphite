@@ -14,6 +14,8 @@ class GraphiteQuery
 
     protected $searchPattern;
 
+    protected $variablePattern = '/\$(\w+)/';
+
     public function __construct(GraphiteWeb $web)
     {
         $this->web = $web;
@@ -112,15 +114,22 @@ class GraphiteQuery
         return $this->replaceRemainingVariables($this->search);
     }
 
+    public function extractVariableNames($pattern)
+    {
+        if (preg_match_all($this->variablePattern, $pattern, $m)) {
+            return $m[1];
+        }
+
+        return array();
+    }
+
     protected function extractVars($string, $pattern)
     {
-        $regexVar = '/\$(\w+)/';
         $vars = array();
+        $varnames = $this->extractVariableNames($pattern);
 
-        if (preg_match_all($regexVar, $pattern, $m)) {
-            $varnames = $m[1];
-
-            $parts = preg_split($regexVar, $pattern);
+        if (! empty($varnames)) {
+            $parts = preg_split($this->variablePattern, $pattern);
             foreach ($parts as $key => $val) {
                 $parts[$key] = preg_quote($val, '/');
             }
