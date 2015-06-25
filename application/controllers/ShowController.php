@@ -93,8 +93,14 @@ class Graphite_ShowController extends Controller
             $template->getDatasource($key)->disable();
         }
 
-        // $template->setTitle('$hostname: ' . $template->getTitle());
-        $template->setTitle('$hostname');
+        $title = $template->getTitle();
+        if (false === strpos($title, '$')) {
+            $template->setTitle('$hostname');
+        } else {
+            if (false === strpos($title, '$hostname')) {
+                $template->setTitle('$hostname: ' . $template->getTitle());
+            }
+        }
         $this->view->template = $template;
 
         $query = $this->graphiteWeb
