@@ -1,14 +1,16 @@
 <?php
 
+namespace Icinga\Module\Graphite\Controllers;
+
+use DirectoryIterator;
 use Icinga\Exception\NotFoundError;
 use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\GraphiteWeb;
 use Icinga\Module\Graphite\GraphTemplate;
 use Icinga\Web\Controller;
 use Icinga\Web\Widget;
-use \DirectoryIterator;
 
-class Graphite_ShowController extends Controller
+class ShowController extends Controller
 {
     protected $baseUrl;
 
