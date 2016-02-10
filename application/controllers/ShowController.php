@@ -115,16 +115,22 @@ class ShowController extends Controller
             ->where($this->view->filterColumn, $this->view->filterValue);
 
         // TODO: $max  = $query->getMaxValue();
-        $imgs = $query->getImages($template);
+        $start  = $this->params->get('start', '-1hours');
+        $width  = $this->params->get('width', '300');
+        $height = $this->params->get('height', '150');
 
-        foreach ($imgs as $img) {
-            $img->setStart($this->params->get('start', '-1hours'))
-                ->setWidth($this->params->get('width', '300'))
-                ->setHeight($this->params->get('height', '150'))
-                ->showLegend(false);
-        }
+        $this->view->width  = $width;
+        $this->view->height = $height;
 
-        $this->view->images = $imgs;
+        $this->view->images = $query->getWrappedImageLinks(
+            $template,
+            array(
+                'template' => $this->view->templateName,
+                'start'    => $start,
+                'width'    => $width,
+                'height'   => $height
+            )
+        );
     }
 
     public function graphAction()

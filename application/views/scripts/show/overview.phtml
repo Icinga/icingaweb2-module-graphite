@@ -31,8 +31,8 @@
 <?php endif ?>
 <?php endforeach ?>
 </ul>
-<?php foreach ($this->images as $img): ?>
-<img class="svg" src="<?= $img->getUrl() ?>" alt="<?= $img->getTitle() ?>" title="<?= $img->getTitle() ?>" />
+<?php foreach ($this->images as $title => $url): ?>
+<img src="<?= $url ?>" alt="" width="<?= $this->width ?>" height="<?= $this->height ?>" />
 <?php endforeach ?>
 <?php else: ?>
 <?= $this->translate('Please make your selection') ?>
