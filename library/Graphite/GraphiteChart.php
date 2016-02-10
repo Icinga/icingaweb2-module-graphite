@@ -111,7 +111,7 @@ class GraphiteChart
             'header'=>
                 "Accept-language: en\r\n".
                 "Content-type: application/x-www-form-urlencoded\r\n",
-                'content'=> $data
+//                'content'=> $data
             )
         );
 
