@@ -61,6 +61,7 @@ class ShowController extends Controller
         $this->view->templateName = $this->params->get('templateName');
 
         $optional = array(null => '- please choose -');
+        $any = array('*' => 'Show any');
 
         $this->view->templates = $optional;
         foreach ($this->loadTemplates() as $type => $template) {
@@ -78,7 +79,7 @@ class ShowController extends Controller
         if ($this->view->filterColumn) {
             if (array_key_exists($this->view->filterColumn, $this->view->filterColumns)) {
 
-                $this->view->filterValues = $optional + $this->graphiteWeb->select()
+                $this->view->filterValues = $optional + $any + $this->graphiteWeb->select()
                     ->from($base)
                     ->listDistinct($this->view->filterColumn);
             }
