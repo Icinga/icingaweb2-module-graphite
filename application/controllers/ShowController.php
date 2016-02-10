@@ -126,6 +126,46 @@ class ShowController extends Controller
         $this->view->images = $imgs;
     }
 
+    public function graphAction()
+    {
+        $base = $this->Config()->get('global', 'host_pattern');
+
+        $template = $this->loadTemplate($this->params->shift('template'));
+        $start    = $this->params->shift('start', '-1hours');
+        $width    = $this->params->shift('width', '300');
+        $height   = $this->params->shift('height', '150');
+
+        $title = $template->getTitle();
+        if (false === strpos($title, '$')) {
+            $template->setTitle('$hostname');
+        } else {
+            if (false === strpos($title, '$hostname')) {
+                $template->setTitle('$hostname: ' . $template->getTitle());
+            }
+        }
+
+        $query = $this->graphiteWeb
+            ->select()
+            ->from(
+                array('host' => $base),
+                $template->getFilterString()
+            );
+
+        foreach ($this->params->toArray() as $val) {
+            $query->where($val[0], $val[1]);
+        }
+
+        $img = current($query->getImages($template));
+
+        $img->setStart($start)
+            ->setWidth($width)
+            ->setHeight($height)
+            ->showLegend(false);
+
+        $this->_helper->layout()->disableLayout();
+        $this->view->image = $img->fetchImage();
+    }
+
     public function hostAction()
     {
         $hostname = $this->view->hostname = $this->params->get('host');
