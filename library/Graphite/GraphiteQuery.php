@@ -96,6 +96,21 @@ class GraphiteQuery
         return $charts;
     }
 
+    public function getWrappedImageLinks(GraphTemplate $template, $params)
+    {
+        $links = array();
+
+        foreach ($this->listMetrics() as $metric) {
+            $vars = GraphiteUtil::extractVars($metric, $this->getSearchPattern());
+            $links[] = Url::fromPath(
+                'graphite/show/graph',
+                array_merge($params, $vars)
+            );
+        }
+
+        return $links;
+    }
+
     /**
      * List all metrics fitting this query
      *
