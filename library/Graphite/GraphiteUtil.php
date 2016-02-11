@@ -75,7 +75,7 @@ class GraphiteUtil
                 $parts[$key] = preg_quote($val, '/');
             }
 
-            $regex = '/' . implode('([^\.]+?)', $parts) . '/';
+            $regex = '/^' . implode('([^\.]+?)', $parts) . '$/';
             if (preg_match($regex, $metric, $m)) {
                 array_shift($m);
                 $vars = array_combine($varnames, $m);
