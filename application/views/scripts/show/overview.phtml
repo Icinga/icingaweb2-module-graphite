@@ -7,6 +7,12 @@
 <?php if ($this->filterColumn): ?>
  = <?= $this->formSelect('filterValue', $this->filterValue, array('class' => 'autosubmit'), $this->filterValues) ?>
 <?php endif ?>
+<?= $this->formSelect('start', $this->start, array('class' => 'autosubmit'), array(
+    '-15min' => '15 minutes',
+    '-60min' => '1 hour',
+    '-2hour' => '4 hours',
+    '-1day' => '1 day',
+)) ?>
 </form>
 </div>
 
