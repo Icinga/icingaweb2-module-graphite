@@ -20,7 +20,7 @@
 <?php if (is_array($this->images)): ?>
 <?= $this->render('show/legend.phtml') ?>
 <?php foreach ($this->images as $title => $url): ?>
-<img src="<?= $url ?>" alt="" width="<?= $this->width ?>" height="<?= $this->height ?>" />
+<img src="<?= $url ?>" class="graphiteImg" alt="" width="<?= $this->width ?>" height="<?= $this->height ?>" />
 <?php endforeach ?>
 <?php else: ?>
 <?= $this->translate('Please make your selection') ?>
