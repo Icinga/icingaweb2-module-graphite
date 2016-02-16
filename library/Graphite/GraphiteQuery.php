@@ -4,6 +4,7 @@ namespace Icinga\Module\Graphite;
 
 use Icinga\Module\Graphite\GraphiteWeb;
 use Icinga\Web\Url;
+use Icinga\Web\UrlParams;
 
 /**
  * Graphite query
@@ -99,13 +100,26 @@ class GraphiteQuery
     public function getWrappedImageLinks(GraphTemplate $template, $params)
     {
         $links = array();
+        if ($params instanceof UrlParams) {
+            $urlParams = $params;
+        } else {
+            $urlParams = new UrlParams();
+            foreach ($params as $k => $v) {
+                if (is_array($v)) {
+                    $urlParams->addValues($k, $v);
+                } else {
+                    $urlParams->add($k, $v);
+                }
+            }
+        }
 
         foreach ($this->listMetrics() as $metric) {
+            $params = clone($urlParams);
             $vars = GraphiteUtil::extractVars($metric, $this->getSearchPattern());
-            $links[] = Url::fromPath(
-                'graphite/show/graph',
-                array_merge($params, $vars)
-            );
+            $params->mergeValues($vars);
+            $url = Url::fromPath('graphite/show/graph')->setParams($params);
+
+            $links[] = $url;
         }
 
         return $links;
