@@ -7,12 +7,6 @@ installation in your
 [Icinga Web 2](https://www.icinga.org/icinga/screenshots/icinga-web-2/) web
 frontend.
 
-
-> **Note**
->
-> This is a showcase module and to be considered an unsupported prototype
-> unless explicitely stated otherwise.
-
 ## Features
 
 * Global overview underneath `Reporting` menu section
@@ -21,7 +15,7 @@ frontend.
 
 ## Requirements
 
-* Icinga Web 2 v2.0.0 (or git snapshot younger than 5.9.2015 using namespaced controllers)
+* Icinga Web 2 v2.1.0
 * Icinga 2 v2.4.0 using the new Graphite tree in ([#9461](https://dev.icinga.org/issues/9461)).
 * Graphite and Graphite Web
 
@@ -54,8 +48,6 @@ to the Graphite web host.
 
     [global]
     web_url = http://my.graphite.web
-
-Modify the `host_pattern` attribute to match your current tree.
 
 Example for Icinga 2 v2.4.x:
 
@@ -95,7 +87,6 @@ Graphite and Graphite Web running, e.g. as docker instance:
 
 Icinga Web 2 with Graphite module enabled
 
-    [global]
+    [graphite]
     web_url = http://localhost:9090
-    host_pattern = icinga2.$hostname
 
