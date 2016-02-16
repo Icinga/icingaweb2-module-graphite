@@ -84,4 +84,23 @@ class GraphiteUtil
 
         return $vars;
     }
+
+    public static function replace($string, $key, $replacement)
+    {
+        return preg_replace(
+            '/\$' . preg_quote($key) . '(\.|$)/',
+            $replacement . '\1',
+            $string
+        );
+    }
+
+    /**
+     * Replace all variables ($some_thing) with an asterisk
+     *
+     * TODO: I'd opt for \w instead of [^\.]
+     */
+    public static function replaceRemainingVariables($string)
+    {
+        return preg_replace('/\$[^\.]+(\.|$)/', '*\1', $string);
+    }
 }

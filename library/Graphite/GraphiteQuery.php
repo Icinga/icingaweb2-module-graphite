@@ -57,7 +57,7 @@ class GraphiteQuery
             if ($pattern === null) {
                 $this->search = current($base);
             } else {
-                $this->search = $this->replace($pattern, $key, current($base));
+                $this->search = GraphiteUtil::replace($pattern, $key, current($base));
             }
         } else {
             // TODO: well... patterns might also work for non-aliases $base's
@@ -78,7 +78,7 @@ class GraphiteQuery
      */
     public function where($column, $search)
     {
-        $this->search = $this->replace($this->search, $column, $search);
+        $this->search = GraphiteUtil::replace($this->search, $column, $search);
         return $this;
     }
 
@@ -184,7 +184,7 @@ class GraphiteQuery
             return array();
         }
 
-        $pattern = $this->replaceRemainingVariables($found);
+        $pattern = GraphiteUtil::replaceRemainingVariables($found);
         $metrics = $this->listMetrics($pattern);
         $distinct = array();
 
@@ -210,30 +210,11 @@ class GraphiteQuery
         return $this->searchPattern;
     }
 
-    protected function replace($string, $key, $replacement)
-    {
-        return preg_replace(
-            '/\$' . preg_quote($key) . '(\.|$)/',
-            $replacement . '\1',
-            $string
-        );
-    }
-
-    /**
-     * Replace all variables ($some_thing) with an asterisk
-     *
-     * TODO: I'd opt for \w instead of [^\.]
-     */
-    protected function replaceRemainingVariables($string)
-    {
-        return preg_replace('/\$[^\.]+(\.|$)/', '*\1', $string);
-    }
-
     /**
      * Create a filter string allowing us to filter metrics
      */
     protected function toFilterString()
     {
-        return $this->replaceRemainingVariables($this->search);
+        return GraphiteUtil::replaceRemainingVariables($this->search);
     }
 }
