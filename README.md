@@ -35,18 +35,17 @@ might be please check the module path in your Icinga Web 2 configuration.
 
 Copy the sample configuration to `/etc/icingaweb2/modules` like so:
 
-    mkdir /etc/icingaweb2/modules/graphite
-    cp -rv sample-config/* /etc/icingaweb2/modules/graphite/
+    cp -rv sample-config/icinga2 /etc/icingaweb2/modules/graphite
 
 Change permissions (Note: Change `apache` to the user your
 webserver is running as). Example for RHEL/CentOS/Fedora:
 
-    chown -R apache:apache /etc/icingaweb2/modules/graphite
+    chown -R apache:icingaweb2 /etc/icingaweb2/modules/graphite
 
 Edit `/etc/icingaweb2/modules/graphite/config.ini` and set `web_url`
 to the Graphite web host.
 
-    [global]
+    [graphite]
     web_url = http://my.graphite.web
 
 Example for Icinga 2 v2.4.x:
