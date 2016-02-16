@@ -8,8 +8,16 @@
 <?php if (count($imgs) > 0): ?>
 
 <div class="images"><h3><?= $this->escape(ucfirst($type)) ?></h3>
-<?php foreach ($imgs as $img): ?>
-<img class="svg" src="<?= $img->getUrl() ?>" alt="<?= $img->getTitle() ?>" title="<?= $img->getTitle() ?>" />
+<?php $template = $this->templates[$type] ?>
+<?= $this->partial(
+    'show/legend.phtml',
+    array(
+        'template'            => $template,
+        'disabledDatasources' => $this->disabledDatasources
+    )
+) ?>
+<?php foreach ($imgs as $title => $url): ?>
+<img src="<?= $url ?>" class="graphiteImg" alt="" width="<?= $this->width ?>" height="<?= $this->height ?>" />
 <?php endforeach ?>
 </div>
 
