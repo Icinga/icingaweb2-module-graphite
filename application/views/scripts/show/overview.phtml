@@ -2,7 +2,7 @@
 <?= $this->tabs ?>
 <h1><?= $this->translate('Graphite') ?></h1>
 <form action="<?= $this->url()->without('disabled') ?>" method="get">
-<?= $this->translate('Template') ?> <?= $this->formSelect('templateName', $this->templateName, array('class' => 'autosubmit'), $this->templates) ?>
+<?= $this->translate('Template') ?> <?= $this->formSelect('template', $this->templateName, array('class' => 'autosubmit'), $this->templates) ?>
  <?= $this->translate('Filter') ?> <?= $this->formSelect('filterColumn', $this->filterColumn, array('class' => 'autosubmit'), $this->filterColumns) ?>
 <?php if ($this->filterColumn): ?>
  = <?= $this->formSelect('filterValue', $this->filterValue, array('class' => 'autosubmit'), $this->filterValues) ?>
