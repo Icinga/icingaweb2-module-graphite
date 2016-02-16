@@ -103,4 +103,9 @@ class GraphiteUtil
     {
         return preg_replace('/\$[^\.]+(\.|$)/', '*\1', $string);
     }
+
+    public static function escape($string)
+    {
+        return preg_replace('/[^a-zA-Z0-9]/', '_', $string);
+    }
 }
