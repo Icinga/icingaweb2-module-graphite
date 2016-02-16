@@ -1,0 +1,26 @@
+<div class="controls">
+<?= $this->tabs ?>
+<h1><?= $this->hostname ?>: <?= $this->service ?></h1>
+</div>
+
+<div class="content">
+<?php foreach ($this->images as $type => $imgs): ?>
+<?php if (count($imgs) > 0): ?>
+
+<div class="images"><h3><?= $this->escape(ucfirst($type)) ?></h3>
+<?php $template = $this->templates[$type] ?>
+<?= $this->partial(
+    'show/legend.phtml',
+    array(
+        'template'            => $template,
+        'disabledDatasources' => $this->disabledDatasources
+    )
+) ?>
+<?php foreach ($imgs as $title => $url): ?>
+<img src="<?= $url ?>" class="graphiteImg" alt="" width="<?= $this->width ?>" height="<?= $this->height ?>" />
+<?php endforeach ?>
+</div>
+
+<?php endif ?>
+<?php endforeach ?>
+</div>
