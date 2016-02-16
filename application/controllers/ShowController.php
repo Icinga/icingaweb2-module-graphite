@@ -170,6 +170,7 @@ class ShowController extends Controller
             ->showLegend(false);
 
         $this->_helper->layout()->disableLayout();
+        header('Content-Type: image/png');
         $this->view->image = $img->fetchImage();
     }
 

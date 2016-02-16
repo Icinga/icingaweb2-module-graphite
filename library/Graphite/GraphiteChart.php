@@ -116,7 +116,6 @@ class GraphiteChart
         );
 
         $context = stream_context_create($options);
-        header('Content-Type: image/png');
         return file_get_contents($this->getUrl(), false, $context);
     }
 }
