@@ -35,10 +35,8 @@ class ShowController extends Controller
         $config = $this->Config();
         $this->templateStore = new TemplateStore();
         $this->baseUrl = $this->Config()->get('graphite', 'web_url');
-        if ($this->template = $this->view->template = $this->loadTemplate()) {
-            $graphite = $this->graphiteWeb = new GraphiteWeb($this->baseUrl);
-        }
-
+        $graphite = $this->graphiteWeb = new GraphiteWeb($this->baseUrl);
+        $this->template = $this->view->template = $this->loadTemplate();
         $this->params->shift('r');
     }
 
