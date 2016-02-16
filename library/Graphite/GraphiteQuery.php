@@ -78,7 +78,12 @@ class GraphiteQuery
      */
     public function where($column, $search)
     {
-        $this->search = GraphiteUtil::replace($this->search, $column, $search);
+        $this->search = GraphiteUtil::replace(
+            $this->search,
+            $column,
+            GraphiteUtil::escape($search)
+        );
+
         return $this;
     }
 
