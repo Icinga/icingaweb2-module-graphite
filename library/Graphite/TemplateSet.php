@@ -3,6 +3,7 @@
 namespace Icinga\Module\Graphite;
 
 use DirectoryIterator;
+use Icinga\Exception\NotFoundError;
 
 class TemplateSet
 {
@@ -82,13 +83,14 @@ class TemplateSet
                 if ($name !== null) {
                     if ($name !== $tname) continue;
                 }
-                $templates[$tname] = GraphTemplate::load(
+                $templates[$this->name . '/' . $tname] = GraphTemplate::load(
                     file_get_contents($file->getPathname())
                 )->prefillFilterString($this->getBasePatterns());
             }
         }
 
         if ($name !== null) {
+            $name = $this->name . '/' . $name;
             if (! array_key_exists($name, $templates)) {
                 throw new NotFoundError(
                     'The desired template "%s" doesn\'t exist',
