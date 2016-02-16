@@ -59,7 +59,7 @@ class TemplateSet
     public function extendEnumTemplates(& $enum)
     {
         foreach ($this->loadTemplates() as $key => $template) {
-            $enum[sprintf('%s/%s', $this->name, $key)] = $template->getTitle();
+            $enum[$key] = $template->getTitle();
         }
 
         return $enum;
@@ -74,23 +74,28 @@ class TemplateSet
     {
         $dir = $this->basedir;
         $templates = array();
+        if ($name !== null && strpos($name, '/') === false) {
+            $name = $this->name . '/' . $name;
+        }
 
         foreach (new DirectoryIterator($dir) as $file) {
             if ($file->isDot()) continue;
             $filename = $file->getFilename();
             if (substr($filename, -5) === '.conf') {
                 $tname = substr($filename, 0, -5);
+                $key = $this->name . '/' . $tname;
+
                 if ($name !== null) {
-                    if ($name !== $tname) continue;
+                    if ($name !== $key) continue;
                 }
-                $templates[$this->name . '/' . $tname] = GraphTemplate::load(
+                $templates[$key] = GraphTemplate::load(
                     file_get_contents($file->getPathname())
                 )->prefillFilterString($this->getBasePatterns());
             }
         }
 
         if ($name !== null) {
-            $name = $this->name . '/' . $name;
+
             if (! array_key_exists($name, $templates)) {
                 throw new NotFoundError(
                     'The desired template "%s" doesn\'t exist',
