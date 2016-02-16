@@ -1,8 +1,8 @@
 <?php
 
-namespace Icinga\Module\Graphite;
+namespace Icinga\Module\Graphite\ProvidedHook\Monitoring;
 
-use Icinga\Module\Monitoring\Web\Hook\ServiceActionsHook;
+use Icinga\Module\Monitoring\Hook\ServiceActionsHook;
 use Icinga\Module\Monitoring\Object\Service;
 use Icinga\Web\Url;
 
