@@ -45,7 +45,7 @@ class GraphTemplate
 
     public function getDatasource($name)
     {
-        if (! array_key_exists($name, $this->datasources)) {
+        if (! $this->hasDatasource($name)) {
             throw new ProgrammingError(
                 'Trying to access invalid datasource "%s"',
                 $name
@@ -53,6 +53,11 @@ class GraphTemplate
         }
 
         return $this->datasources[$name];
+    }
+
+    public function hasDatasource($name)
+    {
+        return array_key_exists($name, $this->datasources);
     }
 
     public function getFilterString()
