@@ -84,7 +84,7 @@ class TemplateSet
                 }
                 $templates[$tname] = GraphTemplate::load(
                     file_get_contents($file->getPathname())
-                );
+                )->prefillFilterString($this->getBasePatterns());
             }
         }
 

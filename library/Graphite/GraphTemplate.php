@@ -60,6 +60,19 @@ class GraphTemplate
         return $this->filterString;
     }
 
+    public function prefillFilterString($patterns)
+    {
+        foreach ($patterns as $key => $replacement) {
+            $this->filterString = GraphiteUtil::replace(
+                $this->filterString,
+                $key,
+                $replacement
+            );
+        }
+
+        return $this;
+    }
+
     protected function parse($string)
     {
         $lines = preg_split('/\n/', $string);
