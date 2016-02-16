@@ -9,9 +9,8 @@ frontend.
 
 ## Features
 
-* Global overview underneath `Reporting` menu section
-* Detail view actions: Jump from host/service detail view directly into Graphite Web
-
+* Global overview underneath `History / Graphite` menu section
+* Detail view actions: render graphs for hosts and services
 
 ## Requirements
 
