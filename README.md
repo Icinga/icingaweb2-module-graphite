@@ -48,19 +48,20 @@ Web 2 module path. Enable the graphite module in your Icinga Web 2 frontend
 the box.
 
 NB: It is best practice to install 3rd party modules into a distinct module
-folder like /usr/share/icingaweb2/modules. In case you don't know where this
+folder for example `/usr/share/icingaweb2/modules`. In case you don't know where this
 might be please check the module path in your Icinga Web 2 configuration.
 
 ## Configuration
 
 Copy the sample configuration to `/etc/icingaweb2/modules` like so:
 
-    cp -rv sample-config/icinga2 /etc/icingaweb2/modules/graphite
+    mkdir -p /etc/icingaweb2/modules/graphite
+    cp -rv sample-config/icinga2/* /etc/icingaweb2/modules/graphite
 
-Change permissions (Note: Change `apache` to the user your
-webserver is running as). Example for RHEL/CentOS/Fedora:
+Change permissions:
 
-    chown -R apache:icingaweb2 /etc/icingaweb2/modules/graphite
+    chown -R root:icingaweb2 /etc/icingaweb2/modules/graphite
+    chmod -R 2755 /etc/icingaweb2/modules/graphite
 
 Edit `/etc/icingaweb2/modules/graphite/config.ini` and set `web\_url`
 to the Graphite web host.
