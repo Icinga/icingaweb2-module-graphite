@@ -168,7 +168,7 @@ class ShowController extends Controller
             if (! array_key_exists('icingaHost', $patterns)) continue;
 
             foreach ($set->loadTemplates() as $key => $template) {
-                if (strpos($template->getFilterString(), '$service') !== false) continue;
+                if (strpos($template->getFilterString(), $service) !== false) continue;
 
                 $imgParams = array(
                     'template' => $key,
@@ -228,7 +228,7 @@ class ShowController extends Controller
             if (! array_key_exists('icingaHost', $patterns)) continue;
 
             foreach ($set->loadTemplates() as $key => $template) {
-                if (strpos($template->getFilterString(), '$service') === false) continue;
+                if (strpos($template->getFilterString(), $service) === false) continue;
 
                 $imgParams = array(
                     'template' => $key,
@@ -289,7 +289,7 @@ class ShowController extends Controller
 
             foreach ($set->loadTemplates() as $key => $template) {
 
-                if (strpos($template->getFilterString(), '$service') === false) continue;
+                if (strpos($template->getFilterString(), $service) === false) continue;
 
                 $this->view->templates[$key] = $template;
 
