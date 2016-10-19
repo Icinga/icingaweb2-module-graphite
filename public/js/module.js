@@ -46,7 +46,7 @@
             $.each(this.imgClones, this.reloadContainerImgs.bind(self));
         },
 
-        reloadContainerImgs(idx, imgs)
+        reloadContainerImgs: function(idx, imgs)
         {
             $.each(imgs, this.reloadImg);
         },
