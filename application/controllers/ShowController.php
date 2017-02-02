@@ -133,7 +133,7 @@ class ShowController extends Controller
             );
 
         foreach ($this->params->toArray() as $val) {
-            $query->where($val[0], $val[1]);
+            $query->where($val[0], urldecode($val[1]));
         }
 
         $img = $this->applyGraphParams(current($query->getImages($template)))
