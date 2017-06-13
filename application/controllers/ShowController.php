@@ -228,7 +228,15 @@ class ShowController extends Controller
             if (! array_key_exists('icingaHost', $patterns)) continue;
 
             foreach ($set->loadTemplates() as $key => $template) {
-                if (strpos($template->getFilterString(), '$service') === false) continue;
+                # TS: use only templates whose graphite target string contains
+                # the name of the service
+                $resolvedFilter =
+                   GraphiteUtil::replace(
+                      GraphiteUtil::replace(
+                         $template->getFilterString(),
+                            'service', $service),
+                      'hostname', $hostname);
+                if (strpos($resolvedFilter, $service) === false) continue;
 
                 $imgParams = array(
                     'template' => $key,
