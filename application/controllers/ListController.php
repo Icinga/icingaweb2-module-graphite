@@ -17,6 +17,24 @@ class ListController extends Controller
         $this->setupSortControl(['host_display_name' => mt('monitoring', 'Hostname')], $hosts);
     }
 
+    public function servicesAction()
+    {
+        $this->view->services = $services = $this->backend->select()->from('servicestatus', [
+            'host_name',
+            'host_display_name',
+            'service_description',
+            'service_display_name'
+        ]);
+        $this->applyRestriction('monitoring/filter/objects', $services);
+        $this->filterQuery($services);
+        $this->setupPaginationControl($services);
+        $this->setupLimitControl();
+        $this->setupSortControl([
+            'service_display_name'  => mt('monitoring', 'Service Name'),
+            'host_display_name'     => mt('monitoring', 'Hostname')
+        ], $services);
+    }
+
     /**
      * Apply filters on a DataView
      *
