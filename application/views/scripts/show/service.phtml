@@ -1,7 +1,12 @@
+<?php
+/** @var \Icinga\Web\View $this */
+
+if (! $compact): ?>
 <div class="controls">
 <?= $this->tabs ?>
 <h1><?= $this->hostname ?>: <?= $this->service ?></h1>
 </div>
+<?php endif ?>
 
 <div class="content">
 <?php foreach ($this->images as $type => $imgs): ?>
@@ -23,4 +28,9 @@
 
 <?php endif ?>
 <?php endforeach ?>
+
+<?php if (! isset($title)): ?>
+<p><?= $this->translate('No graphs found') ?></p>
+<?php endif ?>
+
 </div>
