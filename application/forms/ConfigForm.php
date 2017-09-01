@@ -31,7 +31,9 @@ class ConfigForm extends BaseConfigForm
                 'graphite_web_user',
                 [
                     'label'         => $this->translate('Graphite Web user'),
-                    'description'   => $this->translate('A user with access to your Graphite Web'),
+                    'description'   => $this->translate(
+                        'A user with access to your Graphite Web via HTTP basic authentication'
+                    ),
                     'validators'    => [new HttpUserValidator()]
                 ]
             ],
