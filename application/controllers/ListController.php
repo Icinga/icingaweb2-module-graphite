@@ -4,11 +4,18 @@ namespace Icinga\Module\Graphite\Controllers;
 
 use Icinga\Module\Monitoring\Controller;
 use Icinga\Module\Monitoring\DataView\DataView;
+use Icinga\Web\Url;
 
 class ListController extends Controller
 {
     public function hostsAction()
     {
+        $this->addTitleTab(
+            'hosts',
+            mt('monitoring', 'Hosts'),
+            mt('monitoring', 'List hosts')
+        );
+
         $this->view->hosts = $hosts = $this->backend->select()->from('hoststatus', ['host_name', 'host_display_name']);
         $this->applyRestriction('monitoring/filter/objects', $hosts);
         $this->filterQuery($hosts);
@@ -19,6 +26,12 @@ class ListController extends Controller
 
     public function servicesAction()
     {
+        $this->addTitleTab(
+            'services',
+            mt('monitoring', 'Services'),
+            mt('monitoring', 'List services')
+        );
+
         $this->view->services = $services = $this->backend->select()->from('servicestatus', [
             'host_name',
             'host_display_name',
@@ -44,5 +57,22 @@ class ListController extends Controller
     {
         $this->setupFilterControl($dataView, null, null, ['format', 'stateType', 'addColumns', 'problems']);
         $this->handleFormatRequest($dataView);
+    }
+
+    /**
+     * Add title tab
+     *
+     * @param   string  $action
+     * @param   string  $title
+     * @param   string  $tip
+     */
+    protected function addTitleTab($action, $title, $tip)
+    {
+        $this->getTabs()->add($action, [
+            'title'     => $tip,
+            'label'     => $title,
+            'url'       => Url::fromRequest(),
+            'active'    => true
+        ]);
     }
 }
