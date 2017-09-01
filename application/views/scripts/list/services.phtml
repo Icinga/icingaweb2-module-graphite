@@ -1,4 +1,6 @@
 <?php
+
+use Icinga\Module\Graphite\EmbedGraphs;
 use Icinga\Web\Url;
 
 /** @var \Icinga\Web\View $this */
@@ -35,14 +37,7 @@ if (! $compact): ?>
             'service'   => $service->service_description
         ])
     ) ?></h2>
-    <div class="container" data-base-target="_main" data-last-update="-1" data-icinga-refresh="15" data-icinga-url="<?=
-        // TODO(ak): EL says "<div class="container" data-icinga-url="..." /> is enough", but this seems not to work for me
-        $this->href('graphite/show/service', [
-            'host'      => $service->host_name,
-            'service'   => $service->service_description,
-            'view'      => 'compact'
-        ])
-    ?>"></div>
+    <?= EmbedGraphs::service($service->host_name, $service->service_description) ?>
 <?php endforeach ?>
 <?php if ($services->hasMore()): ?>
     <div class="action-links">

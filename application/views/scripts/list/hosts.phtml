@@ -1,4 +1,6 @@
 <?php
+
+use Icinga\Module\Graphite\EmbedGraphs;
 use Icinga\Web\Url;
 
 /** @var \Icinga\Web\View $this */
@@ -27,13 +29,7 @@ if (! $compact): ?>
             : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
         Url::fromPath('monitoring/host/show', ['host' => $host->host_name])
     ) ?></h2>
-    <div class="container" data-base-target="_main" data-last-update="-1" data-icinga-refresh="15" data-icinga-url="<?=
-        // TODO(ak): EL says "<div class="container" data-icinga-url="..." /> is enough", but this seems not to work for me
-        $this->href('graphite/show/host', [
-            'host'  => $host->host_name,
-            'view'  => 'compact'
-        ])
-    ?>"></div>
+    <?= EmbedGraphs::host($host->host_name) ?>
 <?php endforeach ?>
 <?php if ($hosts->hasMore()): ?>
     <div class="action-links">
