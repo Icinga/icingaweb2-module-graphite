@@ -24,32 +24,34 @@ if ($filterEditor->getFilter()->isEmpty()) {
     echo '<p>' . $this->escape($this->translate('Please specify a filter')) . '</p>';
 } elseif ($services->hasResult()) {
     foreach ($services->peekAhead($compact) as $service) {
-        echo '<h2>'
-            . $this->qlink(
-                $service->host_name === $service->host_display_name
-                    ? $service->host_display_name
-                    : $service->host_display_name . ' (' . $this->escape($service->host_name) . ')',
-                Url::fromPath('monitoring/host/show', ['host' => $service->host_name]),
-                null,
-                ['data-base-target' => '_next']
-            )
-            . '&#58; '
-            . $this->qlink(
-                $service->service_description === $service->service_display_name
-                    ? $service->service_display_name
-                    : $service->service_display_name . ' (' . $this->escape($service->service_description) . ')',
-                Url::fromPath('monitoring/service/show', [
-                    'host'      => $service->host_name,
-                    'service'   => $service->service_description
-                ]),
-                null,
-                ['data-base-target' => '_next']
-            )
-            . '</h2>';
+        if (! $compact) {
+            echo '<h2>'
+                . $this->qlink(
+                    $service->host_name === $service->host_display_name
+                        ? $service->host_display_name
+                        : $service->host_display_name . ' (' . $this->escape($service->host_name) . ')',
+                    Url::fromPath('monitoring/host/show', ['host' => $service->host_name]),
+                    null,
+                    ['data-base-target' => '_next']
+                )
+                . '&#58; '
+                . $this->qlink(
+                    $service->service_description === $service->service_display_name
+                        ? $service->service_display_name
+                        : $service->service_display_name . ' (' . $this->escape($service->service_description) . ')',
+                    Url::fromPath('monitoring/service/show', [
+                        'host' => $service->host_name,
+                        'service' => $service->service_description
+                    ]),
+                    null,
+                    ['data-base-target' => '_next']
+                )
+                . '</h2>';
+        }
         echo EmbedGraphs::service($service->host_name, $service->service_description);
     }
 
-    if ($services->hasMore()) {
+    if (! $compact && $services->hasMore()) {
         echo '<div class="action-links">'
             . $this->qlink(
                 mt('monitoring', 'Show More'),
