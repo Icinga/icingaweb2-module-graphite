@@ -29,7 +29,9 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 $host->host_name === $host->host_display_name
                     ? $host->host_display_name
                     : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
-                Url::fromPath('monitoring/host/show', ['host' => $host->host_name])
+                Url::fromPath('monitoring/host/show', ['host' => $host->host_name]),
+                null,
+                ['data-base-target' => '_next']
             )
             . '</h2>';
         echo EmbedGraphs::host($host->host_name);

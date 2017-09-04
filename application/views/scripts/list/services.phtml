@@ -29,7 +29,9 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 $service->host_name === $service->host_display_name
                     ? $service->host_display_name
                     : $service->host_display_name . ' (' . $this->escape($service->host_name) . ')',
-                Url::fromPath('monitoring/host/show', ['host' => $service->host_name])
+                Url::fromPath('monitoring/host/show', ['host' => $service->host_name]),
+                null,
+                ['data-base-target' => '_next']
             )
             . '&#58; '
             . $this->qlink(
@@ -39,7 +41,9 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 Url::fromPath('monitoring/service/show', [
                     'host'      => $service->host_name,
                     'service'   => $service->service_description
-                ])
+                ]),
+                null,
+                ['data-base-target' => '_next']
             )
             . '</h2>';
         echo EmbedGraphs::service($service->host_name, $service->service_description);
