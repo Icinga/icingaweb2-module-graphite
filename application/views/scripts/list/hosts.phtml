@@ -24,6 +24,8 @@ if ($filterEditor->getFilter()->isEmpty()) {
     echo '<p>' . $this->escape($this->translate('Please specify a filter')) . '</p>';
 } elseif ($hosts->hasResult()) {
     foreach ($hosts->peekAhead($compact) as $host) {
+        echo '<div class="graphs-host">';
+
         if (! $compact) {
             echo '<h2>'
                 . $this->qlink(
@@ -37,6 +39,8 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 . '</h2>';
         }
         echo EmbedGraphs::host($host->host_name);
+
+        echo '</div>';
     }
 
     if (! $compact && $hosts->hasMore()) {
