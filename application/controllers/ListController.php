@@ -5,9 +5,17 @@ namespace Icinga\Module\Graphite\Controllers;
 use Icinga\Module\Monitoring\Controller;
 use Icinga\Module\Monitoring\DataView\DataView;
 use Icinga\Web\Url;
+use Icinga\Web\Widget\Tabextension\DashboardAction;
+use Icinga\Web\Widget\Tabextension\MenuAction;
 
 class ListController extends Controller
 {
+    public function init()
+    {
+        parent::init();
+        $this->getTabs()->extend(new DashboardAction())->extend(new MenuAction());
+    }
+
     public function hostsAction()
     {
         $this->addTitleTab(
