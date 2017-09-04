@@ -4,6 +4,7 @@ use Icinga\Module\Graphite\EmbedGraphs;
 use Icinga\Web\Url;
 
 /** @var \Icinga\Web\View $this */
+/** @var \Icinga\Web\Widget\FilterEditor $filterEditor */
 /** @var \Icinga\Module\Monitoring\DataView\DataView $services */
 
 if (! $compact): ?>
@@ -18,38 +19,47 @@ if (! $compact): ?>
 </div>
 <?php endif ?>
 <div class="content">
-<?php if (! $services->hasResult()): ?>
-    <p><?= mt('monitoring', 'No services found matching the filter.') ?></p>
-</div>
-<?php return; endif ?>
-<?php foreach ($services->peekAhead($compact) as $service): ?>
-    <h2><?= $this->qlink(
-        $service->host_name === $service->host_display_name
-            ? $service->host_display_name
-            : $service->host_display_name . ' (' . $this->escape($service->host_name) . ')',
-        Url::fromPath('monitoring/host/show', ['host' => $service->host_name])
-    ) ?>&#58; <?= $this->qlink(
-        $service->service_description === $service->service_display_name
-            ? $service->service_display_name
-            : $service->service_display_name . ' (' . $this->escape($service->service_description) . ')',
-        Url::fromPath('monitoring/service/show', [
-            'host'      => $service->host_name,
-            'service'   => $service->service_description
-        ])
-    ) ?></h2>
-    <?= EmbedGraphs::service($service->host_name, $service->service_description) ?>
-<?php endforeach ?>
-<?php if ($services->hasMore()): ?>
-    <div class="action-links">
-        <?= $this->qlink(
-            mt('monitoring', 'Show More'),
-            $this->url()->without(array('view', 'limit')),
-            null,
-            [
-                'class'             => 'action-link',
-                'data-base-target'  => '_next'
-            ]
-        ) ?>
-    </div>
-<?php endif ?>
+<?php
+if ($filterEditor->getFilter()->isEmpty()) {
+    echo '<p>' . $this->escape($this->translate('Please specify a filter')) . '</p>';
+} elseif ($services->hasResult()) {
+    foreach ($services->peekAhead($compact) as $service) {
+        echo '<h2>'
+            . $this->qlink(
+                $service->host_name === $service->host_display_name
+                    ? $service->host_display_name
+                    : $service->host_display_name . ' (' . $this->escape($service->host_name) . ')',
+                Url::fromPath('monitoring/host/show', ['host' => $service->host_name])
+            )
+            . '&#58; '
+            . $this->qlink(
+                $service->service_description === $service->service_display_name
+                    ? $service->service_display_name
+                    : $service->service_display_name . ' (' . $this->escape($service->service_description) . ')',
+                Url::fromPath('monitoring/service/show', [
+                    'host'      => $service->host_name,
+                    'service'   => $service->service_description
+                ])
+            )
+            . '</h2>';
+        echo EmbedGraphs::service($service->host_name, $service->service_description);
+    }
+
+    if ($services->hasMore()) {
+        echo '<div class="action-links">'
+            . $this->qlink(
+                mt('monitoring', 'Show More'),
+                $this->url()->without(array('view', 'limit')),
+                null,
+                [
+                    'class'             => 'action-link',
+                    'data-base-target'  => '_next'
+                ]
+            )
+            . '</div>';
+    }
+} else {
+    echo '<p>' . $this->escape(mt('monitoring', 'No services found matching the filter.')) . '</p>';
+}
+?>
 </div>

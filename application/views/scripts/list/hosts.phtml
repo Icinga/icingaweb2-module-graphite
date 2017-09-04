@@ -4,6 +4,7 @@ use Icinga\Module\Graphite\EmbedGraphs;
 use Icinga\Web\Url;
 
 /** @var \Icinga\Web\View $this */
+/** @var \Icinga\Web\Widget\FilterEditor $filterEditor */
 /** @var \Icinga\Module\Monitoring\DataView\DataView $hosts */
 
 if (! $compact): ?>
@@ -18,30 +19,37 @@ if (! $compact): ?>
 </div>
 <?php endif ?>
 <div class="content">
-<?php if (! $hosts->hasResult()): ?>
-    <p><?= mt('monitoring', 'No hosts found matching the filter.') ?></p>
-</div>
-<?php return; endif ?>
-<?php foreach ($hosts->peekAhead($compact) as $host): ?>
-    <h2><?= $this->qlink(
-        $host->host_name === $host->host_display_name
-            ? $host->host_display_name
-            : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
-        Url::fromPath('monitoring/host/show', ['host' => $host->host_name])
-    ) ?></h2>
-    <?= EmbedGraphs::host($host->host_name) ?>
-<?php endforeach ?>
-<?php if ($hosts->hasMore()): ?>
-    <div class="action-links">
-        <?= $this->qlink(
-            mt('monitoring', 'Show More'),
-            $this->url()->without(array('view', 'limit')),
-            null,
-            [
-                'class'             => 'action-link',
-                'data-base-target'  => '_next'
-            ]
-        ) ?>
-    </div>
-<?php endif ?>
+<?php
+if ($filterEditor->getFilter()->isEmpty()) {
+    echo '<p>' . $this->escape($this->translate('Please specify a filter')) . '</p>';
+} elseif ($hosts->hasResult()) {
+    foreach ($hosts->peekAhead($compact) as $host) {
+        echo '<h2>'
+            . $this->qlink(
+                $host->host_name === $host->host_display_name
+                    ? $host->host_display_name
+                    : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
+                Url::fromPath('monitoring/host/show', ['host' => $host->host_name])
+            )
+            . '</h2>';
+        echo EmbedGraphs::host($host->host_name);
+    }
+
+    if ($hosts->hasMore()) {
+        echo '<div class="action-links">'
+            . $this->qlink(
+                mt('monitoring', 'Show More'),
+                $this->url()->without(array('view', 'limit')),
+                null,
+                [
+                    'class'             => 'action-link',
+                    'data-base-target'  => '_next'
+                ]
+            )
+            . '</div>';
+    }
+} else {
+    echo '<p>' . $this->escape(mt('monitoring', 'No hosts found matching the filter.')) . '</p>';
+}
+?>
 </div>
