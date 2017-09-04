@@ -95,27 +95,20 @@ class GraphiteChart
 
     public function getUrl()
     {
-        $urlPattern = '/^' . preg_quote(Url::fromPath('/'), '/') . '/';
         $url = Url::fromPath('/render', $this->getParams());
         $this->template->extendUrl($url, $this->metric, $this->vars);
         $url->getParams()->add('_ext', 'whatever.svg');
-        $url = preg_replace($urlPattern, $this->web->getBaseUrl() . '/', $url);
         return $url;
     }
 
     public function fetchImage()
     {
-        $options = array(
-            'http'=>array(
-            'method'=>"POST",
-            'header'=>
-                "Accept-language: en\r\n".
-                "Content-type: application/x-www-form-urlencoded\r\n",
-//                'content'=> $data
-            )
+        $url = $this->getUrl();
+        return $this->web->getClient()->request(
+            $url->getPath(),
+            $url->getParams(),
+            'POST',
+            ['Accept-language' => 'en', 'Content-type' => 'application/x-www-form-urlencoded']
         );
-
-        $context = stream_context_create($options);
-        return file_get_contents($this->getUrl(), false, $context);
     }
 }

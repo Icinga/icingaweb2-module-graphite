@@ -3,6 +3,7 @@
 namespace Icinga\Module\Graphite\Forms;
 
 use Icinga\Forms\ConfigForm as BaseConfigForm;
+use Icinga\Module\Graphite\Web\Form\Validator\HttpUserValidator;
 
 class ConfigForm extends BaseConfigForm
 {
@@ -14,15 +15,36 @@ class ConfigForm extends BaseConfigForm
 
     public function createElements(array $formData)
     {
-        $this->addElement(
-            'text',
-            'graphite_web_url',
-            array(
-                'required'      => true,
-                'label'         => $this->translate('Graphite Web URL'),
-                'description'   => $this->translate('URL to your Graphite Web'),
-                'validators'    => ['UrlValidator']
-            )
-        );
+        $this->addElements([
+            [
+                'text',
+                'graphite_web_url',
+                [
+                    'required'      => true,
+                    'label'         => $this->translate('Graphite Web URL'),
+                    'description'   => $this->translate('URL to your Graphite Web'),
+                    'validators'    => ['UrlValidator']
+                ]
+            ],
+            [
+                'text',
+                'graphite_web_user',
+                [
+                    'label'         => $this->translate('Graphite Web user'),
+                    'description'   => $this->translate(
+                        'A user with access to your Graphite Web via HTTP basic authentication'
+                    ),
+                    'validators'    => [new HttpUserValidator()]
+                ]
+            ],
+            [
+                'password',
+                'graphite_web_password',
+                [
+                    'label'         => $this->translate('Graphite Web password'),
+                    'description'   => $this->translate('The above user\'s password')
+                ]
+            ]
+        ]);
     }
 }
