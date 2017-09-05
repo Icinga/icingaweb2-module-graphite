@@ -5,10 +5,10 @@ namespace Icinga\Module\Graphite\Forms;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
-use Icinga\Exception\NotImplementedError;
 use Icinga\Util\TimezoneDetect;
 use Icinga\Web\Form;
 use Icinga\Web\Url;
+use Zend_Form_Element_Checkbox;
 
 class TimeRangePickerForm extends Form
 {
@@ -16,6 +16,48 @@ class TimeRangePickerForm extends Form
      * @var string
      */
     protected $dateTimeFormat = 'Y-m-d\TH:i';
+
+    /**
+     * @var string
+     */
+    protected $timestamp = '/^(?:0|-?[1-9]\d*)$/';
+
+    /**
+     * The selectable units with themselves in seconds
+     *
+     * One month equals 30 days and one year equals 365.25 days. This should cover enough cases.
+     *
+     * @var int[string]
+     */
+    protected $rangeFactors = [
+        'years'     => 31557600,
+        'months'    => 2592000,
+        'weeks'     => 604800,
+        'days'      => 86400,
+        'hours'     => 3600,
+        'minutes'   => 60
+    ];
+
+    /**
+     * Whether this form has been requested for the first time
+     *
+     * @var bool
+     */
+    protected $initialRequest = false;
+
+    /**
+     * Whether this form asks for a custom date/time range
+     *
+     * @var bool
+     */
+    protected $customRange;
+
+    /**
+     * The elements' default values
+     *
+     * @var string[string]|null
+     */
+    protected $defaultFormData;
 
     /**
      * The URL to redirect to
@@ -48,54 +90,149 @@ class TimeRangePickerForm extends Form
     public function init()
     {
         $this->setName('form_timerangepicker_graphite');
-        $this->setSubmitLabel($this->translate('Update'));
     }
 
     public function createElements(array $formData)
     {
-        $this->addElements([
-            [
-                'date',
-                'start_date',
-                [
-                    'label'         => $this->translate('Start Date'),
-                    'description'   => $this->translate('Start date of the date/time range')
-                ]
-            ],
-            [
-                'time',
-                'start_time',
-                [
-                    'label'         => $this->translate('Start Time'),
-                    'description'   => $this->translate('Start time of the date/time range')
-                ]
-            ],
-            [
-                'date',
-                'end_date',
-                [
-                    'label'         => $this->translate('End Date'),
-                    'description'   => $this->translate('End date of the date/time range')
-                ]
-            ],
-            [
-                'time',
-                'end_time',
-                [
-                    'label'         => $this->translate('End Time'),
-                    'description'   => $this->translate('End time of the date/time range')
-                ]
-            ]
-        ]);
+        if ($this->initialRequest) {
+            $this->customRange = true;
+            if (! $this->getUrl()->hasParam('graph_end')) {
+                $timestamp = $this->getUrl()->getParam('graph_start');
+                if ($timestamp === null || preg_match($this->timestamp, $timestamp) && (int) $timestamp <= 0) {
+                    $this->customRange = false;
+                }
+            }
+        } else {
+            $this->customRange = isset($formData['custom']) && $formData['custom'];
+        }
 
-        $this->urlToForm('start');
-        $this->urlToForm('end');
+        if ($this->customRange) {
+            $this->addElement($this->getCustomCheckbox()->setChecked(true));
+
+            $this->addElements([
+                [
+                    'date',
+                    'start_date',
+                    [
+                        'label'         => $this->translate('Start Date'),
+                        'description'   => $this->translate('Start date of the date/time range')
+                    ]
+                ],
+                [
+                    'time',
+                    'start_time',
+                    [
+                        'label'         => $this->translate('Start Time'),
+                        'description'   => $this->translate('Start time of the date/time range')
+                    ]
+                ],
+                [
+                    'date',
+                    'end_date',
+                    [
+                        'label'         => $this->translate('End Date'),
+                        'description'   => $this->translate('End date of the date/time range')
+                    ]
+                ],
+                [
+                    'time',
+                    'end_time',
+                    [
+                        'label'         => $this->translate('End Time'),
+                        'description'   => $this->translate('End time of the date/time range')
+                    ]
+                ]
+            ]);
+
+            $this->setSubmitLabel($this->translate('Update'));
+
+            $this->urlToCustom('start');
+            $this->urlToCustom('end');
+        } else {
+            $this->addElements([
+                [
+                    'select',
+                    'minutes',
+                    [
+                        'label'         => $this->translate('Minutes'),
+                        'description'   => $this->translate('Show the last … minutes'),
+                        'multiOptions'  => $this->generateMultiOptions([5, 10, 15, 30, 45]),
+                        'autosubmit'    => true
+                    ]
+                ],
+                [
+                    'select',
+                    'hours',
+                    [
+                        'label'         => $this->translate('Hours'),
+                        'description'   => $this->translate('Show the last … hours'),
+                        'multiOptions'  => $this->generateMultiOptions([1, 2, 3, 6, 12, 18]),
+                        'autosubmit'    => true
+                    ]
+                ],
+                [
+                    'select',
+                    'days',
+                    [
+                        'label'         => $this->translate('Days'),
+                        'description'   => $this->translate('Show the last … days'),
+                        'multiOptions'  => $this->generateMultiOptions(range(1, 6)),
+                        'autosubmit'    => true
+                    ]
+                ],
+                [
+                    'select',
+                    'weeks',
+                    [
+                        'label'         => $this->translate('Weeks'),
+                        'description'   => $this->translate('Show the last … weeks'),
+                        'multiOptions'  => $this->generateMultiOptions(range(1, 4)),
+                        'autosubmit'    => true
+                    ]
+                ],
+                [
+                    'select',
+                    'months',
+                    [
+                        'label'         => $this->translate('Months'),
+                        'description'   => $this->translate('Show the last … months'),
+                        'multiOptions'  => $this->generateMultiOptions([1, 2, 3, 6, 9]),
+                        'autosubmit'    => true
+                    ]
+                ],
+                [
+                    'select',
+                    'years',
+                    [
+                        'label'         => $this->translate('Years'),
+                        'description'   => $this->translate('Show the last … years'),
+                        'multiOptions'  => $this->generateMultiOptions(range(1, 3)),
+                        'autosubmit'    => true
+                    ]
+                ]
+            ]);
+
+            $this->addElement($this->getCustomCheckbox());
+
+            $this->urlToCommon();
+
+            $this->defaultFormData = $this->getValues();
+        }
+    }
+
+    public function onRequest()
+    {
+        $this->initialRequest = true;
     }
 
     public function onSuccess()
     {
-        $this->formToUrl('start', '00:00');
-        $this->formToUrl('end', '23:59', 'PT59S');
+        if ($this->customRange) {
+            $this->customToUrl('start', '00:00');
+            $this->customToUrl('end', '23:59', 'PT59S');
+        } else {
+            $this->commonToUrl();
+        }
 
         if ($this->urlHasBeenChanged) {
             $this->setRedirectUrl($this->getUrl());
@@ -105,16 +242,88 @@ class TimeRangePickerForm extends Form
     }
 
     /**
+     * @return Zend_Form_Element_Checkbox
+     */
+    protected function getCustomCheckbox()
+    {
+        return $this->createElement('checkbox', 'custom', [
+            'label'         => $this->translate('Custom'),
+            'description'   => $this->translate('Provide a custom date/time range'),
+            'autosubmit'    => true
+        ]);
+    }
+
+    /**
+     * Generate an array suitable for a selection form element's multiOptions
+     *
+     * E.g.: $this->generateMultiOptions([15, 30, 45]) === ['' => '-', '15' => '15', '30' => '30', '45' => '45']
+     *
+     * @param   array   $options
+     *
+     * @return  string[string]
+     */
+    protected function generateMultiOptions(array $options)
+    {
+        $result = ['' => '-'];
+        foreach ($options as $option) {
+            $result[$option] = (string) $option;
+        }
+        return $result;
+    }
+
+    /**
+     * Set this form's elements' default values based on {@link url}'s parameters
+     */
+    protected function urlToCommon()
+    {
+        $timestamp = $this->getUrl()->getParam('graph_start');
+        if ($timestamp !== null) {
+            if (preg_match($this->timestamp, $timestamp)) {
+                $timestamp = (int) $timestamp;
+
+                if ($timestamp <= 0) {
+                    $seconds = - $timestamp;
+
+                    foreach ($this->rangeFactors as $unit => $factor) {
+                        /** @var \Zend_Form_Element_Select $element */
+                        $element = $this->getElement($unit);
+
+                        $options = $element->getMultiOptions();
+                        unset($options['']);
+                        krsort($options);
+
+                        foreach ($options as $option => $_) {
+                            if ($seconds >= $option * $factor) {
+                                $element->setValue((string) $option);
+                                return;
+                            }
+                        }
+                    }
+
+                    $this->getElement('minutes')->setValue('5');
+                }
+            } else {
+                $this->getUrl()->remove('graph_start');
+                $this->urlHasBeenChanged = true;
+            }
+        }
+    }
+
+    /**
      * Set this form's elements' default values based on {@link url}'s parameters
      *
      * @param   string  $part   Either 'start' or 'end'
      */
-    protected function urlToForm($part)
+    protected function urlToCustom($part)
     {
-        $timestamp = $this->getUrl()->getParam("graph_$part", '');
-        if (preg_match('/^(?:0|-?[1-9]\d*)$/', $timestamp)) {
-            $timestamp = (int) $timestamp;
-            if ($timestamp > 0) {
+        $timestamp = $this->getUrl()->getParam("graph_$part");
+        if ($timestamp !== null) {
+            if (preg_match($this->timestamp, $timestamp)) {
+                $timestamp = (int) $timestamp;
+                if ($timestamp < 0) {
+                    $timestamp += $this->getNow()->getTimestamp();
+                }
+
                 list($date, $time) = explode(
                     'T',
                     DateTime::createFromFormat('U', $timestamp)
@@ -125,16 +334,26 @@ class TimeRangePickerForm extends Form
                 $this->getElement("{$part}_date")->setValue($date);
                 $this->getElement("{$part}_time")->setValue($time);
             } else {
-                // TODO(ak): relative to now
-                throw new NotImplementedError('');
+                $this->getUrl()->remove("graph_$part");
+                $this->urlHasBeenChanged = true;
             }
-        } else {
-            $this->getElement("{$part}_date")->setValue('');
-            $this->getElement("{$part}_time")->setValue('');
+        }
+    }
 
-            $this->getUrl()->remove("graph_$part");
-
-            $this->urlHasBeenChanged = true;
+    /**
+     * Change {@link url}'s parameters based on this form's elements' values
+     */
+    protected function commonToUrl()
+    {
+        $formData = $this->getValues();
+        foreach ($this->rangeFactors as $unit => $factor) {
+            if ($formData[$unit] !== '' && $formData[$unit] !== $this->defaultFormData[$unit]) {
+                $params = $this->getUrl()->getParams();
+                $params->set('graph_start', (string) - ((int) $formData[$unit] * $factor));
+                $params->remove('graph_end');
+                $this->urlHasBeenChanged = true;
+                return;
+            }
         }
     }
 
@@ -145,7 +364,7 @@ class TimeRangePickerForm extends Form
      * @param   string  $defaultTime    Default if no time given
      * @param   string  $addInterval    Add this interval to the result
      */
-    protected function formToUrl($part, $defaultTime, $addInterval = null)
+    protected function customToUrl($part, $defaultTime, $addInterval = null)
     {
         $date = $this->getValue("{$part}_date");
         $time = $this->getValue("{$part}_time");
