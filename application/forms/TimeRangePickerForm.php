@@ -162,6 +162,10 @@ class TimeRangePickerForm extends Form
 
                 $this->getUrl()->remove("graph_$part");
             } else {
+                if ($dateTime->getTimestamp() < 1) {
+                    $dateTime = DateTime::createFromFormat('U', '1')->setTimezone($this->getTimeZone());
+                }
+
                 if ($addInterval !== null) {
                     $dateTime->add(new DateInterval($addInterval));
                 }
