@@ -8,7 +8,9 @@ use DateTimeZone;
 use Icinga\Util\TimezoneDetect;
 use Icinga\Web\Form;
 use Icinga\Web\Url;
+use Zend_Form_Decorator_HtmlTag;
 use Zend_Form_Element_Checkbox;
+use Zend_Form_Element_Select;
 
 class TimeRangePickerForm extends Form
 {
@@ -150,66 +152,54 @@ class TimeRangePickerForm extends Form
             $this->urlToCustom('end');
         } else {
             $this->addElements([
-                [
-                    'select',
+                $this->createSelect(
                     'minutes',
-                    [
-                        'label'         => $this->translate('Minutes'),
-                        'description'   => $this->translate('Show the last … minutes'),
-                        'multiOptions'  => $this->generateMultiOptions([5, 10, 15, 30, 45]),
-                        'autosubmit'    => true
-                    ]
-                ],
-                [
-                    'select',
+                    $this->translate('Minutes'),
+                    $this->translate('Show the last … minutes'),
+                    [5, 10, 15, 30, 45],
+                    $this->translate('%d minute'),
+                    $this->translate('%d minutes')
+                ),
+                $this->createSelect(
                     'hours',
-                    [
-                        'label'         => $this->translate('Hours'),
-                        'description'   => $this->translate('Show the last … hours'),
-                        'multiOptions'  => $this->generateMultiOptions([1, 2, 3, 6, 12, 18]),
-                        'autosubmit'    => true
-                    ]
-                ],
-                [
-                    'select',
+                    $this->translate('Hours'),
+                    $this->translate('Show the last … hours'),
+                    [1, 2, 3, 6, 12, 18],
+                    $this->translate('%d hour'),
+                    $this->translate('%d hours')
+                ),
+                $this->createSelect(
                     'days',
-                    [
-                        'label'         => $this->translate('Days'),
-                        'description'   => $this->translate('Show the last … days'),
-                        'multiOptions'  => $this->generateMultiOptions(range(1, 6)),
-                        'autosubmit'    => true
-                    ]
-                ],
-                [
-                    'select',
+                    $this->translate('Days'),
+                    $this->translate('Show the last … days'),
+                    range(1, 6),
+                    $this->translate('%d day'),
+                    $this->translate('%d days')
+                ),
+                $this->createSelect(
                     'weeks',
-                    [
-                        'label'         => $this->translate('Weeks'),
-                        'description'   => $this->translate('Show the last … weeks'),
-                        'multiOptions'  => $this->generateMultiOptions(range(1, 4)),
-                        'autosubmit'    => true
-                    ]
-                ],
-                [
-                    'select',
+                    $this->translate('Weeks'),
+                    $this->translate('Show the last … weeks'),
+                    range(1, 4),
+                    $this->translate('%d week'),
+                    $this->translate('%d weeks')
+                ),
+                $this->createSelect(
                     'months',
-                    [
-                        'label'         => $this->translate('Months'),
-                        'description'   => $this->translate('Show the last … months'),
-                        'multiOptions'  => $this->generateMultiOptions([1, 2, 3, 6, 9]),
-                        'autosubmit'    => true
-                    ]
-                ],
-                [
-                    'select',
+                    $this->translate('Months'),
+                    $this->translate('Show the last … months'),
+                    [1, 2, 3, 6, 9],
+                    $this->translate('%d month'),
+                    $this->translate('%d months')
+                ),
+                $this->createSelect(
                     'years',
-                    [
-                        'label'         => $this->translate('Years'),
-                        'description'   => $this->translate('Show the last … years'),
-                        'multiOptions'  => $this->generateMultiOptions(range(1, 3)),
-                        'autosubmit'    => true
-                    ]
-                ]
+                    $this->translate('Years'),
+                    $this->translate('Show the last … years'),
+                    range(1, 3),
+                    $this->translate('%d year'),
+                    $this->translate('%d years')
+                )
             ]);
 
             $this->addElement($this->getCustomCheckbox());
@@ -254,21 +244,41 @@ class TimeRangePickerForm extends Form
     }
 
     /**
-     * Generate an array suitable for a selection form element's multiOptions
+     * Create a common range picker for a specific time unit
      *
-     * E.g.: $this->generateMultiOptions([15, 30, 45]) === ['' => '-', '15' => '15', '30' => '30', '45' => '45']
+     * @param   string  $name
+     * @param   string  $label
+     * @param   string  $description
+     * @param   int[]   $options
+     * @param   string  $singular
+     * @param   string  $plural
      *
-     * @param   array   $options
-     *
-     * @return  string[string]
+     * @return  Zend_Form_Element_Select
      */
-    protected function generateMultiOptions(array $options)
+    protected function createSelect($name, $label, $description, array $options, $singular, $plural)
     {
-        $result = ['' => '-'];
+        $multiOptions = ['' => $label];
         foreach ($options as $option) {
-            $result[$option] = (string) $option;
+            $multiOptions[$option] = sprintf($option === 1 ? $singular : $plural, $option);
         }
-        return $result;
+
+        $element = $this->createElement('select', $name, [
+            'label'         => $label,
+            'description'   => $description,
+            'multiOptions'  => $multiOptions,
+            'autosubmit'    => true
+        ]);
+
+        $decorators = $element->getDecorators();
+        $element->setDecorators([
+            'Zend_Form_Decorator_ViewHelper'    => $decorators['Zend_Form_Decorator_ViewHelper'],
+            'Zend_Form_Decorator_HtmlTag'       => new Zend_Form_Decorator_HtmlTag([
+                'tag'   => 'span',
+                'title' => $description
+            ])
+        ]);
+
+        return $element;
     }
 
     /**
@@ -285,7 +295,7 @@ class TimeRangePickerForm extends Form
                     $seconds = - $timestamp;
 
                     foreach ($this->rangeFactors as $unit => $factor) {
-                        /** @var \Zend_Form_Element_Select $element */
+                        /** @var Zend_Form_Element_Select $element */
                         $element = $this->getElement($unit);
 
                         $options = $element->getMultiOptions();
