@@ -5,6 +5,7 @@ namespace Icinga\Module\Graphite\Forms\TimeRangePicker;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use Icinga\Module\Graphite\Web\Form\Decorator\Proxy;
 use Icinga\Util\TimezoneDetect;
 use Icinga\Web\Form;
 
@@ -39,35 +40,38 @@ class CustomForm extends Form
                 'date',
                 'start_date',
                 [
-                    'label'         => $this->translate('Start Date'),
-                    'description'   => $this->translate('Start date of the date/time range')
+                    'label'         => $this->translate('Start'),
+                    'description'   => $this->translate('Start of the date/time range')
                 ]
             ],
             [
                 'time',
                 'start_time',
                 [
-                    'label'         => $this->translate('Start Time'),
-                    'description'   => $this->translate('Start time of the date/time range')
+                    'label'         => $this->translate('Start'),
+                    'description'   => $this->translate('Start of the date/time range')
                 ]
             ],
             [
                 'date',
                 'end_date',
                 [
-                    'label'         => $this->translate('End Date'),
-                    'description'   => $this->translate('End date of the date/time range')
+                    'label'         => $this->translate('End'),
+                    'description'   => $this->translate('End of the date/time range')
                 ]
             ],
             [
                 'time',
                 'end_time',
                 [
-                    'label'         => $this->translate('End Time'),
-                    'description'   => $this->translate('End time of the date/time range')
+                    'label'         => $this->translate('End'),
+                    'description'   => $this->translate('End of the date/time range')
                 ]
             ]
         ]);
+
+        $this->groupDateTime('start');
+        $this->groupDateTime('end');
 
         $this->setSubmitLabel($this->translate('Update'));
 
@@ -86,6 +90,37 @@ class CustomForm extends Form
         }
 
         $this->getRedirectUrl()->remove('graph_range');
+    }
+
+    /**
+     * Add display group for a date and a time input belonging together
+     *
+     * @param   string  $part   Either 'start' or 'end'
+     */
+    protected function groupDateTime($part)
+    {
+        $this->addDisplayGroup(["{$part}_date", "{$part}_time"], $part);
+        $group = $this->getDisplayGroup($part);
+
+        foreach ($group->getElements() as $element) {
+            /** @var \Zend_Form_Element $element */
+
+            $elementDecorators = $element->getDecorators();
+            $element->setDecorators([
+                'Zend_Form_Decorator_ViewHelper' => $elementDecorators['Zend_Form_Decorator_ViewHelper']
+            ]);
+        }
+
+        $decorators = [];
+        foreach ($elementDecorators as $key => $decorator) {
+            if ($key === 'Zend_Form_Decorator_ViewHelper') {
+                $decorators['Zend_Form_Decorator_FormElements'] = $group->getDecorators()['Zend_Form_Decorator_FormElements'];
+            } else {
+                $decorators[$key] = (new Proxy())->setActualDecorator($decorator->setElement($element));
+            }
+        }
+
+        $group->setDecorators($decorators);
     }
 
     /**
