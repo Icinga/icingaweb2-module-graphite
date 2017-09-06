@@ -77,8 +77,14 @@ class CustomForm extends Form
 
     public function onSuccess()
     {
-        $this->formToUrl('start', '00:00');
-        $this->formToUrl('end', '23:59', 'PT59S');
+        $start = $this->formToUrl('start', '00:00');
+        $end = $this->formToUrl('end', '23:59', 'PT59S');
+        if ($start > $end) {
+            $this->getRedirectUrl()->getParams()
+                ->set('graph_start', $end)
+                ->set('graph_end', $start);
+        }
+
         $this->getRedirectUrl()->remove('graph_range');
     }
 
@@ -115,6 +121,8 @@ class CustomForm extends Form
      * @param   string  $part           Either 'start' or 'end'
      * @param   string  $defaultTime    Default if no time given
      * @param   string  $addInterval    Add this interval to the result
+     *
+     * @return  int|null                The updated timestamp (if any)
      */
     protected function formToUrl($part, $defaultTime, $addInterval = null)
     {
@@ -140,6 +148,7 @@ class CustomForm extends Form
                 }
 
                 $params->set("graph_$part", $dateTime->format('U'));
+                return $dateTime->getTimestamp();
             }
         }
     }
