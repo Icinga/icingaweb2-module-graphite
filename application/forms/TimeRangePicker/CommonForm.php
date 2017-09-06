@@ -8,10 +8,7 @@ use Zend_Form_Element_Select;
 
 class CommonForm extends Form
 {
-    /**
-     * @var string
-     */
-    protected $seconds = '/^(?:0|[1-9]\d*)$/';
+    use TimeRangePickerTrait;
 
     /**
      * The selectable units with themselves in seconds
@@ -149,12 +146,10 @@ class CommonForm extends Form
     protected function urlToForm()
     {
         $params = $this->getRedirectUrl()->getParams();
-        $seconds = $params->get('graph_range');
+        $seconds = $this->getRelativeSeconds($params);
 
         if ($seconds !== null) {
-            if (preg_match($this->seconds, $seconds)) {
-                $seconds = (int) $seconds;
-
+            if ($seconds !== false) {
                 foreach ($this->rangeFactors as $unit => $factor) {
                     /** @var Zend_Form_Element_Select $element */
                     $element = $this->getElement($unit);

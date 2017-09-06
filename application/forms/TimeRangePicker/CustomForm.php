@@ -11,6 +11,8 @@ use Icinga\Web\Form;
 
 class CustomForm extends Form
 {
+    use TimeRangePickerTrait;
+
     /**
      * @var string
      */
@@ -27,6 +29,13 @@ class CustomForm extends Form
      * @var DateTimeZone
      */
     protected $timeZone;
+
+    /**
+     * Right now
+     *
+     * @var DateTime
+     */
+    protected $now;
 
     public function init()
     {
@@ -75,7 +84,7 @@ class CustomForm extends Form
 
         $this->setSubmitLabel($this->translate('Update'));
 
-        $this->urlToForm('start');
+        $this->urlToForm('start', $this->getRelativeTimestamp());
         $this->urlToForm('end');
     }
 
@@ -126,12 +135,13 @@ class CustomForm extends Form
     /**
      * Set this form's elements' default values based on the redirect URL's parameters
      *
-     * @param   string  $part   Either 'start' or 'end'
+     * @param   string  $part               Either 'start' or 'end'
+     * @param   int     $defaultTimestamp   Fallback
      */
-    protected function urlToForm($part)
+    protected function urlToForm($part, $defaultTimestamp = null)
     {
         $params = $this->getRedirectUrl()->getParams();
-        $timestamp = $params->get("graph_$part");
+        $timestamp = $params->get("graph_$part", $defaultTimestamp);
 
         if ($timestamp !== null) {
             if (preg_match($this->timestamp, $timestamp)) {
@@ -148,6 +158,17 @@ class CustomForm extends Form
                 $params->remove("graph_$part");
             }
         }
+    }
+
+    /**
+     * Get the relative range start (if any) set by {@link CommonForm}
+     *
+     * @return int|null
+     */
+    protected function getRelativeTimestamp()
+    {
+        $seconds = $this->getRelativeSeconds($this->getRedirectUrl()->getParams());
+        return is_int($seconds) ? $this->getNow()->getTimestamp() - $seconds : null;
     }
 
     /**
@@ -170,7 +191,7 @@ class CustomForm extends Form
         } else {
             $dateTime = DateTime::createFromFormat(
                 $this->dateTimeFormat,
-                ($date === '' ? (new DateTime())->setTimezone($this->getTimeZone())->format('Y-m-d') : $date)
+                ($date === '' ? $this->getNow()->format('Y-m-d') : $date)
                     . 'T' . ($time === '' ? $defaultTime : $time),
                 $this->getTimeZone()
             );
@@ -215,6 +236,33 @@ class CustomForm extends Form
     public function setTimeZone(DateTimeZone $timeZone)
     {
         $this->timeZone = $timeZone;
+        return $this;
+    }
+
+    /**
+     * Get {@link now}
+     *
+     * @return DateTime
+     */
+    public function getNow()
+    {
+        if ($this->now === null) {
+            $this->now = (new DateTime())->setTimezone($this->getTimeZone());
+        }
+
+        return $this->now;
+    }
+
+    /**
+     * Set {@link now}
+     *
+     * @param DateTime $now
+     *
+     * @return $this
+     */
+    public function setNow($now)
+    {
+        $this->now = $now;
         return $this;
     }
 }
