@@ -9,14 +9,6 @@ use Icinga\Web\Request;
 use Icinga\Web\Url;
 use Icinga\Web\View;
 
-/**
- * @method string translate($text, $context = null) {
- *  @param  string      $text
- *  @param  string|null $context
- * }
- *
- * @property View $view
- */
 trait TimeRangePickerTrait
 {
     /**
@@ -45,9 +37,11 @@ trait TimeRangePickerTrait
     /**
      * Render all needed forms and links
      *
-     * @return string
+     * @param   View    $view
+     *
+     * @return  string
      */
-    protected function renderTimeRangePicker()
+    protected function renderTimeRangePicker(View $view)
     {
         $result = $this->getTimeRangePickerCommonForm();
         $url = Url::fromRequest();
@@ -55,8 +49,8 @@ trait TimeRangePickerTrait
 
         foreach ($relevantParams as $param) {
             if ($url->hasParam($param)) {
-                $result .= $this->view->qlink(
-                    $this->translate('Clear', 'TimeRangePicker'),
+                $result .= $view->qlink(
+                    $view->translate('Clear', 'TimeRangePicker'),
                     $url->without($relevantParams),
                     null,
                     ['class' => 'button-link']
@@ -68,8 +62,8 @@ trait TimeRangePickerTrait
         if ($url->hasParam(TimeRangePicker::getRangeCustomizationParameter())) {
             $result .= $this->getTimeRangePickerCustomForm();
         } else {
-            $result .= $this->view->qlink(
-                $this->translate('Custom', 'TimeRangePicker'),
+            $result .= $view->qlink(
+                $view->translate('Custom', 'TimeRangePicker'),
                 $url->with(TimeRangePicker::getRangeCustomizationParameter(), '1'),
                 null,
                 ['class' => 'button-link']
