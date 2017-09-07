@@ -12,6 +12,11 @@ class GraphiteChart
 
     protected $from = '-4hours';
 
+    /**
+     * @var string
+     */
+    protected $until;
+
     protected $showLegend = true;
 
     protected $height = 200;
@@ -70,9 +75,32 @@ class GraphiteChart
         return $this->from;
     }
 
+    /**
+     * Get {@link until}
+     *
+     * @return string
+     */
+    public function getUntil()
+    {
+        return $this->until;
+    }
+
+    /**
+     * Set {@link until}
+     *
+     * @param string $until
+     *
+     * @return $this
+     */
+    public function setUntil($until)
+    {
+        $this->until = $until;
+        return $this;
+    }
+
     protected function getParams()
     {
-        return array(
+        $params = [
             'height'         => $this->height,
             'width'          => $this->width,
             '_salt'          => time() . '.000',
@@ -90,7 +118,13 @@ class GraphiteChart
             // 'hideYAxis'   => 'true',
             // 'format'      => 'svg',
             // 'pieMode'     => 'average',
-        );
+        ];
+
+        if ($this->until !== null) {
+            $params['until'] = $this->until;
+        }
+
+        return $params;
     }
 
     public function getUrl()

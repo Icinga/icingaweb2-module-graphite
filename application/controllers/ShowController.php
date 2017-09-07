@@ -4,6 +4,7 @@ namespace Icinga\Module\Graphite\Controllers;
 
 use DirectoryIterator;
 use Icinga\Exception\NotFoundError;
+use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
 use Icinga\Module\Graphite\GraphiteChart;
 use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\GraphiteWeb;
@@ -11,6 +12,7 @@ use Icinga\Module\Graphite\GraphiteWebClient;
 use Icinga\Module\Graphite\GraphTemplate;
 use Icinga\Module\Graphite\TemplateStore;
 use Icinga\Web\Controller;
+use Icinga\Web\UrlParams;
 use Icinga\Web\Widget;
 
 class ShowController extends Controller
@@ -168,15 +170,14 @@ class ShowController extends Controller
             foreach ($set->loadTemplates() as $key => $template) {
                 if (strpos($template->getFilterString(), '$service') !== false) continue;
 
-                $imgParams = array(
-                    'template' => $key,
-                    'start'    => $view->start,
-                    'width'    => $view->width,
-                    'height'   => $view->height
-                );
+                $imgParams = (new UrlParams())
+                    ->set('template', $key)
+                    ->set('start', $view->start)
+                    ->set('width', $view->width)
+                    ->set('height', $view->height);
 
                 if ($this->view->disabledDatasources) {
-                    $imgParams['disabled'] = $this->view->disabledDatasources;
+                    $imgParams->set('disabled', $this->view->disabledDatasources);
                     foreach ($this->view->disabledDatasources as $dis) {
                         if ($template->hasDatasource($dis)) {
                             $template->getDatasource($dis)->disable();
@@ -190,7 +191,7 @@ class ShowController extends Controller
                     ->select()
                     ->from($template->getFilterString())
                     ->where('hostname', $hostname)
-                    ->getWrappedImageLinks($template, $imgParams);
+                    ->getWrappedImageLinks($template, TimeRangePickerTrait::copyAllRangeParameters($imgParams));
 
             }
         }
@@ -228,15 +229,14 @@ class ShowController extends Controller
             foreach ($set->loadTemplates() as $key => $template) {
                 if (strpos($template->getFilterString(), '$service') === false) continue;
 
-                $imgParams = array(
-                    'template' => $key,
-                    'start'    => $view->start,
-                    'width'    => $view->width,
-                    'height'   => $view->height
-                );
+                $imgParams = (new UrlParams())
+                    ->set('template', $key)
+                    ->set('start', $view->start)
+                    ->set('width', $view->width)
+                    ->set('height', $view->height);;
 
                 if ($this->view->disabledDatasources) {
-                    $imgParams['disabled'] = $this->view->disabledDatasources;
+                    $imgParams->set('disabled', $this->view->disabledDatasources);
                     foreach ($this->view->disabledDatasources as $dis) {
                         if ($template->hasDatasource($dis)) {
                             $template->getDatasource($dis)->disable();
@@ -252,7 +252,7 @@ class ShowController extends Controller
                     ->from($template->getFilterString())
                     ->where('hostname', $hostname)
                     ->where('service',  $service)
-                    ->getWrappedImageLinks($template, $imgParams);
+                    ->getWrappedImageLinks($template, TimeRangePickerTrait::copyAllRangeParameters($imgParams));
 
             }
         }
@@ -329,12 +329,29 @@ class ShowController extends Controller
         $this->view->disabledDatasources = $this->params->getValues('disabled');
     }
 
+    /**
+     * Get time range parameters for Graphite from the URL
+     *
+     * @return string[]
+     */
+    protected function getRangeFromTimeRangePicker()
+    {
+        $params = $this->getRequest()->getUrl()->getParams();
+        $relative = $params->get(TimeRangePickerTrait::getRelativeRangeParameter());
+        if ($relative !== null) {
+            return ["-{$relative}s", null];
+        }
+
+        $absolute = TimeRangePickerTrait::getAbsoluteRangeParameters();
+        return [$params->get($absolute['start'], '-1hours'), $params->get($absolute['end'])];
+    }
+
     protected function handleGraphParams()
     {
         if ($this->handledGraphParams === false) {
             $this->handledGraphParams = true;
             $view = $this->view;
-            $view->start  = $this->params->shift('start', '-1hours');
+            list($view->start, $view->end) = $this->getRangeFromTimeRangePicker();
             $view->width  = $this->params->shift('width', '300');
             $view->height = $this->params->shift('height', '150');
         }
@@ -347,6 +364,7 @@ class ShowController extends Controller
         $this->handleGraphParams();
         $view = $this->view;
         $chart->setStart($view->start)
+              ->setUntil($view->end)
               ->setWidth($view->width)
               ->setHeight($view->height)
               // TODO: handle before

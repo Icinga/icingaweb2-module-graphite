@@ -3,6 +3,7 @@
 namespace Icinga\Module\Graphite;
 
 use Icinga\Application\Icinga;
+use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
 use Icinga\Web\Url;
 use Icinga\Web\View;
 
@@ -17,10 +18,7 @@ class EmbedGraphs
      */
     public static function host($host)
     {
-        return static::url(static::getView()->href('graphite/show/host', [
-            'host'  => $host,
-            'view'  => 'compact'
-        ]));
+        return static::url(static::getView()->href('graphite/show/host', ['host'  => $host]));
     }
 
     /**
@@ -35,8 +33,7 @@ class EmbedGraphs
     {
         return static::url(static::getView()->href('graphite/show/service', [
             'host'      => $host,
-            'service'   => $service,
-            'view'      => 'compact'
+            'service'   => $service
         ]));
     }
 
@@ -49,10 +46,12 @@ class EmbedGraphs
      */
     protected static function url(Url $url)
     {
+        TimeRangePickerTrait::copyAllRangeParameters($url->getParams());
+
         // TODO(ak): EL says "<div class="container" data-icinga-url="..." /> is enough",
         // but this seems not to work for me
         return '<div class="container" data-base-target="_main" data-last-update="-1" data-icinga-refresh="15"'
-            . ' data-icinga-url="' . $url . '"></div>';
+            . ' data-icinga-url="' . $url->setParam('view', 'compact') . '"></div>';
     }
 
     /**
