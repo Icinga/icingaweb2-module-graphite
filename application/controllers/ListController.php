@@ -2,6 +2,8 @@
 
 namespace Icinga\Module\Graphite\Controllers;
 
+use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePicker;
+use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
 use Icinga\Module\Monitoring\Controller;
 use Icinga\Module\Monitoring\DataView\DataView;
 use Icinga\Web\Url;
@@ -10,6 +12,8 @@ use Icinga\Web\Widget\Tabextension\MenuAction;
 
 class ListController extends Controller
 {
+    use TimeRangePickerTrait;
+
     public function init()
     {
         parent::init();
@@ -30,6 +34,9 @@ class ListController extends Controller
         $this->setupPaginationControl($hosts);
         $this->setupLimitControl();
         $this->setupSortControl(['host_display_name' => mt('monitoring', 'Hostname')], $hosts);
+
+        $this->handleTimeRangePickerRequest();
+        $this->view->timeRangePicker = $this->renderTimeRangePicker($this->view);
     }
 
     public function servicesAction()
@@ -54,6 +61,9 @@ class ListController extends Controller
             'service_display_name'  => mt('monitoring', 'Service Name'),
             'host_display_name'     => mt('monitoring', 'Hostname')
         ], $services);
+
+        $this->handleTimeRangePickerRequest();
+        $this->view->timeRangePicker = $this->renderTimeRangePicker($this->view);
     }
 
     /**
@@ -63,7 +73,12 @@ class ListController extends Controller
      */
     protected function filterQuery(DataView $dataView)
     {
-        $this->setupFilterControl($dataView, null, null, ['format', 'stateType', 'addColumns', 'problems']);
+        $this->setupFilterControl(
+            $dataView,
+            null,
+            null,
+            array_merge(['format', 'stateType', 'addColumns', 'problems'], TimeRangePicker::getAllParameters())
+        );
         $this->handleFormatRequest($dataView);
     }
 
