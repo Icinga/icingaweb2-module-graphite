@@ -45,19 +45,6 @@ trait TimeRangePickerTrait
     {
         $result = $this->getTimeRangePickerCommonForm();
         $url = Url::fromRequest();
-        $relevantParams = TimeRangePicker::getAllRangeParameters();
-
-        foreach ($relevantParams as $param) {
-            if ($url->hasParam($param)) {
-                $result .= $view->qlink(
-                    $view->translate('Clear', 'TimeRangePicker'),
-                    $url->without($relevantParams),
-                    null,
-                    ['class' => 'button-link']
-                );
-                break;
-            }
-        }
 
         if ($url->hasParam(TimeRangePicker::getRangeCustomizationParameter())) {
             $result .= $this->getTimeRangePickerCustomForm();
