@@ -13,20 +13,20 @@ use Icinga\Module\Graphite\GraphiteQuery;
 class GraphiteWeb
 {
     /**
-     * Graphite webapp base url
+     * HTTP interface to Graphite Web
      *
-     * @var string
+     * @var GraphiteWebClientInterface
      */
-    protected $baseUrl;
+    private $client;
 
     /**
      * Construct a new graphite webapp instance
      *
-     * @param $baseUrl string Graphite webapp base url
+     * @param   GraphiteWebClientInterface  $client HTTP interface to Graphite Web
      */
-    public function __construct($baseUrl)
+    public function __construct(GraphiteWebClientInterface $client)
     {
-        $this->baseUrl = $baseUrl;
+        $this->client = $client;
     }
 
     /**
@@ -40,13 +40,13 @@ class GraphiteWeb
     }
 
     /**
-     * Retrieve out base url
+     * Get {@link client}
      *
-     * @return string
+     * @return GraphiteWebClientInterface
      */
-    public function getBaseUrl()
+    public function getClient()
     {
-        return $this->baseUrl;
+        return $this->client;
     }
 
     /**
@@ -56,11 +56,7 @@ class GraphiteWeb
      */
     public function listMetrics($filter)
     {
-        $res = json_decode(
-            file_get_contents(
-                $this->baseUrl . '/metrics/expand?query=' . $filter
-            )
-        );
+        $res = json_decode($this->client->request('metrics/expand', ['query' => $filter]));
         natsort($res->results);
         return array_values($res->results);
     }

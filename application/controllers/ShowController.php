@@ -7,6 +7,7 @@ use Icinga\Exception\NotFoundError;
 use Icinga\Module\Graphite\GraphiteChart;
 use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\GraphiteWeb;
+use Icinga\Module\Graphite\GraphiteWebClient;
 use Icinga\Module\Graphite\GraphTemplate;
 use Icinga\Module\Graphite\TemplateStore;
 use Icinga\Web\Controller;
@@ -14,8 +15,6 @@ use Icinga\Web\Widget;
 
 class ShowController extends Controller
 {
-    protected $baseUrl;
-
     protected $graphiteWeb;
 
     protected $templates;
@@ -34,8 +33,7 @@ class ShowController extends Controller
     {
         $config = $this->Config();
         $this->templateStore = new TemplateStore();
-        $this->baseUrl = $this->Config()->get('graphite', 'web_url');
-        $graphite = $this->graphiteWeb = new GraphiteWeb($this->baseUrl);
+        $graphite = $this->graphiteWeb = new GraphiteWeb(GraphiteWebClient::getInstance());
         $this->template = $this->view->template = $this->loadTemplate();
         $this->params->shift('r');
     }
