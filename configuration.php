@@ -2,7 +2,10 @@
 
 /** @var \Icinga\Application\Modules\Module $this */
 
-$this->menuSection(N_('Graphite'), ['icon' => 'chart-area'])->setUrl('graphite/show/overview');
+/** @var \Icinga\Application\Modules\MenuItemContainer $section */
+$section = $this->menuSection(N_('Graphite'), ['icon' => 'chart-area'])->setUrl('graphite/show/overview');
+$section->add(N_('Hosts'), ['url' => 'graphite/list/hosts']);
+$section->add(N_('Services'), ['url' => 'graphite/list/services']);
 
 $this->provideConfigTab('backend', array(
     'title' => $this->translate('Configure the Graphite Web backend'),

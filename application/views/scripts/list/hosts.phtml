@@ -1,0 +1,64 @@
+<?php
+
+use Icinga\Module\Graphite\EmbedGraphs;
+use Icinga\Web\Url;
+
+/** @var \Icinga\Web\View $this */
+/** @var \Icinga\Web\Widget\FilterEditor $filterEditor */
+/** @var \Icinga\Module\Monitoring\DataView\DataView $hosts */
+
+if (! $compact): ?>
+<div class="controls">
+    <?= $tabs ?>
+    <?= $paginator ?>
+    <div class="sort-controls-container">
+        <?= $limiter ?>
+        <?= $sortBox ?>
+    </div>
+    <?= $filterEditor ?>
+    <?= $timeRangePicker ?>
+</div>
+<?php endif ?>
+<div class="content">
+<?php
+if ($filterEditor->getFilter()->isEmpty()) {
+    echo '<p>' . $this->escape($this->translate('Please specify a filter')) . '</p>';
+} elseif ($hosts->hasResult()) {
+    foreach ($hosts->peekAhead($compact) as $host) {
+        echo '<div class="graphs-host">';
+
+        if (! $compact) {
+            echo '<h2>'
+                . $this->qlink(
+                    $host->host_name === $host->host_display_name
+                        ? $host->host_display_name
+                        : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
+                    Url::fromPath('monitoring/host/show', ['host' => $host->host_name]),
+                    null,
+                    ['data-base-target' => '_next']
+                )
+                . '</h2>';
+        }
+        echo EmbedGraphs::host($host->host_name);
+
+        echo '</div>';
+    }
+
+    if (! $compact && $hosts->hasMore()) {
+        echo '<div class="action-links">'
+            . $this->qlink(
+                mt('monitoring', 'Show More'),
+                $this->url()->without(array('view', 'limit')),
+                null,
+                [
+                    'class'             => 'action-link',
+                    'data-base-target'  => '_next'
+                ]
+            )
+            . '</div>';
+    }
+} else {
+    echo '<p>' . $this->escape(mt('monitoring', 'No hosts found matching the filter.')) . '</p>';
+}
+?>
+</div>

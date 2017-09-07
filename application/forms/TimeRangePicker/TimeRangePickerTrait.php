@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Graphite\Forms\TimeRangePicker;
 
+use Icinga\Web\Url;
 use Icinga\Web\UrlParams;
 
 trait TimeRangePickerTrait
@@ -44,6 +45,33 @@ trait TimeRangePickerTrait
     public static function getAllParameters()
     {
         return array_values(array_merge(static::getAllRangeParameters(), [static::getRangeCustomizationParameter()]));
+    }
+
+    /**
+     * Copy {@link getAllRangeParameters()} from one {@link UrlParams} instance to another
+     *
+     * @param   UrlParams|null  $copy   Defaults to a new instance
+     * @param   UrlParams|null  $origin Defaults to the current request's params
+     *
+     * @return  UrlParams               The copy
+     */
+    public static function copyAllRangeParameters(UrlParams $copy = null, UrlParams $origin = null)
+    {
+        if ($origin === null) {
+            $origin = Url::fromRequest()->getParams();
+        }
+        if ($copy === null) {
+            $copy = new UrlParams();
+        }
+
+        foreach (TimeRangePickerTrait::getAllRangeParameters() as $param) {
+            $value = $origin->get($param);
+            if ($value !== null) {
+                $copy->set($param, $value);
+            }
+        }
+
+        return $copy;
     }
 
     /**
