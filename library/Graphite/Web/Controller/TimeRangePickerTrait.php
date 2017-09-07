@@ -51,15 +51,15 @@ trait TimeRangePickerTrait
         $result = $this->getTimeRangePickerCommonForm();
         $url = Url::fromRequest();
         $relevantParams = ['graph_range', 'graph_start', 'graph_end'];
-        $hasLink = false;
 
         foreach ($relevantParams as $param) {
             if ($url->hasParam($param)) {
                 $result .= $this->view->qlink(
                     $this->translate('Clear', 'TimeRangePicker'),
-                    $url->without($relevantParams)
+                    $url->without($relevantParams),
+                    null,
+                    ['class' => 'button-link']
                 );
-                $hasLink = true;
                 break;
             }
         }
@@ -67,17 +67,15 @@ trait TimeRangePickerTrait
         if ($url->hasParam('graph_range_custom')) {
             $result .= $this->getTimeRangePickerCustomForm();
         } else {
-            if ($hasLink) {
-                $result .= '&emsp;';
-            }
-
             $result .= $this->view->qlink(
                 $this->translate('Custom', 'TimeRangePicker'),
-                $url->with('graph_range_custom', '1')
+                $url->with('graph_range_custom', '1'),
+                null,
+                ['class' => 'button-link']
             );
         }
 
-        return $result;
+        return '<div class="timerangepicker-forms">' . $result . '</div>';
     }
 
     /**
