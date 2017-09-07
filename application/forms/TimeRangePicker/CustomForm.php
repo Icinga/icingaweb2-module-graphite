@@ -98,7 +98,7 @@ class CustomForm extends Form
                 ->set('graph_end', $start);
         }
 
-        $this->getRedirectUrl()->remove('graph_range');
+        $this->getRedirectUrl()->remove(['graph_range', 'graph_range_custom']);
     }
 
     /**
