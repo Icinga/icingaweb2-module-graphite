@@ -4,6 +4,7 @@ namespace Icinga\Module\Graphite\Web\Controller;
 
 use Icinga\Module\Graphite\Forms\TimeRangePicker\CommonForm;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\CustomForm;
+use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePicker;
 use Icinga\Web\Request;
 use Icinga\Web\Url;
 use Icinga\Web\View;
@@ -50,7 +51,7 @@ trait TimeRangePickerTrait
     {
         $result = $this->getTimeRangePickerCommonForm();
         $url = Url::fromRequest();
-        $relevantParams = ['graph_range', 'graph_start', 'graph_end'];
+        $relevantParams = TimeRangePicker::getAllRangeParameters();
 
         foreach ($relevantParams as $param) {
             if ($url->hasParam($param)) {
@@ -64,12 +65,12 @@ trait TimeRangePickerTrait
             }
         }
 
-        if ($url->hasParam('graph_range_custom')) {
+        if ($url->hasParam(TimeRangePicker::getRangeCustomizationParameter())) {
             $result .= $this->getTimeRangePickerCustomForm();
         } else {
             $result .= $this->view->qlink(
                 $this->translate('Custom', 'TimeRangePicker'),
-                $url->with('graph_range_custom', '1'),
+                $url->with(TimeRangePicker::getRangeCustomizationParameter(), '1'),
                 null,
                 ['class' => 'button-link']
             );

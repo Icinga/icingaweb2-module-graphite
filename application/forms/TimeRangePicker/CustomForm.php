@@ -93,12 +93,15 @@ class CustomForm extends Form
         $start = $this->formToUrl('start', '00:00');
         $end = $this->formToUrl('end', '23:59', 'PT59S');
         if ($start > $end) {
+            $absoluteRangeParameters = static::getAbsoluteRangeParameters();
             $this->getRedirectUrl()->getParams()
-                ->set('graph_start', $end)
-                ->set('graph_end', $start);
+                ->set($absoluteRangeParameters['start'], $end)
+                ->set($absoluteRangeParameters['end'], $start);
         }
 
-        $this->getRedirectUrl()->remove(['graph_range', 'graph_range_custom']);
+        $this->getRedirectUrl()->remove(
+            [static::getRelativeRangeParameter(), static::getRangeCustomizationParameter()]
+        );
     }
 
     /**
@@ -141,7 +144,8 @@ class CustomForm extends Form
     protected function urlToForm($part, $defaultTimestamp = null)
     {
         $params = $this->getRedirectUrl()->getParams();
-        $timestamp = $params->get("graph_$part", $defaultTimestamp);
+        $absoluteRangeParameters = static::getAbsoluteRangeParameters();
+        $timestamp = $params->get($absoluteRangeParameters[$part], $defaultTimestamp);
 
         if ($timestamp !== null) {
             if (preg_match($this->timestamp, $timestamp)) {
@@ -155,7 +159,7 @@ class CustomForm extends Form
                 $this->getElement("{$part}_date")->setValue($date);
                 $this->getElement("{$part}_time")->setValue($time);
             } else {
-                $params->remove("graph_$part");
+                $params->remove($absoluteRangeParameters[$part]);
             }
         }
     }
@@ -185,9 +189,10 @@ class CustomForm extends Form
         $date = $this->getValue("{$part}_date");
         $time = $this->getValue("{$part}_time");
         $params = $this->getRedirectUrl()->getParams();
+        $absoluteRangeParameters = static::getAbsoluteRangeParameters();
 
         if ($date === '' && $time === '') {
-            $params->remove("graph_$part");
+            $params->remove($absoluteRangeParameters[$part]);
         } else {
             $dateTime = DateTime::createFromFormat(
                 $this->dateTimeFormat,
@@ -197,13 +202,13 @@ class CustomForm extends Form
             );
 
             if ($dateTime === false) {
-                $params->remove("graph_$part");
+                $params->remove($absoluteRangeParameters[$part]);
             } else {
                 if ($addInterval !== null) {
                     $dateTime->add(new DateInterval($addInterval));
                 }
 
-                $params->set("graph_$part", $dateTime->format('U'));
+                $params->set($absoluteRangeParameters[$part], $dateTime->format('U'));
                 return $dateTime->getTimestamp();
             }
         }

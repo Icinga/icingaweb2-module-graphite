@@ -99,7 +99,7 @@ class CommonForm extends Form
     public function onSuccess()
     {
         $this->formToUrl();
-        $this->getRedirectUrl()->remove(['graph_start', 'graph_end']);
+        $this->getRedirectUrl()->remove(array_values(static::getAbsoluteRangeParameters()));
     }
 
     /**
@@ -166,7 +166,7 @@ class CommonForm extends Form
                 }
             }
 
-            $params->remove('graph_range');
+            $params->remove(static::getRelativeRangeParameter());
         }
     }
 
@@ -178,7 +178,10 @@ class CommonForm extends Form
         $formData = $this->getValues();
         foreach ($this->rangeFactors as $unit => $factor) {
             if ($formData[$unit] !== '' && $formData[$unit] !== $this->defaultFormData[$unit]) {
-                $this->getRedirectUrl()->setParam('graph_range', (string) ((int) $formData[$unit] * $factor));
+                $this->getRedirectUrl()->setParam(
+                    static::getRelativeRangeParameter(),
+                    (string) ((int) $formData[$unit] * $factor)
+                );
                 return;
             }
         }
