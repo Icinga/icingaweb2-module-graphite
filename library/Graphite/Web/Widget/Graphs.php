@@ -41,14 +41,14 @@ abstract class Graphs extends AbstractWidget
      *
      * @var string
      */
-    protected $width;
+    protected $width = '300';
 
     /**
      * Graph image height
      *
      * @var string
      */
-    protected $height;
+    protected $height = '150';
 
     /**
      * Graph range start
@@ -162,8 +162,8 @@ abstract class Graphs extends AbstractWidget
     {
         $params = $request->getUrl()->getParams();
         list($this->start, $this->end) = $this->getRangeFromTimeRangePicker($request);
-        $this->width  = $params->shift('width', '300');
-        $this->height = $params->shift('height', '150');
+        $this->width  = $params->shift('width', $this->width);
+        $this->height = $params->shift('height', $this->height);
     }
 
     /**
@@ -276,6 +276,54 @@ abstract class Graphs extends AbstractWidget
     public function setCompact($compact = true)
     {
         $this->compact = $compact;
+        return $this;
+    }
+
+    /**
+     * Get the graph image width
+     *
+     * @return string
+     */
+    public function getWidth()
+    {
+        return $this->width;
+    }
+
+    /**
+     * Set the graph image width
+     *
+     * @param string $width
+     *
+     * @return $this
+     */
+    public function setWidth($width)
+    {
+        $this->width = $width;
+
+        return $this;
+    }
+
+    /**
+     * Get the graph image height
+     *
+     * @return string
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * Set the graph image height
+     *
+     * @param string $height
+     *
+     * @return $this
+     */
+    public function setHeight($height)
+    {
+        $this->height = $height;
+
         return $this;
     }
 }
