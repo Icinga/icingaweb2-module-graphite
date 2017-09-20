@@ -12,6 +12,11 @@ class GraphiteChart
 
     protected $from = '-4hours';
 
+    /**
+     * @var string
+     */
+    protected $until;
+
     protected $showLegend = true;
 
     protected $height = 200;
@@ -70,9 +75,32 @@ class GraphiteChart
         return $this->from;
     }
 
+    /**
+     * Get {@link until}
+     *
+     * @return string
+     */
+    public function getUntil()
+    {
+        return $this->until;
+    }
+
+    /**
+     * Set {@link until}
+     *
+     * @param string $until
+     *
+     * @return $this
+     */
+    public function setUntil($until)
+    {
+        $this->until = $until;
+        return $this;
+    }
+
     protected function getParams()
     {
-        return array(
+        $params = [
             'height'         => $this->height,
             'width'          => $this->width,
             '_salt'          => time() . '.000',
@@ -90,32 +118,31 @@ class GraphiteChart
             // 'hideYAxis'   => 'true',
             // 'format'      => 'svg',
             // 'pieMode'     => 'average',
-        );
+        ];
+
+        if ($this->until !== null) {
+            $params['until'] = $this->until;
+        }
+
+        return $params;
     }
 
     public function getUrl()
     {
-        $urlPattern = '/^' . preg_quote(Url::fromPath('/'), '/') . '/';
         $url = Url::fromPath('/render', $this->getParams());
         $this->template->extendUrl($url, $this->metric, $this->vars);
         $url->getParams()->add('_ext', 'whatever.svg');
-        $url = preg_replace($urlPattern, $this->web->getBaseUrl() . '/', $url);
         return $url;
     }
 
     public function fetchImage()
     {
-        $options = array(
-            'http'=>array(
-            'method'=>"POST",
-            'header'=>
-                "Accept-language: en\r\n".
-                "Content-type: application/x-www-form-urlencoded\r\n",
-//                'content'=> $data
-            )
+        $url = $this->getUrl();
+        return $this->web->getClient()->request(
+            $url->getPath(),
+            $url->getParams(),
+            'POST',
+            ['Accept-language' => 'en', 'Content-type' => 'application/x-www-form-urlencoded']
         );
-
-        $context = stream_context_create($options);
-        return file_get_contents($this->getUrl(), false, $context);
     }
 }

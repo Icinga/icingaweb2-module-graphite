@@ -4,18 +4,19 @@ namespace Icinga\Module\Graphite\Controllers;
 
 use DirectoryIterator;
 use Icinga\Exception\NotFoundError;
+use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
 use Icinga\Module\Graphite\GraphiteChart;
 use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\GraphiteWeb;
+use Icinga\Module\Graphite\GraphiteWebClient;
 use Icinga\Module\Graphite\GraphTemplate;
 use Icinga\Module\Graphite\TemplateStore;
 use Icinga\Web\Controller;
+use Icinga\Web\UrlParams;
 use Icinga\Web\Widget;
 
 class ShowController extends Controller
 {
-    protected $baseUrl;
-
     protected $graphiteWeb;
 
     protected $templates;
@@ -34,84 +35,9 @@ class ShowController extends Controller
     {
         $config = $this->Config();
         $this->templateStore = new TemplateStore();
-        $this->baseUrl = $this->Config()->get('graphite', 'web_url');
-        $graphite = $this->graphiteWeb = new GraphiteWeb($this->baseUrl);
+        $graphite = $this->graphiteWeb = new GraphiteWeb(GraphiteWebClient::getInstance());
         $this->template = $this->view->template = $this->loadTemplate();
         $this->params->shift('r');
-    }
-
-    public function overviewAction()
-    {
-        $this->handleDatasourceToggles();
-        $this->handleGraphParams();
-        // TODO: $max  = $query->getMaxValue();
-
-        $this->view->tabs->add('overview', array(
-            'label' => $this->translate('Graphite - Overview'),
-            'url'   => $this->getRequest()->getUrl()
-        ))->activate('overview');
-
-        $this->view->filterColumn = $this->params->get('filterColumn');
-        $this->view->filterValue  = $this->params->get('filterValue');
-
-        $optional = array(null => '- please choose -');
-        $any = array('*' => 'Show any');
-
-        $this->view->templates = array_merge(
-            $optional,
-            $this->templateStore->enumTemplates()
-        );
-
-        if (! $template = $this->template) {
-            return;
-        }
-
-        $varnames = GraphiteUtil::extractVariableNames($template->getFilterString());
-        $varnames = array_combine($varnames, $varnames);
-
-        $this->view->filterColumns = $optional + $varnames;
-
-        if ($this->view->filterColumn) {
-            if (array_key_exists($this->view->filterColumn, $this->view->filterColumns)) {
-
-                $this->view->filterValues = $optional + $any + $this->graphiteWeb->select()
-                    ->from($template->getFilterString())
-                    ->listDistinct($this->view->filterColumn);
-            }
-        }
-
-        if (! $this->view->filterColumn || ! $this->view->filterValue) {
-            return;
-        }
-
-        $imgs = array();
-
-        $title = $template->getTitle();
-        if (false === strpos($title, '$')) {
-            $template->setTitle('$hostname');
-        } else {
-            if (false === strpos($title, '$hostname')) {
-                $template->setTitle('$hostname: ' . $template->getTitle());
-            }
-        }
-
-        $query = $this->graphiteWeb->select()->from(
-            $template->getFilterString()
-        )->where($this->view->filterColumn, $this->view->filterValue);
-
-        $view = $this->view;
-        $imgParams = array(
-            'template' => $view->templateName,
-            'start'    => $view->start,
-            'width'    => $view->width,
-            'height'   => $view->height
-        );
-
-        if ($this->view->disabledDatasources) {
-            $imgParams['disabled'] = $this->view->disabledDatasources;
-        }
-
-        $view->images = $query->getWrappedImageLinks($template, $imgParams);
     }
 
     public function graphAction()
@@ -142,124 +68,6 @@ class ShowController extends Controller
         $this->_helper->layout()->disableLayout();
         header('Content-Type: image/png');
         $this->view->image = $img->fetchImage();
-    }
-
-    public function hostAction()
-    {
-        $this->handleDatasourceToggles();
-        $this->handleGraphParams();
-        $hostname = $this->view->hostname = $this->params->get('host');
-        if (! $hostname) {
-            throw new NotFoundError('Host is required');
-        }
-
-        $view = $this->view;
-        $this->getTabs()->add('host', array(
-            'label' => $this->translate('Graphite - Single Host'),
-            'url' => $this->getRequest()->getUrl()
-        ))->activate('host');
-
-        $imgs = array();
-        $this->view->templates = array();
-
-        foreach ($this->templateStore->loadTemplateSets() as $setname => $set) {
-
-            $patterns = $set->getBasePatterns();
-            if (! array_key_exists('icingaHost', $patterns)) continue;
-
-            foreach ($set->loadTemplates() as $key => $template) {
-                if (strpos($template->getFilterString(), '$service') !== false) continue;
-
-                $imgParams = array(
-                    'template' => $key,
-                    'start'    => $view->start,
-                    'width'    => $view->width,
-                    'height'   => $view->height
-                );
-
-                if ($this->view->disabledDatasources) {
-                    $imgParams['disabled'] = $this->view->disabledDatasources;
-                    foreach ($this->view->disabledDatasources as $dis) {
-                        if ($template->hasDatasource($dis)) {
-                            $template->getDatasource($dis)->disable();
-                        }
-                    }
-                }
-
-                $this->view->templates[$key] = $template;
-
-                $imgs[$key] = $this->graphiteWeb
-                    ->select()
-                    ->from($template->getFilterString())
-                    ->where('hostname', $hostname)
-                    ->getWrappedImageLinks($template, $imgParams);
-
-            }
-        }
-
-        $view->images = $imgs;
-    }
-
-    public function serviceAction()
-    {
-        $this->handleDatasourceToggles();
-        $this->handleGraphParams();
-        $hostname = $this->view->hostname = $this->params->get('host');
-        $service = $this->view->service = $this->params->get('service');
-        if (! $hostname) {
-            throw new NotFoundError('Host is required');
-        }
-        if (! $service) {
-            throw new NotFoundError('Service is required');
-        }
-        $this->getTabs()->add('service', array(
-            'label' => $this->translate('Graphite - Single service'),
-            'url' => $this->getRequest()->getUrl()
-        ))->activate('service');
-
-        $view = $this->view;
-
-        $imgs = array();
-        $this->view->templates = array();
-
-        foreach ($this->templateStore->loadTemplateSets() as $setname => $set) {
-
-            $patterns = $set->getBasePatterns();
-            if (! array_key_exists('icingaHost', $patterns)) continue;
-
-            foreach ($set->loadTemplates() as $key => $template) {
-                if (strpos($template->getFilterString(), '$service') === false) continue;
-
-                $imgParams = array(
-                    'template' => $key,
-                    'start'    => $view->start,
-                    'width'    => $view->width,
-                    'height'   => $view->height
-                );
-
-                if ($this->view->disabledDatasources) {
-                    $imgParams['disabled'] = $this->view->disabledDatasources;
-                    foreach ($this->view->disabledDatasources as $dis) {
-                        if ($template->hasDatasource($dis)) {
-                            $template->getDatasource($dis)->disable();
-                        }
-
-                    }
-                }
-
-                $this->view->templates[$key] = $template;
-
-                $imgs[$key] = $this->graphiteWeb
-                    ->select()
-                    ->from($template->getFilterString())
-                    ->where('hostname', $hostname)
-                    ->where('service',  $service)
-                    ->getWrappedImageLinks($template, $imgParams);
-
-            }
-        }
-
-        $view->images = $imgs;
     }
 
     public function XXXserviceAction()
@@ -331,12 +139,29 @@ class ShowController extends Controller
         $this->view->disabledDatasources = $this->params->getValues('disabled');
     }
 
+    /**
+     * Get time range parameters for Graphite from the URL
+     *
+     * @return string[]
+     */
+    protected function getRangeFromTimeRangePicker()
+    {
+        $params = $this->getRequest()->getUrl()->getParams();
+        $relative = $params->get(TimeRangePickerTrait::getRelativeRangeParameter());
+        if ($relative !== null) {
+            return ["-{$relative}s", null];
+        }
+
+        $absolute = TimeRangePickerTrait::getAbsoluteRangeParameters();
+        return [$params->get($absolute['start'], '-1hours'), $params->get($absolute['end'])];
+    }
+
     protected function handleGraphParams()
     {
         if ($this->handledGraphParams === false) {
             $this->handledGraphParams = true;
             $view = $this->view;
-            $view->start  = $this->params->shift('start', '-1hours');
+            list($view->start, $view->end) = $this->getRangeFromTimeRangePicker();
             $view->width  = $this->params->shift('width', '300');
             $view->height = $this->params->shift('height', '150');
         }
@@ -349,6 +174,7 @@ class ShowController extends Controller
         $this->handleGraphParams();
         $view = $this->view;
         $chart->setStart($view->start)
+              ->setUntil($view->end)
               ->setWidth($view->width)
               ->setHeight($view->height)
               // TODO: handle before
