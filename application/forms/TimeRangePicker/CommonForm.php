@@ -36,6 +36,7 @@ class CommonForm extends Form
     public function init()
     {
         $this->setName('form_timerangepickercommon_graphite');
+        $this->setAttrib('data-base-target', '_self');
     }
 
     public function createElements(array $formData)
