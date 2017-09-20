@@ -1,6 +1,6 @@
 <?php
 
-use Icinga\Module\Graphite\EmbedGraphs;
+use Icinga\Module\Graphite\Web\Widget\Graphs\Service;
 use Icinga\Web\Url;
 
 /** @var \Icinga\Web\View $this */
@@ -49,7 +49,7 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 )
                 . '</h2>';
         }
-        echo EmbedGraphs::service($service->host_name, $service->service_description);
+        echo (new Service($service->host_name, $service->service_description))->setCompact()->handleRequest();
     }
 
     if (! $compact && $services->hasMore()) {

@@ -1,6 +1,6 @@
 <?php
 
-use Icinga\Module\Graphite\EmbedGraphs;
+use Icinga\Module\Graphite\Web\Widget\Graphs\Host;
 use Icinga\Web\Url;
 
 /** @var \Icinga\Web\View $this */
@@ -39,7 +39,7 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 )
                 . '</h2>';
         }
-        echo EmbedGraphs::host($host->host_name);
+        echo (new Host($host->host_name))->setCompact()->handleRequest();
 
         echo '</div>';
     }
