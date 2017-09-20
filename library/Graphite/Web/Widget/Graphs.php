@@ -23,6 +23,20 @@ use Icinga\Web\Widget\AbstractWidget;
 abstract class Graphs extends AbstractWidget
 {
     /**
+     * [$setName => $set]
+     *
+     * @var TemplateSet[string]
+     */
+    protected static $templateSets;
+
+    /**
+     * [$setName => [$templateName => $template]]
+     *
+     * @var GraphTemplate[string][string]
+     */
+    protected static $allTemplates = [];
+
+    /**
      * Graph image width
      *
      * @var string
@@ -176,11 +190,19 @@ abstract class Graphs extends AbstractWidget
      */
     protected function collectTemplates()
     {
-        foreach ((new TemplateStore())->loadTemplateSets() as $setname => $set) {
+        if (static::$templateSets === null) {
+            static::$templateSets = (new TemplateStore())->loadTemplateSets();
+        }
+
+        foreach (static::$templateSets as $setname => $set) {
             /** @var TemplateSet $set */
 
             if (array_key_exists('icingaHost', $set->getBasePatterns())) {
-                foreach ($set->loadTemplates() as $templateName => $template) {
+                if (! isset(static::$allTemplates[$setname])) {
+                    static::$allTemplates[$setname] = $set->loadTemplates();
+                }
+
+                foreach (static::$allTemplates[$setname] as $templateName => $template) {
                     /** @var GraphTemplate $template */
 
                     if ($this->includeTemplate($template)) {
