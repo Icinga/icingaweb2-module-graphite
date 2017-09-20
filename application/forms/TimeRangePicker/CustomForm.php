@@ -40,6 +40,7 @@ class CustomForm extends Form
     public function init()
     {
         $this->setName('form_timerangepickercustom_graphite');
+        $this->setAttrib('data-base-target', '_self');
     }
 
     public function createElements(array $formData)

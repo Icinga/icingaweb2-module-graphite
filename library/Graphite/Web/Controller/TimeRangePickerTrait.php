@@ -53,7 +53,10 @@ trait TimeRangePickerTrait
                 $view->translate('Custom', 'TimeRangePicker'),
                 $url->with(TimeRangePicker::getRangeCustomizationParameter(), '1'),
                 null,
-                ['class' => 'button-link']
+                [
+                    'class'             => 'button-link',
+                    'data-base-target'  => '_self'
+                ]
             );
         }
 
