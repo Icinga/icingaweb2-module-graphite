@@ -7,6 +7,12 @@ use Icinga\Web\Controller;
 
 class ConfigController extends Controller
 {
+    public function init()
+    {
+        $this->assertPermission('config/modules');
+        parent::init();
+    }
+
     public function indexAction()
     {
         $this->view->form = $form = new ConfigForm();
