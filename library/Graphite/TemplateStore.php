@@ -54,14 +54,16 @@ class TemplateStore
         $dir = $this->getDir();
         $sets = array();
 
-        foreach (new DirectoryIterator($dir) as $file) {
-            if ($file->isDot()) continue;
-            if (! $file->isDir()) continue;
-            $setname = $file->getFilename();
-            $iniFilename = $file->getPathName() . '/templateset.ini';
-            if (! is_readable($iniFilename)) continue;
+        if (file_exists($dir)) {
+            foreach (new DirectoryIterator($dir) as $file) {
+                if ($file->isDot()) continue;
+                if (!$file->isDir()) continue;
+                $setname = $file->getFilename();
+                $iniFilename = $file->getPathName() . '/templateset.ini';
+                if (!is_readable($iniFilename)) continue;
 
-            $sets[$setname] = new TemplateSet($iniFilename);
+                $sets[$setname] = new TemplateSet($iniFilename);
+            }
         }
 
         if ($name !== null) {
