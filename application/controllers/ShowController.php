@@ -66,8 +66,11 @@ class ShowController extends Controller
             ->showLegend(false);
         
         $this->_helper->layout()->disableLayout();
+
+        $image = $img->fetchImage();
         header('Content-Type: image/png');
-        $this->view->image = $img->fetchImage();
+        echo $image;
+        exit;
     }
 
     public function XXXserviceAction()
