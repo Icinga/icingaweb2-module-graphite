@@ -22,19 +22,7 @@ use Icinga\Web\Widget\AbstractWidget;
 
 abstract class Graphs extends AbstractWidget
 {
-    /**
-     * [$setName => $set]
-     *
-     * @var TemplateSet[string]
-     */
-    protected static $templateSets;
-
-    /**
-     * [$setName => [$templateName => $template]]
-     *
-     * @var GraphTemplate[string][string]
-     */
-    protected static $allTemplates = [];
+    use GraphsTrait;
 
     /**
      * Graph image width
@@ -79,11 +67,6 @@ abstract class Graphs extends AbstractWidget
      * @var string[string][string]
      */
     protected $images;
-
-    /**
-     * @var GraphTemplate[string]
-     */
-    protected $templates;
 
     /**
      * Factory, based on the given object
@@ -186,75 +169,25 @@ abstract class Graphs extends AbstractWidget
     }
 
     /**
-     * Initialize {@link templates}
-     */
-    protected function collectTemplates()
-    {
-        if (static::$templateSets === null) {
-            static::$templateSets = (new TemplateStore())->loadTemplateSets();
-        }
-
-        foreach (static::$templateSets as $setname => $set) {
-            /** @var TemplateSet $set */
-
-            if (array_key_exists('icingaHost', $set->getBasePatterns())) {
-                if (! isset(static::$allTemplates[$setname])) {
-                    static::$allTemplates[$setname] = $set->loadTemplates();
-                }
-
-                foreach (static::$allTemplates[$setname] as $templateName => $template) {
-                    /** @var GraphTemplate $template */
-
-                    if ($this->includeTemplate($template)) {
-                        $this->templates[$templateName] = $template;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Initialize {@link images}
      */
     protected function collectImages()
     {
-        $graphiteWeb = new GraphiteWeb(GraphiteWebClient::getInstance());
-        foreach ($this->templates as $templateName => $template) {
-            /** @var GraphTemplate $template */
+        $this->collectGraphiteQueries();
 
-            $this->images[$templateName] = $this->filterGraphiteQuery(
-                $graphiteWeb->select()->from($template->getFilterString())
-            )
-                ->getWrappedImageLinks(
-                    $template,
-                    TimeRangePickerTrait::copyAllRangeParameters(
-                        (new UrlParams())
-                            ->set('template', $templateName)
-                            ->set('start', $this->start)
-                            ->set('width', $this->width)
-                            ->set('height', $this->height)
-                    )
-                );
+        foreach ($this->graphiteQueries as $templateName => $graphiteQuery) {
+            $this->images[$templateName] = $graphiteQuery->getWrappedImageLinks(
+                $this->templates[$templateName],
+                TimeRangePickerTrait::copyAllRangeParameters(
+                    (new UrlParams())
+                        ->set('template', $templateName)
+                        ->set('start', $this->start)
+                        ->set('width', $this->width)
+                        ->set('height', $this->height)
+                )
+            );
         }
     }
-
-    /**
-     * Add filters to the given query so that only specific graphs are shown
-     *
-     * @param   GraphiteQuery   $query
-     *
-     * @return  GraphiteQuery           The given query
-     */
-    abstract protected function filterGraphiteQuery(GraphiteQuery $query);
-
-    /**
-     * Return whether to use the given template
-     *
-     * @param   GraphTemplate   $template
-     *
-     * @return  bool
-     */
-    abstract protected function includeTemplate(GraphTemplate $template);
 
     /**
      * Get {@link compact}
