@@ -5,18 +5,14 @@ namespace Icinga\Module\Graphite\Web\Widget;
 use Icinga\Application\Icinga;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
 use Icinga\Module\Graphite\GraphiteQuery;
-use Icinga\Module\Graphite\GraphiteWeb;
-use Icinga\Module\Graphite\GraphiteWebClient;
-use Icinga\Module\Graphite\GraphTemplate;
-use Icinga\Module\Graphite\TemplateSet;
-use Icinga\Module\Graphite\TemplateStore;
+use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Host as HostGraphs;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Service as ServiceGraphs;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Module\Monitoring\Object\Service;
 use Icinga\Web\Request;
-use Icinga\Web\UrlParams;
+use Icinga\Web\Url;
 use Icinga\Web\View;
 use Icinga\Web\Widget\AbstractWidget;
 
@@ -66,7 +62,7 @@ abstract class Graphs extends AbstractWidget
      *
      * @var string[string][string]
      */
-    protected $images;
+    protected $images = [];
 
     /**
      * Factory, based on the given object
@@ -115,22 +111,20 @@ abstract class Graphs extends AbstractWidget
         $rendered = '';
 
         foreach ($this->images as $type => $images) {
-            if (count($images) > 0) {
-                $rendered .= '<div class="images">';
+            $rendered .= '<div class="images">';
 
-                if (! $this->compact) {
-                    $rendered .= "<h3>{$view->escape(ucfirst($type))}</h3>{$view->partial(
-                        'show/legend.phtml',
-                        ['template' => $this->templates[$type]]
-                    )}";
-                }
-
-                foreach ($images as $title => $url) {
-                    $rendered .= "<img src=\"$url\" class=\"graphiteImg\" alt=\"\" width=\"$this->width\" height=\"$this->height\" />";
-                }
-
-                $rendered .= '</div>';
+            if (! $this->compact) {
+                $rendered .= "<h3>{$view->escape(ucfirst($type))}</h3>{$view->partial(
+                    'show/legend.phtml',
+                    ['template' => $this->templates[$type]]
+                )}";
             }
+
+            foreach ($images as $url) {
+                $rendered .= "<img src=\"$url\" class=\"graphiteImg\" alt=\"\" width=\"$this->width\" height=\"$this->height\" />";
+            }
+
+            $rendered .= '</div>';
         }
 
         return $rendered ?: "<p>{$view->escape($view->translate('No graphs found'))}</p>";
@@ -174,20 +168,30 @@ abstract class Graphs extends AbstractWidget
     protected function collectImages()
     {
         $this->collectGraphiteQueries();
+        $imageBaseUrl = $this->getImageBaseUrl();
 
         foreach ($this->graphiteQueries as $templateName => $graphiteQuery) {
-            $this->images[$templateName] = $graphiteQuery->getWrappedImageLinks(
-                $this->templates[$templateName],
-                TimeRangePickerTrait::copyAllRangeParameters(
-                    (new UrlParams())
-                        ->set('template', $templateName)
-                        ->set('start', $this->start)
-                        ->set('width', $this->width)
-                        ->set('height', $this->height)
-                )
-            );
+            /** @var GraphiteQuery $graphiteQuery */
+
+            $searchPattern = $graphiteQuery->getSearchPattern();
+
+            foreach ($graphiteQuery->listMetrics() as $metric) {
+                $this->images[$templateName][] = $imageBaseUrl
+                    ->with(GraphiteUtil::extractVars($metric, $searchPattern))
+                    ->setParam('start', $this->start)
+                    ->setParam('end', $this->end)
+                    ->setParam('width', $this->width)
+                    ->setParam('height', $this->height);
+            }
         }
     }
+
+    /**
+     * Get the base URL to a graph specifying just the monitored object kind
+     *
+     * @return Url
+     */
+    abstract protected function getImageBaseUrl();
 
     /**
      * Get {@link compact}
