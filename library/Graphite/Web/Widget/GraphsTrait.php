@@ -28,12 +28,12 @@ trait GraphsTrait
     /**
      * @var GraphTemplate[string]
      */
-    protected $templates;
+    protected $templates = [];
 
     /**
      * @var GraphiteQuery[string]
      */
-    protected $graphiteQueries;
+    protected $graphiteQueries = [];
 
     /**
      * Initialize {@link templates}

@@ -178,6 +178,7 @@ abstract class Graphs extends AbstractWidget
             foreach ($graphiteQuery->listMetrics() as $metric) {
                 $this->images[$templateName][] = $imageBaseUrl
                     ->with(GraphiteUtil::extractVars($metric, $searchPattern))
+                    ->setParam('template', $this->templates[$templateName]->getFilterString())
                     ->setParam('start', $this->start)
                     ->setParam('end', $this->end)
                     ->setParam('width', $this->width)

@@ -15,11 +15,11 @@ class GraphController extends Controller
     use GraphsTrait;
 
     /**
-     * The URL parameters for graph sizing
+     * The URL parameters for the graph
      *
      * @var string[]
      */
-    protected $geometryParamsNames = ['start', 'end', 'width', 'height', 'legend'];
+    protected $graphParamsNames = ['start', 'end', 'width', 'height', 'legend', 'template'];
 
     /**
      * Whether we supply a service's graph
@@ -36,11 +36,11 @@ class GraphController extends Controller
     protected $filterParams;
 
     /**
-     * The URL parameters for graph sizing
+     * The URL parameters for the graph
      *
      * @var string[string]
      */
-    protected $geometryParams = [];
+    protected $graphParams = [];
 
     public function hostAction()
     {
@@ -61,8 +61,8 @@ class GraphController extends Controller
     {
         $this->filterParams = clone $this->getRequest()->getUrl()->getParams();
 
-        foreach ($this->geometryParamsNames as $paramName) {
-            $this->geometryParams[$paramName] = $this->filterParams->shift($paramName);
+        foreach ($this->graphParamsNames as $paramName) {
+            $this->graphParams[$paramName] = $this->filterParams->shift($paramName);
         }
 
         $this->collectTemplates();
@@ -86,11 +86,11 @@ class GraphController extends Controller
         }
 
         $image = $charts[0]
-            ->setStart($this->geometryParams['start'])
-            ->setUntil($this->geometryParams['end'])
-            ->setWidth($this->geometryParams['width'])
-            ->setHeight($this->geometryParams['height'])
-            ->showLegend((bool) $this->geometryParams['legend'])
+            ->setStart($this->graphParams['start'])
+            ->setUntil($this->graphParams['end'])
+            ->setWidth($this->graphParams['width'])
+            ->setHeight($this->graphParams['height'])
+            ->showLegend((bool) $this->graphParams['legend'])
             ->fetchImage();
 
         $this->_helper->layout()->disableLayout();
@@ -103,7 +103,7 @@ class GraphController extends Controller
 
     protected function includeTemplate(GraphTemplate $template)
     {
-        return (strpos($template->getFilterString(), '$service') !== false) === $this->service;
+        return $template->getFilterString() === $this->graphParams['template'];
     }
 
     protected function filterGraphiteQuery(GraphiteQuery $query)
