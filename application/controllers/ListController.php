@@ -3,14 +3,14 @@
 namespace Icinga\Module\Graphite\Controllers;
 
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePicker;
+use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
-use Icinga\Module\Monitoring\Controller;
 use Icinga\Module\Monitoring\DataView\DataView;
 use Icinga\Web\Url;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
 use Icinga\Web\Widget\Tabextension\MenuAction;
 
-class ListController extends Controller
+class ListController extends MonitoringAwareController
 {
     use TimeRangePickerTrait;
 
@@ -28,8 +28,10 @@ class ListController extends Controller
             mt('monitoring', 'List hosts')
         );
 
-        $this->view->hosts = $hosts = $this->backend->select()->from('hoststatus', ['host_name', 'host_display_name']);
-        $this->applyRestriction('monitoring/filter/objects', $hosts);
+        $this->view->hosts = $hosts = $this->applyMonitoringRestriction(
+            $this->backend->select()->from('hoststatus', ['host_name', 'host_display_name'])
+        );
+
         $this->filterQuery($hosts);
         $this->setupPaginationControl($hosts);
         $this->setupLimitControl();
@@ -47,13 +49,15 @@ class ListController extends Controller
             mt('monitoring', 'List services')
         );
 
-        $this->view->services = $services = $this->backend->select()->from('servicestatus', [
-            'host_name',
-            'host_display_name',
-            'service_description',
-            'service_display_name'
-        ]);
-        $this->applyRestriction('monitoring/filter/objects', $services);
+        $this->view->services = $services = $this->applyMonitoringRestriction(
+            $this->backend->select()->from('servicestatus', [
+                'host_name',
+                'host_display_name',
+                'service_description',
+                'service_display_name'
+            ])
+        );
+
         $this->filterQuery($services);
         $this->setupPaginationControl($services);
         $this->setupLimitControl();

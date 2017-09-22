@@ -176,8 +176,9 @@ abstract class Graphs extends AbstractWidget
             $searchPattern = $graphiteQuery->getSearchPattern();
 
             foreach ($graphiteQuery->listMetrics() as $metric) {
-                $this->images[$templateName][] = $imageBaseUrl
-                    ->with(GraphiteUtil::extractVars($metric, $searchPattern))
+                $this->images[$templateName][] = $this->filterImageUrl(
+                    $imageBaseUrl->with(GraphiteUtil::extractVars($metric, $searchPattern))
+                )
                     ->setParam('template', $this->templates[$templateName]->getFilterString())
                     ->setParam('start', $this->start)
                     ->setParam('end', $this->end)
@@ -193,6 +194,15 @@ abstract class Graphs extends AbstractWidget
      * @return Url
      */
     abstract protected function getImageBaseUrl();
+
+    /**
+     * Extend the {@link getImageBaseUrl()}'s result's parameters with the concrete monitored object
+     *
+     * @param   Url $url    The URL to extend
+     *
+     * @return  Url         The given URL
+     */
+    abstract protected function filterImageUrl(Url $url);
 
     /**
      * Get {@link compact}
