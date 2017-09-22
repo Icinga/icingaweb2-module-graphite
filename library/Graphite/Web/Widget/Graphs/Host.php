@@ -5,6 +5,7 @@ namespace Icinga\Module\Graphite\Web\Widget\Graphs;
 use Icinga\Module\Graphite\GraphiteQuery;
 use Icinga\Module\Graphite\GraphTemplate;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
+use Icinga\Web\Url;
 
 class Host extends Graphs
 {
@@ -33,5 +34,10 @@ class Host extends Graphs
     protected function includeTemplate(GraphTemplate $template)
     {
         return strpos($template->getFilterString(), '$service') === false;
+    }
+
+    protected function getImageBaseUrl()
+    {
+        return Url::fromPath('graphite/graph/host');
     }
 }

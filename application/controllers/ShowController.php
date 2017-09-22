@@ -40,39 +40,6 @@ class ShowController extends Controller
         $this->params->shift('r');
     }
 
-    public function graphAction()
-    {
-        $template = $this->loadTemplate();
-        $title = $template->getTitle();
-        if (false === strpos($title, '$')) {
-            $template->setTitle('$hostname');
-        } else {
-            if (false === strpos($title, '$hostname')) {
-                $template->setTitle('$hostname: ' . $template->getTitle());
-            }
-        }
-
-        $query = $this->graphiteWeb
-            ->select()
-            ->from(
-                $template->getFilterString()
-            );
-
-        foreach ($this->params->toArray() as $val) {
-            $query->where($val[0], urldecode($val[1]));
-        }
-
-        $img = $this->applyGraphParams(current($query->getImages($template)))
-            ->showLegend(false);
-        
-        $this->_helper->layout()->disableLayout();
-
-        $image = $img->fetchImage();
-        header('Content-Type: image/png');
-        echo $image;
-        exit;
-    }
-
     protected function loadTemplate()
     {
         $this->handleTemplateParams();
@@ -160,7 +127,7 @@ class ShowController extends Controller
                     $params->add('disabled', $key);
                 }
             }
-            
+
             $this->redirectNow($url);
         }
     }
