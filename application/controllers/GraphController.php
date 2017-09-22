@@ -6,11 +6,11 @@ use Icinga\Exception\Http\HttpBadRequestException;
 use Icinga\Exception\Http\HttpNotFoundException;
 use Icinga\Module\Graphite\GraphiteQuery;
 use Icinga\Module\Graphite\GraphTemplate;
+use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Widget\GraphsTrait;
-use Icinga\Web\Controller;
 use Icinga\Web\UrlParams;
 
-class GraphController extends Controller
+class GraphController extends MonitoringAwareController
 {
     use GraphsTrait;
 
@@ -42,8 +42,30 @@ class GraphController extends Controller
      */
     protected $geometryParams = [];
 
+    public function init()
+    {
+        parent::init();
+
+        $this->filterParams = clone $this->getRequest()->getUrl()->getParams();
+
+        foreach ($this->geometryParamsNames as $paramName) {
+            $this->geometryParams[$paramName] = $this->filterParams->shift($paramName);
+        }
+    }
+
     public function hostAction()
     {
+        $host = $this->applyMonitoringRestriction(
+            $this->backend->select()->from('hoststatus', ['host_name'])
+        )
+            ->where('host_name', $this->filterParams->getRequired('hostname'))
+            ->limit(1) // just to be sure to save a few CPU cycles
+            ->fetchRow();
+
+        if ($host === false) {
+            throw new HttpNotFoundException('%s', $this->translate('No such host'));
+        }
+
         $this->service = false;
 
         $this->supplyImage();
@@ -51,6 +73,18 @@ class GraphController extends Controller
 
     public function serviceAction()
     {
+        $service = $this->applyMonitoringRestriction(
+            $this->backend->select()->from('servicestatus', ['host_name', 'service_description'])
+        )
+            ->where('host_name', $this->filterParams->getRequired('hostname'))
+            ->where('service_description', $this->filterParams->getRequired('service'))
+            ->limit(1) // just to be sure to save a few CPU cycles
+            ->fetchRow();
+
+        if ($service === false) {
+            throw new HttpNotFoundException('%s', $this->translate('No such service'));
+        }
+
         $this->supplyImage();
     }
 
@@ -59,12 +93,6 @@ class GraphController extends Controller
      */
     protected function supplyImage()
     {
-        $this->filterParams = clone $this->getRequest()->getUrl()->getParams();
-
-        foreach ($this->geometryParamsNames as $paramName) {
-            $this->geometryParams[$paramName] = $this->filterParams->shift($paramName);
-        }
-
         $this->collectTemplates();
         $this->collectGraphiteQueries();
 
