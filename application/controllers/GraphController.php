@@ -142,7 +142,8 @@ class GraphController extends MonitoringAwareController
 
     protected function filterGraphiteQuery(GraphiteQuery $query)
     {
-        foreach ($this->filterParams->toArray() as list($key, $value)) {
+        foreach ($this->filterParams->toArray() as $param) {
+            list($key, $value) = $param;
             $query->where($key, $value);
         }
 
