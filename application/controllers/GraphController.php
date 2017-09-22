@@ -5,6 +5,7 @@ namespace Icinga\Module\Graphite\Controllers;
 use Icinga\Exception\Http\HttpBadRequestException;
 use Icinga\Exception\Http\HttpNotFoundException;
 use Icinga\Module\Graphite\GraphiteQuery;
+use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\GraphTemplate;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Widget\GraphsTrait;
@@ -93,6 +94,11 @@ class GraphController extends MonitoringAwareController
      */
     protected function supplyImage()
     {
+        $this->filterParams->set('hostname', GraphiteUtil::escape($this->filterParams->get('hostname')));
+        if ($this->service) {
+            $this->filterParams->set('service', GraphiteUtil::escape($this->filterParams->get('service')));
+        }
+
         $this->collectTemplates();
         $this->collectGraphiteQueries();
 

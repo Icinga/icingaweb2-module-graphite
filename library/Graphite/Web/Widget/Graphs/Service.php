@@ -51,4 +51,9 @@ class Service extends Graphs
     {
         return Url::fromPath('graphite/graph/service');
     }
+
+    protected function filterImageUrl(Url $url)
+    {
+        return $url->setParam('hostname', $this->host)->setParam('service',  $this->service);
+    }
 }
