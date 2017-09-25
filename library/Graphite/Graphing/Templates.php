@@ -14,6 +14,20 @@ use SplFileInfo;
 class Templates
 {
     /**
+     * The configured icinga.graphite_writer_host_name_template
+     *
+     * @var MacroTemplate
+     */
+    protected static $hostNameTemplate;
+
+    /**
+     * The configured icinga.graphite_writer_service_name_template
+     *
+     * @var MacroTemplate
+     */
+    protected static $serviceNameTemplate;
+
+    /**
      * Create and return templates with their paths as configured inside the given directory
      *
      * @param   string  $path
@@ -136,6 +150,12 @@ class Templates
                 );
             }
 
+            if (! isset($template['graph']['check_command'])) {
+                throw new ConfigurationError(
+                    'Icinga check command for template "%s" in file "%s" missing', $templateName, $path
+                );
+            }
+
             try {
                 $metricsFilter = new MacroTemplate($template['graph']['metrics_filter']);
             } catch (InvalidArgumentException $e) {
@@ -148,17 +168,33 @@ class Templates
                 );
             }
 
-            if (count(array_intersect($metricsFilter->getMacros(), ['icinga_host', 'icinga_service'])) !== 1) {
+            if (count(array_intersect(
+                $metricsFilter->getMacros(),
+                ['host_name_template', 'service_name_template']
+            )) !== 1) {
                 throw new ConfigurationError(
                     'Bad metrics filter ("%s") for template "%s" in file "%s":'
-                    . ' must include either the macro $icinga_host$ or $icinga_service$, but not both',
+                    . ' must include either the macro $host_name_template$ or $service_name_template$, but not both',
                     $template['graph']['metrics_filter'],
                     $templateName,
                     $path
                 );
             }
 
+            $metricsFilter = new MacroTemplate($metricsFilter->resolve([
+                'host_name_template'    => static::getHostNameTemplate()->resolve([
+                    'host.check_command'    => $template['graph']['check_command'],
+                    ''                      => '$$'
+                ]),
+                'service_name_template' => static::getServiceNameTemplate()->resolve([
+                    'service.check_command' => $template['graph']['check_command'],
+                    ''                      => '$$'
+                ]),
+                ''                      => '$$'
+            ]));
+
             unset($template['graph']['metrics_filter']);
+            unset($template['graph']['check_command']);
 
             switch (count($template['graph'])) {
                 case 0:
@@ -229,5 +265,63 @@ class Templates
         }
 
         return $templates;
+    }
+
+    /**
+     * Get {@link hostNameTemplate}
+     *
+     * @return MacroTemplate
+     */
+    protected static function getHostNameTemplate()
+    {
+        if (static::$hostNameTemplate === null) {
+            $config = Config::module('graphite');
+            $template = $config->get(
+                'icinga',
+                'graphite_writer_host_name_template',
+                'icinga2.$host.name$.host.$host.check_command$'
+            );
+
+            try {
+                static::$hostNameTemplate = new MacroTemplate($template);
+            } catch (InvalidArgumentException $e) {
+                throw new ConfigurationError(
+                    'Bad icinga.graphite_writer_host_name_template in "%s": %s',
+                    $config->getConfigFile(),
+                    $e->getMessage()
+                );
+            }
+        }
+
+        return static::$hostNameTemplate;
+    }
+
+    /**
+     * Get {@link serviceNameTemplate}
+     *
+     * @return MacroTemplate
+     */
+    protected static function getServiceNameTemplate()
+    {
+        if (static::$serviceNameTemplate === null) {
+            $config = Config::module('graphite');
+            $template = $config->get(
+                'icinga',
+                'graphite_writer_service_name_template',
+                'icinga2.$host.name$.services.$service.name$.$service.check_command$'
+            );
+
+            try {
+                static::$serviceNameTemplate = new MacroTemplate($template);
+            } catch (InvalidArgumentException $e) {
+                throw new ConfigurationError(
+                    'Bad icinga.graphite_writer_service_name_template in "%s": %s',
+                    $config->getConfigFile(),
+                    $e->getMessage()
+                );
+            }
+        }
+
+        return static::$serviceNameTemplate;
     }
 }
