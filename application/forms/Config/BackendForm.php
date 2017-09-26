@@ -1,16 +1,15 @@
 <?php
 
-namespace Icinga\Module\Graphite\Forms;
+namespace Icinga\Module\Graphite\Forms\Config;
 
-use Icinga\Forms\ConfigForm as BaseConfigForm;
+use Icinga\Forms\ConfigForm;
 use Icinga\Module\Graphite\Web\Form\Validator\HttpUserValidator;
-use Icinga\Module\Graphite\Web\Form\Validator\MacroTemplateValidator;
 
-class ConfigForm extends BaseConfigForm
+class BackendForm extends ConfigForm
 {
     public function init()
     {
-        $this->setName('form_config_graphite');
+        $this->setName('form_config_graphite_backend');
         $this->setSubmitLabel($this->translate('Save Changes'));
     }
 
@@ -44,30 +43,6 @@ class ConfigForm extends BaseConfigForm
                 [
                     'label'         => $this->translate('Graphite Web password'),
                     'description'   => $this->translate('The above user\'s password')
-                ]
-            ],
-            [
-                'text',
-                'icinga_graphite_writer_host_name_template',
-                [
-                    'label'         => $this->translate('Host name template'),
-                    'description'   => $this->translate(
-                        'The value of your Icinga 2 GraphiteWriter\'s'
-                        . ' attribute host_name_template (if specified)'
-                    ),
-                    'validators'    => [new MacroTemplateValidator()]
-                ]
-            ],
-            [
-                'text',
-                'icinga_graphite_writer_service_name_template',
-                [
-                    'label'         => $this->translate('Service name template'),
-                    'description'   => $this->translate(
-                        'The value of your Icinga 2 GraphiteWriter\'s'
-                        . ' attribute service_name_template (if specified)'
-                    ),
-                    'validators'    => [new MacroTemplateValidator()]
                 ]
             ]
         ]);
