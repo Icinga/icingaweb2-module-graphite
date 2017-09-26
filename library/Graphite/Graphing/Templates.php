@@ -11,6 +11,9 @@ use Icinga\Web\UrlParams;
 use InvalidArgumentException;
 use SplFileInfo;
 
+/**
+ * Templates collection
+ */
 class Templates
 {
     /**
@@ -18,32 +21,44 @@ class Templates
      *
      * @var MacroTemplate
      */
-    protected static $hostNameTemplate;
+    protected $hostNameTemplate;
 
     /**
      * The configured icinga.graphite_writer_service_name_template
      *
      * @var MacroTemplate
      */
-    protected static $serviceNameTemplate;
+    protected $serviceNameTemplate;
 
     /**
-     * Create and return templates with their paths as configured inside the given directory
+     * All templates by their name
+     *
+     * @var Template[string]
+     */
+    protected $templates = [];
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
+
+    /**
+     * Load templates as configured inside the given directory
      *
      * @param   string  $path
      *
-     * @return  Template[string]
+     * @return  $this
      */
-    public static function fromDir($path)
+    public function loadDir($path)
     {
-        $result = static::fromFileSystem(new SplFileInfo($path))[1];
-        if ($result === null) {
-            return [];
+        $result = $this->fromFileSystem(new SplFileInfo($path))[1];
+        if ($result !== null) {
+            $this->treeToFlat($result, $this->templates);
         }
 
-        $results = [];
-        static::treeToFlat($result, $results);
-        return $results;
+        return $this;
     }
 
     /**
@@ -55,7 +70,7 @@ class Templates
      *
      * @return  array
      */
-    protected static function fromFileSystem(SplFileInfo $root)
+    protected function fromFileSystem(SplFileInfo $root)
     {
         if ($root->isLink()) {
             $realpath = $root->getRealPath();
@@ -70,7 +85,7 @@ class Templates
         if ($root->isFile()) {
             $matches = [];
             if (preg_match('/\A([^.].*)\.ini\z/si', isset($filename) ? $filename : $root->getFilename(), $matches)) {
-                $result = static::fromIni($root->getPathname());
+                $result = $this->fromIni($root->getPathname());
                 if (! empty($result)) {
                     return [$matches[1], $result];
                 }
@@ -85,7 +100,7 @@ class Templates
             foreach (new FilesystemIterator($root->getPathname()) as $fileinfo) {
                 /** @var SplFileInfo $fileinfo */
 
-                list($name, $result) = static::fromFileSystem($fileinfo);
+                list($name, $result) = $this->fromFileSystem($fileinfo);
                 if ($name !== null) {
                     $results[$name] = $result;
                 }
@@ -106,13 +121,13 @@ class Templates
      * @param   array               $subTree
      * @param   Template[string]    $results
      */
-    protected static function treeToFlat(array $subTree, array & $results, array $basePath = [])
+    protected function treeToFlat(array $subTree, array & $results, array $basePath = [])
     {
         foreach ($subTree as $key => $value) {
             if (is_array($value)) {
                 $subPath = $basePath;
                 $subPath[] = $key;
-                static::treeToFlat($value, $results, $subPath);
+                $this->treeToFlat($value, $results, $subPath);
             } else {
                 $results[implode('/', array_map('rawurlencode', $basePath))] = $value;
             }
@@ -128,7 +143,7 @@ class Templates
      *
      * @throws  ConfigurationError  If the configuration is invalid
      */
-    protected static function fromIni($path)
+    protected function fromIni($path)
     {
         $templates = [];
 
@@ -182,11 +197,11 @@ class Templates
             }
 
             $metricsFilter = new MacroTemplate($metricsFilter->resolve([
-                'host_name_template'    => static::getHostNameTemplate()->resolve([
+                'host_name_template'    => $this->getHostNameTemplate()->resolve([
                     'host.check_command'    => $template['graph']['check_command'],
                     ''                      => '$$'
                 ]),
-                'service_name_template' => static::getServiceNameTemplate()->resolve([
+                'service_name_template' => $this->getServiceNameTemplate()->resolve([
                     'service.check_command' => $template['graph']['check_command'],
                     ''                      => '$$'
                 ]),
@@ -272,9 +287,9 @@ class Templates
      *
      * @return MacroTemplate
      */
-    protected static function getHostNameTemplate()
+    protected function getHostNameTemplate()
     {
-        if (static::$hostNameTemplate === null) {
+        if ($this->hostNameTemplate === null) {
             $config = Config::module('graphite');
             $template = $config->get(
                 'icinga',
@@ -283,7 +298,7 @@ class Templates
             );
 
             try {
-                static::$hostNameTemplate = new MacroTemplate($template);
+                $this->hostNameTemplate = new MacroTemplate($template);
             } catch (InvalidArgumentException $e) {
                 throw new ConfigurationError(
                     'Bad icinga.graphite_writer_host_name_template in "%s": %s',
@@ -293,7 +308,7 @@ class Templates
             }
         }
 
-        return static::$hostNameTemplate;
+        return $this->hostNameTemplate;
     }
 
     /**
@@ -301,9 +316,9 @@ class Templates
      *
      * @return MacroTemplate
      */
-    protected static function getServiceNameTemplate()
+    protected function getServiceNameTemplate()
     {
-        if (static::$serviceNameTemplate === null) {
+        if ($this->serviceNameTemplate === null) {
             $config = Config::module('graphite');
             $template = $config->get(
                 'icinga',
@@ -312,7 +327,7 @@ class Templates
             );
 
             try {
-                static::$serviceNameTemplate = new MacroTemplate($template);
+                $this->serviceNameTemplate = new MacroTemplate($template);
             } catch (InvalidArgumentException $e) {
                 throw new ConfigurationError(
                     'Bad icinga.graphite_writer_service_name_template in "%s": %s',
@@ -322,6 +337,16 @@ class Templates
             }
         }
 
-        return static::$serviceNameTemplate;
+        return $this->serviceNameTemplate;
+    }
+
+    /**
+     * Get all loaded templates by their name
+     *
+     * @return Template[string]
+     */
+    public function getTemplates()
+    {
+        return $this->templates;
     }
 }
