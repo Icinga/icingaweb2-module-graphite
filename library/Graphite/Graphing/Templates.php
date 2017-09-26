@@ -2,13 +2,14 @@
 
 namespace Icinga\Module\Graphite\Graphing;
 
-use FilesystemIterator;
 use Icinga\Application\Config;
 use Icinga\Data\ConfigObject;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Web\UrlParams;
 use InvalidArgumentException;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use SplFileInfo;
 
 /**
@@ -16,6 +17,13 @@ use SplFileInfo;
  */
 class Templates
 {
+    /**
+     * All templates by their name
+     *
+     * @var Template[string]
+     */
+    protected $templates = [];
+
     /**
      * The configured icinga.graphite_writer_host_name_template
      *
@@ -31,13 +39,6 @@ class Templates
     protected $serviceNameTemplate;
 
     /**
-     * All templates by their name
-     *
-     * @var Template[string]
-     */
-    protected $templates = [];
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -50,100 +51,39 @@ class Templates
      * @param   string  $path
      *
      * @return  $this
+     *
+     * @throws  ConfigurationError  If the configuration is invalid
      */
     public function loadDir($path)
     {
-        $result = $this->fromFileSystem(new SplFileInfo($path))[1];
-        if ($result !== null) {
-            $this->treeToFlat($result, $this->templates);
+        foreach (new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator(
+                $path,
+                RecursiveDirectoryIterator::KEY_AS_PATHNAME | RecursiveDirectoryIterator::CURRENT_AS_FILEINFO
+                    | RecursiveDirectoryIterator::SKIP_DOTS | RecursiveDirectoryIterator::FOLLOW_SYMLINKS
+            ),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        ) as $filepath => $fileinfo) {
+            /** @var SplFileInfo $fileinfo */
+
+            if ($fileinfo->isFile() && preg_match('/\A[^.].*\.ini\z/si', $fileinfo->getFilename())) {
+                $this->loadIni($filepath);
+            }
         }
 
         return $this;
     }
 
     /**
-     * Create and return templates as configured inside the given filesystem node
-     *
-     * Directories are traversed recursively
-     *
-     * @param   SplFileInfo $root
-     *
-     * @return  array
-     */
-    protected function fromFileSystem(SplFileInfo $root)
-    {
-        if ($root->isLink()) {
-            $realpath = $root->getRealPath();
-            if ($realpath === false) {
-                return [null, null];
-            }
-
-            $filename = $root->getFilename();
-            $root = new SplFileInfo($realpath);
-        }
-
-        if ($root->isFile()) {
-            $matches = [];
-            if (preg_match('/\A([^.].*)\.ini\z/si', isset($filename) ? $filename : $root->getFilename(), $matches)) {
-                $result = $this->fromIni($root->getPathname());
-                if (! empty($result)) {
-                    return [$matches[1], $result];
-                }
-            }
-
-            return [null, null];
-        }
-
-        if ($root->isDir()) {
-            $results = [];
-
-            foreach (new FilesystemIterator($root->getPathname()) as $fileinfo) {
-                /** @var SplFileInfo $fileinfo */
-
-                list($name, $result) = $this->fromFileSystem($fileinfo);
-                if ($name !== null) {
-                    $results[$name] = $result;
-                }
-            }
-
-            if (! empty($results)) {
-                return [isset($filename) ? $filename : $root->getFilename(), $results];
-            }
-        }
-
-        return [null, null];
-    }
-
-    /**
-     * Flatten the given subtree and append the result to the given results
-     *
-     * @param   string[]            $basePath
-     * @param   array               $subTree
-     * @param   Template[string]    $results
-     */
-    protected function treeToFlat(array $subTree, array & $results, array $basePath = [])
-    {
-        foreach ($subTree as $key => $value) {
-            if (is_array($value)) {
-                $subPath = $basePath;
-                $subPath[] = $key;
-                $this->treeToFlat($value, $results, $subPath);
-            } else {
-                $results[implode('/', array_map('rawurlencode', $basePath))] = $value;
-            }
-        }
-    }
-
-    /**
-     * Create and return templates as configured in the given INI file
+     * Load templates as configured in the given INI file
      *
      * @param   string  $path
      *
-     * @return  Template[string]
+     * @return  $this
      *
      * @throws  ConfigurationError  If the configuration is invalid
      */
-    protected function fromIni($path)
+    public function loadIni($path)
     {
         $templates = [];
 
@@ -279,13 +219,31 @@ class Templates
             $template = new Template($metricsFilter, $urlParams, $functions);
         }
 
-        return $templates;
+        unset($template);
+
+        foreach ($templates as $template) {
+            $this->templates[(string) $template->getFilter()] = $template;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get all loaded templates by their name
+     *
+     * @return Template[string]
+     */
+    public function getTemplates()
+    {
+        return $this->templates;
     }
 
     /**
      * Get {@link hostNameTemplate}
      *
      * @return MacroTemplate
+     *
+     * @throws  ConfigurationError  If the configuration is invalid
      */
     protected function getHostNameTemplate()
     {
@@ -315,6 +273,8 @@ class Templates
      * Get {@link serviceNameTemplate}
      *
      * @return MacroTemplate
+     *
+     * @throws  ConfigurationError  If the configuration is invalid
      */
     protected function getServiceNameTemplate()
     {
@@ -338,15 +298,5 @@ class Templates
         }
 
         return $this->serviceNameTemplate;
-    }
-
-    /**
-     * Get all loaded templates by their name
-     *
-     * @return Template[string]
-     */
-    public function getTemplates()
-    {
-        return $this->templates;
     }
 }
