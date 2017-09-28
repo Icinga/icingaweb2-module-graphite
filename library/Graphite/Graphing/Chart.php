@@ -118,9 +118,12 @@ class Chart
         }
 
         $variables = $this->getMetricVariables();
-
         foreach ($this->template->getUrlParams() as $key => $value) {
             $params->set($key, $value->resolve($variables));
+        }
+
+        foreach ($this->metrics as $curveName => $metric) {
+            $params->add('target', $this->template->getCurves()[$curveName][1]->resolve(['metric' => $metric]));
         }
 
         $image = $this->graphiteWebClient->request('/render', $params, 'POST', [

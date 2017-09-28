@@ -2,13 +2,15 @@
 
 namespace Icinga\Module\Graphite\Controllers;
 
+use DateTimeZone;
 use Icinga\Exception\Http\HttpBadRequestException;
 use Icinga\Exception\Http\HttpNotFoundException;
-use Icinga\Module\Graphite\GraphiteQuery;
+use Icinga\Module\Graphite\Graphing\MetricsDataSource;
 use Icinga\Module\Graphite\GraphiteUtil;
-use Icinga\Module\Graphite\GraphTemplate;
+use Icinga\Module\Graphite\GraphiteWebClient;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Widget\GraphsTrait;
+use Icinga\Util\TimezoneDetect;
 use Icinga\Web\UrlParams;
 
 class GraphController extends MonitoringAwareController
@@ -21,13 +23,6 @@ class GraphController extends MonitoringAwareController
      * @var string[]
      */
     protected $graphParamsNames = ['start', 'end', 'width', 'height', 'legend', 'template'];
-
-    /**
-     * Whether we supply a service's graph
-     *
-     * @var bool
-     */
-    protected $service = true;
 
     /**
      * The URL parameters for metrics filtering
@@ -59,7 +54,7 @@ class GraphController extends MonitoringAwareController
         $host = $this->applyMonitoringRestriction(
             $this->backend->select()->from('hoststatus', ['host_name'])
         )
-            ->where('host_name', $this->filterParams->getRequired('hostname'))
+            ->where('host_name', $this->filterParams->getRequired('host.name'))
             ->limit(1) // just to be sure to save a few CPU cycles
             ->fetchRow();
 
@@ -67,7 +62,7 @@ class GraphController extends MonitoringAwareController
             throw new HttpNotFoundException('%s', $this->translate('No such host'));
         }
 
-        $this->service = false;
+        $this->filterParams->set('host.name', GraphiteUtil::escape($this->filterParams->get('host.name')));
 
         $this->supplyImage();
     }
@@ -77,14 +72,17 @@ class GraphController extends MonitoringAwareController
         $service = $this->applyMonitoringRestriction(
             $this->backend->select()->from('servicestatus', ['host_name', 'service_description'])
         )
-            ->where('host_name', $this->filterParams->getRequired('hostname'))
-            ->where('service_description', $this->filterParams->getRequired('service'))
+            ->where('host_name', $this->filterParams->getRequired('host.name'))
+            ->where('service_description', $this->filterParams->getRequired('service.name'))
             ->limit(1) // just to be sure to save a few CPU cycles
             ->fetchRow();
 
         if ($service === false) {
             throw new HttpNotFoundException('%s', $this->translate('No such service'));
         }
+
+        $this->filterParams->set('host.name', GraphiteUtil::escape($this->filterParams->get('host.name')));
+        $this->filterParams->set('service.name', GraphiteUtil::escape($this->filterParams->get('service.name')));
 
         $this->supplyImage();
     }
@@ -94,59 +92,38 @@ class GraphController extends MonitoringAwareController
      */
     protected function supplyImage()
     {
-        $this->filterParams->set('hostname', GraphiteUtil::escape($this->filterParams->get('hostname')));
-        if ($this->service) {
-            $this->filterParams->set('service', GraphiteUtil::escape($this->filterParams->get('service')));
+        $templates = $this->getAllTemplates()->getTemplates();
+        if (! isset($templates[$this->graphParams['template']])) {
+            throw new HttpNotFoundException($this->translate('No such template'));
         }
 
-        $this->collectTemplates();
-        $this->collectGraphiteQueries();
+        $charts = $templates[$this->graphParams['template']]->getCharts(
+            new MetricsDataSource(GraphiteWebClient::getInstance()),
+            $this->filterParams->toArray(false)
+        );
 
-        $charts = [];
-        foreach ($this->graphiteQueries as $templateName => $graphiteQuery) {
-            /** @var GraphiteQuery $graphiteQuery */
+        switch (count($charts)) {
+            case 0:
+                throw new HttpNotFoundException($this->translate('No such graph'));
 
-            $charts = array_merge($charts, $graphiteQuery->getImages($this->templates[$templateName]));
-            if (count($charts) > 1) {
+            case 1:
+                $timezoneDetect = new TimezoneDetect();
+                $charts[0]
+                    ->setFrom($this->graphParams['start'])
+                    ->setUntil($this->graphParams['end'])
+                    ->setWidth($this->graphParams['width'])
+                    ->setHeight($this->graphParams['height'])
+                    ->setShowLegend((bool) $this->graphParams['legend'])
+                    ->setTimeZone(new DateTimeZone(
+                        $timezoneDetect->success() ? $timezoneDetect->getTimezoneName() : date_default_timezone_get()
+                    ))
+                    ->serveImage($this->getResponse());
+
+            default:
                 throw new HttpBadRequestException('%s', $this->translate(
                     'Graphite Web yields more than one metric for the given filter.'
                     . ' Please specify a more precise filter.'
                 ));
-            }
         }
-
-        if (empty($charts)) {
-            throw new HttpNotFoundException('%s', $this->translate('No such graph'));
-        }
-
-        $image = $charts[0]
-            ->setStart($this->graphParams['start'])
-            ->setUntil($this->graphParams['end'])
-            ->setWidth($this->graphParams['width'])
-            ->setHeight($this->graphParams['height'])
-            ->showLegend((bool) $this->graphParams['legend'])
-            ->fetchImage();
-
-        $this->_helper->layout()->disableLayout();
-
-        header('Content-Type: image/png');
-        header('Content-Disposition: inline; filename="graph.png"');
-        echo $image;
-        exit;
-    }
-
-    protected function includeTemplate(GraphTemplate $template)
-    {
-        return $template->getFilterString() === $this->graphParams['template'];
-    }
-
-    protected function filterGraphiteQuery(GraphiteQuery $query)
-    {
-        foreach ($this->filterParams->toArray() as $param) {
-            list($key, $value) = $param;
-            $query->where($key, $value);
-        }
-
-        return $query;
     }
 }

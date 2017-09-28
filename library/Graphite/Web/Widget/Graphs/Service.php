@@ -2,8 +2,7 @@
 
 namespace Icinga\Module\Graphite\Web\Widget\Graphs;
 
-use Icinga\Module\Graphite\GraphiteQuery;
-use Icinga\Module\Graphite\GraphTemplate;
+use Icinga\Module\Graphite\Graphing\Template;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
 use Icinga\Web\Url;
 
@@ -35,18 +34,6 @@ class Service extends Graphs
         $this->service = $service;
     }
 
-    protected function filterGraphiteQuery(GraphiteQuery $query)
-    {
-        return $query
-            ->where('hostname', $this->host)
-            ->where('service',  $this->service);
-    }
-
-    protected function includeTemplate(GraphTemplate $template)
-    {
-        return strpos($template->getFilterString(), '$service') !== false;
-    }
-
     protected function getImageBaseUrl()
     {
         return Url::fromPath('graphite/graph/service');
@@ -54,6 +41,22 @@ class Service extends Graphs
 
     protected function filterImageUrl(Url $url)
     {
-        return $url->setParam('hostname', $this->host)->setParam('service',  $this->service);
+        return $url->setParam('host.name', $this->host)->setParam('service.name',  $this->service);
+    }
+
+    protected function designedForMyMonitoredObjectType(Template $template)
+    {
+        foreach ($template->getCurves() as $curve) {
+            if (in_array('service.name', $curve[0]->getMacros())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function getMonitoredObjectFilter()
+    {
+        return ['host.name' => $this->host, 'service.name' =>  $this->service];
     }
 }
