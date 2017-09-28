@@ -247,9 +247,27 @@ class Templates
                 }
             }
 
+            $urlParams = [];
+            if (isset($template['urlparams'])) {
+                foreach ($template['urlparams'] as $key => $value) {
+                    try {
+                        $urlParams[$key] = new MacroTemplate($value);
+                    } catch (InvalidArgumentException $e) {
+                        throw new ConfigurationError(
+                            'Invalid URL parameter "%s" ("%s") for template "%s" in file "%s": %s',
+                            $key,
+                            $value,
+                            $templateName,
+                            $path,
+                            $e->getMessage()
+                        );
+                    }
+                }
+            }
+
             $templates[$checkCommand] = (new Template())
                 ->setCurves($curves)
-                ->setUrlParams(isset($template['urlparams']) ? $template['urlparams'] : []);
+                ->setUrlParams($urlParams);
         }
 
         foreach ($templates as $checkCommand => $template) {

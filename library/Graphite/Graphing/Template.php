@@ -20,7 +20,7 @@ class Template
      *
      * [$key => $value, ...]
      *
-     * @var string[]
+     * @var MacroTemplate[]
      */
     protected $urlParams = [];
 
@@ -58,7 +58,7 @@ class Template
     /**
      * Get additional URL parameters for Graphite Web
      *
-     * @return string[]
+     * @return MacroTemplate[]
      */
     public function getUrlParams()
     {
@@ -68,7 +68,7 @@ class Template
     /**
      * Set additional URL parameters for Graphite Web
      *
-     * @param string[]  $urlParams
+     * @param MacroTemplate[]  $urlParams
      *
      * @return $this
      */
