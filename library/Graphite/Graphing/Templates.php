@@ -85,70 +85,31 @@ class Templates
      */
     public function loadIni($path)
     {
-        $templates = [];
+        /** @var string[][][] $rawTemplates */
+        $rawTemplates = [];
 
         foreach (Config::fromIni($path) as $section => $options) {
             /** @var ConfigObject $options */
 
             $matches = [];
-            if (! preg_match('/\A(.+)\.(graph|urlparams|functions)\z/', $section, $matches)) {
+            if (! preg_match('/\A(.+)\.(graph|metrics_filters|urlparams|functions)\z/', $section, $matches)) {
                 throw new ConfigurationError('Bad section name "%s" in file "%s"', $section, $path);
             }
 
-            $templates[$matches[1]][$matches[2]] = $options->toArray();
+            $rawTemplates[$matches[1]][$matches[2]] = $options->toArray();
         }
 
-        foreach ($templates as $templateName => & $template) {
-            if (! isset($template['graph']['metrics_filter'])) {
-                throw new ConfigurationError(
-                    'Metrics filter for template "%s" in file "%s" missing', $templateName, $path
-                );
-            }
+        /** @var Template[] $templates */
+        $templates = [];
 
+        foreach ($rawTemplates as $templateName => $template) {
             if (! isset($template['graph']['check_command'])) {
                 throw new ConfigurationError(
                     'Icinga check command for template "%s" in file "%s" missing', $templateName, $path
                 );
             }
 
-            try {
-                $metricsFilter = new MacroTemplate($template['graph']['metrics_filter']);
-            } catch (InvalidArgumentException $e) {
-                throw new ConfigurationError(
-                    'Bad metrics filter ("%s") for template "%s" in file "%s": %s',
-                    $template['graph']['metrics_filter'],
-                    $templateName,
-                    $path,
-                    $e->getMessage()
-                );
-            }
-
-            if (count(array_intersect(
-                $metricsFilter->getMacros(),
-                ['host_name_template', 'service_name_template']
-            )) !== 1) {
-                throw new ConfigurationError(
-                    'Bad metrics filter ("%s") for template "%s" in file "%s":'
-                    . ' must include either the macro $host_name_template$ or $service_name_template$, but not both',
-                    $template['graph']['metrics_filter'],
-                    $templateName,
-                    $path
-                );
-            }
-
-            $metricsFilter = new MacroTemplate($metricsFilter->resolve([
-                'host_name_template'    => $this->getHostNameTemplate()->resolve([
-                    'host.check_command'    => $template['graph']['check_command'],
-                    ''                      => '$$'
-                ]),
-                'service_name_template' => $this->getServiceNameTemplate()->resolve([
-                    'service.check_command' => $template['graph']['check_command'],
-                    ''                      => '$$'
-                ]),
-                ''                      => '$$'
-            ]));
-
-            unset($template['graph']['metrics_filter']);
+            $checkCommand = $template['graph']['check_command'];
             unset($template['graph']['check_command']);
 
             switch (count($template['graph'])) {
@@ -164,8 +125,8 @@ class Templates
                     );
 
                 default:
-                    $unknown = array_keys($template['graph']);
-                    sort($unknown);
+                    $standalone = array_keys($template['graph']);
+                    sort($standalone);
 
                     throw new ConfigurationError(
                         'Bad options for template "%s" in file "%s": %s',
@@ -175,54 +136,124 @@ class Templates
                             function($option) {
                                 return "\"graph.$option\"";
                             },
-                            $unknown
+                            $standalone
                         ))
                     );
             }
 
-            $urlParams = new UrlParams();
-            if (isset($template['urlparams'])) {
-                $urlParams->addValues($template['urlparams']);
+            if (! isset($template['metrics_filters']) || empty($template['metrics_filters'])) {
+                throw new ConfigurationError(
+                    'Metrics filters for template "%s" in file "%s" missing', $templateName, $path
+                );
             }
 
-            if (isset($template['functions'])) {
-                $functions = [];
-                foreach ($template['functions'] as $functionName => $function) {
+            /** @var MacroTemplate[][] $curves */
+            $curves = [];
+
+            foreach ($template['metrics_filters'] as $curve => $metricsFilter) {
+                try {
+                    $curves[$curve][0] = new MacroTemplate($metricsFilter);
+                } catch (InvalidArgumentException $e) {
+                    throw new ConfigurationError(
+                        'Bad metrics filter "%s" for curve "%s" of template "%s" in file "%s": %s',
+                        $metricsFilter,
+                        $curve,
+                        $templateName,
+                        $path,
+                        $e->getMessage()
+                    );
+                }
+
+                if (count(array_intersect(
+                    $curves[$curve][0]->getMacros(),
+                    ['host_name_template', 'service_name_template']
+                )) !== 1) {
+                    throw new ConfigurationError(
+                        'Bad metrics filter "%s" for curve "%s" of template "%s" in file "%s": must include'
+                        . ' either the macro $host_name_template$ or $service_name_template$, but not both',
+                        $metricsFilter,
+                        $curve,
+                        $templateName,
+                        $path
+                    );
+                }
+
+                $curves[$curve][0] = new MacroTemplate($curves[$curve][0]->resolve([
+                    'host_name_template'    => $this->getHostNameTemplate()->resolve([
+                        'host.check_command'    => $checkCommand,
+                        ''                      => '$$'
+                    ]),
+                    'service_name_template' => $this->getServiceNameTemplate()->resolve([
+                        'service.check_command' => $checkCommand,
+                        ''                      => '$$'
+                    ]),
+                    ''                      => '$$'
+                ]));
+
+                if (isset($template['functions'][$curve])) {
                     try {
-                        $functions[$functionName] = new MacroTemplate($function);
+                        $curves[$curve][1] = new MacroTemplate($template['functions'][$curve]);
                     } catch (InvalidArgumentException $e) {
                         throw new ConfigurationError(
-                            'Bad definition of function "%s" ("%s") for template "%s" in file "%s": %s',
-                            $functionName,
-                            $function,
+                            'Bad function "%s" for curve "%s" of template "%s" in file "%s": %s',
+                            $template['functions'][$curve],
+                            $curve,
                             $templateName,
                             $path,
                             $e->getMessage()
                         );
                     }
 
-                    if ($functions[$functionName]->getMacros() !== ['metric']) {
+                    if ($curves[$curve][1]->getMacros() !== ['metric']) {
                         throw new ConfigurationError(
-                            'Bad function "%s" ("%s") of template "%s" in file "%s":'
+                            'Bad function "%s" for curve "%s" of template "%s" in file "%s":'
                             . ' function definitions of templates must include the macro $metric$ and no other ones',
-                            $functionName,
-                            $function,
+                            $template['functions'][$curve],
+                            $curve,
                             $templateName,
                             $path
                         );
                     }
+
+                    unset($template['functions'][$curve]);
+                } else {
+                    $curves[$curve][1] = new MacroTemplate('$metric$');
                 }
-            } else {
-                $functions = ['value' => new MacroTemplate('$metric$')];
             }
 
-            $template = new Template($metricsFilter, $urlParams, $functions);
+            if (isset($template['functions'])) {
+                switch (count($template['functions'])) {
+                    case 0:
+                        break;
+
+                    case 1:
+                        throw new ConfigurationError(
+                            'Metrics filter for curve "%s" of template "%s" in file "%s" missing',
+                            array_keys($template['functions'])[0],
+                            $templateName,
+                            $path
+                        );
+
+                    default:
+                        $standalone = array_keys($template['functions']);
+                        sort($standalone);
+
+                        throw new ConfigurationError(
+                            'Metrics filter for curves of template "%s" in file "%s" missing: "%s"',
+                            $templateName,
+                            $path,
+                            implode('", "', $standalone)
+                        );
+                }
+            }
+
+            $templates[$checkCommand] = (new Template())
+                ->setCurves($curves)
+                ->setUrlParams(isset($template['urlparams']) ? $template['urlparams'] : []);
         }
 
-        unset($template);
-
-        foreach ($templates as $template) {
-            $this->templates[(string) $template->getFilter()] = $template;
+        foreach ($templates as $checkCommand => $template) {
+            $this->templates[$checkCommand] = $template;
         }
 
         return $this;

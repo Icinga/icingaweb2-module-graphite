@@ -3,66 +3,62 @@
 namespace Icinga\Module\Graphite\Graphing;
 
 use Icinga\Module\Graphite\Util\MacroTemplate;
-use Icinga\Web\UrlParams;
 
 class Template
 {
     /**
-     * Graphite Web metrics filter
+     * All curves to show in a chart by name with Graphite Web metric filters and Graphite functions
      *
-     * @var MacroTemplate
+     * [$curve => [$metricFilter, $function], ...]
+     *
+     * @var MacroTemplate[][]
      */
-    protected $filter;
+    protected $curves = [];
 
     /**
-     * Additional URL parameters for Graphite Web
+     * Additional URL parameters for rendering via Graphite Web
      *
-     * @var UrlParams
-     */
-    protected $urlParams;
-
-    /**
-     * Perfdata curves to show in a chart with Graphite functions to apply to them
+     * [$key => $value, ...]
      *
-     * @var MacroTemplate[string]
+     * @var string[]
      */
-    protected $functions;
+    protected $urlParams = [];
 
     /**
      * Constructor
      */
-    public function __construct(MacroTemplate $filter, UrlParams $urlParams, array $functions)
+    public function __construct()
     {
-        $this->setFilter($filter)->setUrlParams($urlParams)->setFunctions($functions);
     }
 
     /**
-     * Get the Graphite Web metrics filter
+     * Get curves to show in a chart by name with Graphite Web metric filters and Graphite functions
      *
-     * @return MacroTemplate
+     * @return MacroTemplate[][]
      */
-    public function getFilter()
+    public function getCurves()
     {
-        return $this->filter;
+        return $this->curves;
     }
 
     /**
-     * Set the Graphite Web metrics filter
+     * Set curves to show in a chart by name with Graphite Web metric filters and Graphite functions
      *
-     * @param MacroTemplate $filter
+     * @param MacroTemplate[][] $curves
      *
      * @return $this
      */
-    public function setFilter(MacroTemplate $filter)
+    public function setCurves(array $curves)
     {
-        $this->filter = $filter;
+        $this->curves = $curves;
+
         return $this;
     }
 
     /**
      * Get additional URL parameters for Graphite Web
      *
-     * @return UrlParams
+     * @return string[]
      */
     public function getUrlParams()
     {
@@ -72,36 +68,14 @@ class Template
     /**
      * Set additional URL parameters for Graphite Web
      *
-     * @param UrlParams $urlParams
+     * @param string[]  $urlParams
      *
      * @return $this
      */
-    public function setUrlParams(UrlParams $urlParams)
+    public function setUrlParams(array $urlParams)
     {
         $this->urlParams = $urlParams;
-        return $this;
-    }
 
-    /**
-     * Get the perfdata curves to show in a chart with Graphite functions to apply to them
-     *
-     * @return MacroTemplate[string]
-     */
-    public function getFunctions()
-    {
-        return $this->functions;
-    }
-
-    /**
-     * Set the perfdata curves to show in a chart with Graphite functions to apply to them
-     *
-     * @param MacroTemplate[string] $functions
-     *
-     * @return $this
-     */
-    public function setFunctions(array $functions)
-    {
-        $this->functions = $functions;
         return $this;
     }
 }
