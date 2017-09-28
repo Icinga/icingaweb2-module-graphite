@@ -24,6 +24,13 @@ class MacroTemplate
     protected $template;
 
     /**
+     * Regex for reverse resolving patterns
+     *
+     * @var string
+     */
+    protected $reverseResolvePattern;
+
+    /**
      * Constructor
      *
      * @param   string  $template           The raw template
@@ -80,6 +87,30 @@ class MacroTemplate
     }
 
     /**
+     * Try to reverse-resolve the given string
+     *
+     * @param   string  $resolved       A result of {@link resolve()}
+     *
+     * @return  string[string]|false    Variables as passed to {@link resolve()} if successful
+     */
+    public function reverseResolve($resolved)
+    {
+        $matches = [];
+        if (! preg_match($this->getReverseResolvePattern(), $resolved, $matches)) {
+            return false;
+        }
+
+        $result = [];
+        foreach ($matches as $index => $match) {
+            if (! is_int($index)) {
+                $result[hex2bin(explode('_', $index, 2)[1])] = $match;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Return the raw template string this instance was constructed from
      *
      * @return string
@@ -120,5 +151,45 @@ class MacroTemplate
     public function getMacroCharacter()
     {
         return $this->macroCharacter;
+    }
+
+    /**
+     * Get {@link reverseResolvePattern}
+     *
+     * @return string
+     */
+    protected function getReverseResolvePattern()
+    {
+        if ($this->reverseResolvePattern === null) {
+            $result = ['/\A']; // kind of string builder
+            $macro = false;
+            $macros = [];
+            $currentCapturedSubPatternIndex = 0;
+
+            foreach ($this->template as $part) {
+                if ($macro) {
+                    if (isset($macros[$part])) {
+                        $result[] = '\g{';
+                        $result[] = $macros[$part];
+                        $result[] = '}';
+                    } else {
+                        $macros[$part] = ++$currentCapturedSubPatternIndex;
+                        $result[] = '(?P<macro_';
+                        $result[] = bin2hex($part);
+                        $result[] = '>.*)';
+                    }
+                } else {
+                    $result[] = preg_quote($part, '/');
+                }
+
+                $macro = ! $macro;
+            }
+
+            $result[] = '\z/s';
+
+            $this->reverseResolvePattern = implode($result);
+        }
+
+        return $this->reverseResolvePattern;
     }
 }
