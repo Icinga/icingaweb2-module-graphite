@@ -62,8 +62,6 @@ class GraphController extends MonitoringAwareController
             throw new HttpNotFoundException('%s', $this->translate('No such host'));
         }
 
-        $this->filterParams->set('host.name', GraphiteUtil::escape($this->filterParams->get('host.name')));
-
         $this->supplyImage();
     }
 
@@ -80,9 +78,6 @@ class GraphController extends MonitoringAwareController
         if ($service === false) {
             throw new HttpNotFoundException('%s', $this->translate('No such service'));
         }
-
-        $this->filterParams->set('host.name', GraphiteUtil::escape($this->filterParams->get('host.name')));
-        $this->filterParams->set('service.name', GraphiteUtil::escape($this->filterParams->get('service.name')));
 
         $this->supplyImage();
     }
