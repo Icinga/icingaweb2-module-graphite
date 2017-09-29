@@ -4,9 +4,8 @@ namespace Icinga\Module\Graphite\Web\Widget;
 
 use Icinga\Application\Icinga;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
-use Icinga\Module\Graphite\Graphing\MetricsDataSource;
+use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Graphing\Template;
-use Icinga\Module\Graphite\GraphiteWebClient;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Host as HostGraphs;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Service as ServiceGraphs;
 use Icinga\Module\Monitoring\Object\Host;
@@ -19,7 +18,7 @@ use Icinga\Web\Widget\AbstractWidget;
 
 abstract class Graphs extends AbstractWidget
 {
-    use GraphsTrait;
+    use GraphingTrait;
 
     /**
      * Graph image width
@@ -102,7 +101,6 @@ abstract class Graphs extends AbstractWidget
         /** @var View $view */
         $view = $this->view();
         $result = []; // kind of string builder
-        $dataSource = new MetricsDataSource(GraphiteWebClient::getInstance());
         $filter = $this->getMonitoredObjectFilter();
         $imageBaseUrl = $this->getImageBaseUrl();
         $templates = static::getAllTemplates()->getTemplates();
@@ -112,7 +110,7 @@ abstract class Graphs extends AbstractWidget
 
         foreach ($templateNames as $templateName) {
             if ($this->designedForMyMonitoredObjectType($templates[$templateName])) {
-                $charts = $templates[$templateName]->getCharts($dataSource, $filter);
+                $charts = $templates[$templateName]->getCharts(static::getMetricsDataSource(), $filter);
                 if (! empty($charts)) {
                     $result[] = '<div class="images">';
 

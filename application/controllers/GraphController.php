@@ -5,17 +5,14 @@ namespace Icinga\Module\Graphite\Controllers;
 use DateTimeZone;
 use Icinga\Exception\Http\HttpBadRequestException;
 use Icinga\Exception\Http\HttpNotFoundException;
-use Icinga\Module\Graphite\Graphing\MetricsDataSource;
-use Icinga\Module\Graphite\GraphiteUtil;
-use Icinga\Module\Graphite\GraphiteWebClient;
+use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
-use Icinga\Module\Graphite\Web\Widget\GraphsTrait;
 use Icinga\Util\TimezoneDetect;
 use Icinga\Web\UrlParams;
 
 class GraphController extends MonitoringAwareController
 {
-    use GraphsTrait;
+    use GraphingTrait;
 
     /**
      * The URL parameters for the graph
@@ -93,7 +90,7 @@ class GraphController extends MonitoringAwareController
         }
 
         $charts = $templates[$this->graphParams['template']]->getCharts(
-            new MetricsDataSource(GraphiteWebClient::getInstance()),
+            static::getMetricsDataSource(),
             $this->filterParams->toArray(false)
         );
 
