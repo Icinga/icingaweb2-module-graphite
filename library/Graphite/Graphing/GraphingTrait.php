@@ -3,6 +3,7 @@
 namespace Icinga\Module\Graphite\Graphing;
 
 use Icinga\Application\Config;
+use Icinga\Application\Icinga;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Web\Url;
 
@@ -30,7 +31,12 @@ trait GraphingTrait
     protected static function getAllTemplates()
     {
         if (static::$allTemplates === null) {
-            $allTemplates = new Templates();
+            $allTemplates = (new Templates())->loadDir(
+                Icinga::app()
+                    ->getModuleManager()
+                    ->getModule('graphite')
+                    ->getBaseDir() . DIRECTORY_SEPARATOR . 'templates'
+            );
 
             $path = Config::resolvePath('modules/graphite/templates');
             if (file_exists($path)) {
