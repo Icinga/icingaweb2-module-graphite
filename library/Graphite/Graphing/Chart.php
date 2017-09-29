@@ -3,7 +3,6 @@
 namespace Icinga\Module\Graphite\Graphing;
 
 use DateTimeZone;
-use Icinga\Module\Graphite\GraphiteWebClientInterface;
 use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Web\Response;
 use Icinga\Web\Url;
@@ -14,7 +13,7 @@ class Chart
     /**
      * Used to render the chart
      *
-     * @var GraphiteWebClientInterface
+     * @var GraphiteWebClient
      */
     protected $graphiteWebClient;
 
@@ -77,11 +76,11 @@ class Chart
     /**
      * Constructor
      *
-     * @param   GraphiteWebClientInterface  $graphiteWebClient  Used to render the chart
-     * @param   Template                    $template           This chart's base
-     * @param   string[]                    $metrics            Target metrics by curve name
+     * @param   GraphiteWebClient   $graphiteWebClient  Used to render the chart
+     * @param   Template            $template           This chart's base
+     * @param   string[]            $metrics            Target metrics by curve name
      */
-    public function __construct(GraphiteWebClientInterface $graphiteWebClient, Template $template, array $metrics)
+    public function __construct(GraphiteWebClient $graphiteWebClient, Template $template, array $metrics)
     {
         $this->graphiteWebClient = $graphiteWebClient;
         $this->template = $template;
@@ -126,7 +125,7 @@ class Chart
             $params->add('target', $this->template->getCurves()[$curveName][1]->resolve(['metric' => $metric]));
         }
 
-        $image = $this->graphiteWebClient->request('/render', $params, 'POST', [
+        $image = $this->graphiteWebClient->request(Url::fromPath('/render')->setParams($params), 'POST', [
             'Accept-language'   => 'en',
             'Content-type'      => 'application/x-www-form-urlencoded'
         ]);

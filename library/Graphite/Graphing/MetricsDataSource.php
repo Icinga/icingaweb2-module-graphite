@@ -3,7 +3,6 @@
 namespace Icinga\Module\Graphite\Graphing;
 
 use Icinga\Data\Selectable;
-use Icinga\Module\Graphite\GraphiteWebClientInterface;
 
 /**
  * Provides an interface to Graphite Web's metrics list
@@ -13,16 +12,16 @@ class MetricsDataSource implements Selectable
     /**
      * HTTP interface to Graphite Web
      *
-     * @var GraphiteWebClientInterface
+     * @var GraphiteWebClient
      */
     private $client;
 
     /**
      * Constructor
      *
-     * @param   GraphiteWebClientInterface  $client HTTP interface to Graphite Web
+     * @param   GraphiteWebClient   $client HTTP interface to Graphite Web
      */
-    public function __construct(GraphiteWebClientInterface $client)
+    public function __construct(GraphiteWebClient $client)
     {
         $this->client = $client;
     }
@@ -40,7 +39,7 @@ class MetricsDataSource implements Selectable
     /**
      * Get the client passed to the constructor
      *
-     * @return GraphiteWebClientInterface
+     * @return GraphiteWebClient
      */
     public function getClient()
     {

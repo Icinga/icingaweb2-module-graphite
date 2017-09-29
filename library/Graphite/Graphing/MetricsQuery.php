@@ -9,6 +9,7 @@ use Icinga\Data\Queryable;
 use Icinga\Exception\NotImplementedError;
 use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\Util\MacroTemplate;
+use Icinga\Web\Url;
 use InvalidArgumentException;
 
 /**
@@ -106,8 +107,7 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
     public function fetchColumn()
     {
         $res = json_decode($this->dataSource->getClient()->request(
-            'metrics/expand',
-            ['query' => $this->base->resolve($this->filter, '*')]
+            Url::fromPath('metrics/expand', ['query' => $this->base->resolve($this->filter, '*')])
         ));
         natsort($res->results);
         return array_values($res->results);

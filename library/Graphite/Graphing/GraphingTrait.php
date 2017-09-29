@@ -3,7 +3,8 @@
 namespace Icinga\Module\Graphite\Graphing;
 
 use Icinga\Application\Config;
-use Icinga\Module\Graphite\GraphiteWebClient;
+use Icinga\Exception\ConfigurationError;
+use Icinga\Web\Url;
 
 trait GraphingTrait
 {
@@ -40,11 +41,23 @@ trait GraphingTrait
      * Get metrics data source
      *
      * @return MetricsDataSource
+     *
+     * @throws ConfigurationError
      */
     public static function getMetricsDataSource()
     {
         if (static::$metricsDataSource === null) {
-            static::$metricsDataSource = new MetricsDataSource(GraphiteWebClient::getInstance());
+            $config = Config::module('graphite');
+            $graphite = $config->getSection('graphite');
+            if (! isset($graphite->web_url)) {
+                throw new ConfigurationError('Missing "graphite.web_url" in "%s"', $config->getConfigFile());
+            }
+
+            static::$metricsDataSource = new MetricsDataSource(
+                (new GraphiteWebClient(Url::fromPath($graphite->web_url)))
+                    ->setUser($graphite->web_user)
+                    ->setPassword($graphite->web_password)
+            );
         }
 
         return static::$metricsDataSource;
