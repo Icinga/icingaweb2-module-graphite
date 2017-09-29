@@ -10,6 +10,12 @@ $section->add(N_('Services'), ['url' => 'graphite/list/services']);
 $this->provideConfigTab('backend', array(
     'title' => $this->translate('Configure the Graphite Web backend'),
     'label' => $this->translate('Backend'),
-    'url' => 'config'
+    'url' => 'config/backend'
+));
+
+$this->provideConfigTab('advanced', array(
+    'title' => $this->translate('Advanced configuration'),
+    'label' => $this->translate('Advanced'),
+    'url' => 'config/advanced'
 ));
 

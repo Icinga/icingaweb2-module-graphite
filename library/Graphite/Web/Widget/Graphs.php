@@ -4,8 +4,8 @@ namespace Icinga\Module\Graphite\Web\Widget;
 
 use Icinga\Application\Icinga;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
-use Icinga\Module\Graphite\GraphiteQuery;
-use Icinga\Module\Graphite\GraphiteUtil;
+use Icinga\Module\Graphite\Graphing\GraphingTrait;
+use Icinga\Module\Graphite\Graphing\Template;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Host as HostGraphs;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Service as ServiceGraphs;
 use Icinga\Module\Monitoring\Object\Host;
@@ -18,7 +18,7 @@ use Icinga\Web\Widget\AbstractWidget;
 
 abstract class Graphs extends AbstractWidget
 {
-    use GraphsTrait;
+    use GraphingTrait;
 
     /**
      * Graph image width
@@ -56,15 +56,6 @@ abstract class Graphs extends AbstractWidget
     protected $compact = false;
 
     /**
-     * The image links to be shown
-     *
-     * [$type => [$title => $url]]
-     *
-     * @var string[string][string]
-     */
-    protected $images = [];
-
-    /**
      * Factory, based on the given object
      *
      * @param   MonitoredObject $object
@@ -97,9 +88,10 @@ abstract class Graphs extends AbstractWidget
             $request = Icinga::app()->getRequest();
         }
 
-        $this->handleGraphParams($request);
-        $this->collectTemplates();
-        $this->collectImages();
+        $params = $request->getUrl()->getParams();
+        list($this->start, $this->end) = $this->getRangeFromTimeRangePicker($request);
+        $this->width  = $params->shift('width', $this->width);
+        $this->height = $params->shift('height', $this->height);
 
         return $this;
     }
@@ -108,39 +100,52 @@ abstract class Graphs extends AbstractWidget
     {
         /** @var View $view */
         $view = $this->view();
-        $rendered = '';
+        $result = []; // kind of string builder
+        $filter = $this->getMonitoredObjectFilter();
+        $imageBaseUrl = $this->getImageBaseUrl();
+        $templates = static::getAllTemplates()->getTemplates();
+        $templateNames = array_keys($templates);
 
-        foreach ($this->images as $type => $images) {
-            $rendered .= '<div class="images">';
+        shuffle($templateNames);
 
-            if (! $this->compact) {
-                $rendered .= "<h3>{$view->escape(ucfirst($type))}</h3>{$view->partial(
-                    'show/legend.phtml',
-                    ['template' => $this->templates[$type]]
-                )}";
+        foreach ($templateNames as $templateName) {
+            if ($this->designedForMyMonitoredObjectType($templates[$templateName])) {
+                $charts = $templates[$templateName]->getCharts(static::getMetricsDataSource(), $filter);
+                if (! empty($charts)) {
+                    $result[] = '<div class="images">';
+
+                    if (! $this->compact) {
+                        $result[] = '<h3>';
+                        $result[] = $view->escape(ucfirst($templateName));
+                        $result[] = '</h3>';
+                        $result[] = $view->partial('show/legend.phtml', ['template' => $templateName]);
+                    }
+
+                    foreach ($charts as $chart) {
+                        $result[] = '<img src="';
+                        $result[] = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
+                            ->setParam('template', $templateName)
+                            ->setParam('start', $this->start)
+                            ->setParam('end', $this->end)
+                            ->setParam('width', $this->width)
+                            ->setParam('height', $this->height);
+                        $result[] = '" class="graphiteImg" alt="" width="';
+                        $result[] = $this->width;
+                        $result[] = '" height="';
+                        $result[] = $this->height;
+                        $result[] = '">';
+                    }
+
+                    $result[] = '</div>';
+
+                    // A monitored object has only one check command per definition of Icinga 2.
+                    // And there is at most one graph template per check command per our definition.
+                    break;
+                }
             }
-
-            foreach ($images as $url) {
-                $rendered .= "<img src=\"$url\" class=\"graphiteImg\" alt=\"\" width=\"$this->width\" height=\"$this->height\" />";
-            }
-
-            $rendered .= '</div>';
         }
 
-        return $rendered ?: "<p>{$view->escape($view->translate('No graphs found'))}</p>";
-    }
-
-    /**
-     * Handle the given request's parameters
-     *
-     * @param   Request $request
-     */
-    protected function handleGraphParams(Request $request)
-    {
-        $params = $request->getUrl()->getParams();
-        list($this->start, $this->end) = $this->getRangeFromTimeRangePicker($request);
-        $this->width  = $params->shift('width', $this->width);
-        $this->height = $params->shift('height', $this->height);
+        return empty($result) ? "<p>{$view->escape($view->translate('No graphs found'))}</p>" : implode($result);
     }
 
     /**
@@ -163,30 +168,20 @@ abstract class Graphs extends AbstractWidget
     }
 
     /**
-     * Initialize {@link images}
+     * Return whether the given template is designed for the type of the monitored object we display graphs for
+     *
+     * @param   Template    $template
+     *
+     * @return  bool
      */
-    protected function collectImages()
-    {
-        $this->collectGraphiteQueries();
-        $imageBaseUrl = $this->getImageBaseUrl();
+    abstract protected function designedForMyMonitoredObjectType(Template $template);
 
-        foreach ($this->graphiteQueries as $templateName => $graphiteQuery) {
-            /** @var GraphiteQuery $graphiteQuery */
-
-            $searchPattern = $graphiteQuery->getSearchPattern();
-
-            foreach ($graphiteQuery->listMetrics() as $metric) {
-                $this->images[$templateName][] = $this->filterImageUrl(
-                    $imageBaseUrl->with(GraphiteUtil::extractVars($metric, $searchPattern))
-                )
-                    ->setParam('template', $this->templates[$templateName]->getFilterString())
-                    ->setParam('start', $this->start)
-                    ->setParam('end', $this->end)
-                    ->setParam('width', $this->width)
-                    ->setParam('height', $this->height);
-            }
-        }
-    }
+    /**
+     * Return a filter specifying the monitored object we display graphs for
+     *
+     * @return string[]
+     */
+    abstract protected function getMonitoredObjectFilter();
 
     /**
      * Get the base URL to a graph specifying just the monitored object kind

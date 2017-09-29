@@ -1,15 +1,15 @@
 <?php
 
-namespace Icinga\Module\Graphite\Forms;
+namespace Icinga\Module\Graphite\Forms\Config;
 
-use Icinga\Forms\ConfigForm as BaseConfigForm;
+use Icinga\Forms\ConfigForm;
 use Icinga\Module\Graphite\Web\Form\Validator\HttpUserValidator;
 
-class ConfigForm extends BaseConfigForm
+class BackendForm extends ConfigForm
 {
     public function init()
     {
-        $this->setName('form_config_graphite');
+        $this->setName('form_config_graphite_backend');
         $this->setSubmitLabel($this->translate('Save Changes'));
     }
 
