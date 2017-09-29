@@ -29,7 +29,7 @@ class ListController extends MonitoringAwareController
         );
 
         $this->view->hosts = $hosts = $this->applyMonitoringRestriction(
-            $this->backend->select()->from('hoststatus', ['host_name', 'host_display_name'])
+            $this->backend->select()->from('hoststatus', ['host_name', 'host_display_name', 'host_check_command'])
         );
 
         $this->filterQuery($hosts);
@@ -54,7 +54,8 @@ class ListController extends MonitoringAwareController
                 'host_name',
                 'host_display_name',
                 'service_description',
-                'service_display_name'
+                'service_display_name',
+                'service_check_command'
             ])
         );
 

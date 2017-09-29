@@ -264,7 +264,8 @@ class Templates
 
             $templates[$templateName] = (new Template())
                 ->setCurves($curves)
-                ->setUrlParams($urlParams);
+                ->setUrlParams($urlParams)
+                ->setCheckCommand($checkCommand);
         }
 
         foreach ($templates as $templateName => $template) {

@@ -39,7 +39,9 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 )
                 . '</h2>';
         }
-        echo (new Host($host->host_name))->setCompact()->handleRequest();
+        echo (new Host($host->host_name, $host->host_check_command))
+            ->setCompact()
+            ->handleRequest();
 
         echo '</div>';
     }

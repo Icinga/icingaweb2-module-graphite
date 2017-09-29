@@ -25,11 +25,14 @@ class Service extends Graphs
     /**
      * Constructor
      *
-     * @param   string  $host       The host to render the graphs of
-     * @param   string  $service    The service to render the graphs of
+     * @param   string  $host           The host to render the graphs of
+     * @param   string  $service        The service to render the graphs of
+     * @param   string  $checkCommand   The check command of the monitored object we display graphs for
      */
-    public function __construct($host, $service)
+    public function __construct($host, $service, $checkCommand)
     {
+        parent::__construct($checkCommand);
+
         $this->host = $host;
         $this->service = $service;
     }

@@ -49,7 +49,9 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 )
                 . '</h2>';
         }
-        echo (new Service($service->host_name, $service->service_description))->setCompact()->handleRequest();
+        echo (new Service($service->host_name, $service->service_description, $service->service_check_command))
+            ->setCompact()
+            ->handleRequest();
     }
 
     if (! $compact && $services->hasMore()) {
