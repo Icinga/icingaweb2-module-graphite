@@ -91,7 +91,7 @@ class GraphController extends MonitoringAwareController
 
         $charts = $templates[$this->graphParams['template']]->getCharts(
             static::getMetricsDataSource(),
-            $this->filterParams->toArray(false)
+            array_map('rawurldecode', $this->filterParams->toArray(false))
         );
 
         switch (count($charts)) {
