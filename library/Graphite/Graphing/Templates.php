@@ -85,8 +85,8 @@ class Templates
      */
     public function loadIni($path)
     {
-        /** @var string[][][] $rawTemplates */
-        $rawTemplates = [];
+        /** @var string[][][] $templates */
+        $templates = [];
 
         foreach (Config::fromIni($path) as $section => $options) {
             /** @var ConfigObject $options */
@@ -96,13 +96,10 @@ class Templates
                 throw new ConfigurationError('Bad section name "%s" in file "%s"', $section, $path);
             }
 
-            $rawTemplates[$matches[1]][$matches[2]] = $options->toArray();
+            $templates[$matches[1]][$matches[2]] = $options->toArray();
         }
 
-        /** @var Template[] $templates */
-        $templates = [];
-
-        foreach ($rawTemplates as $templateName => $template) {
+        foreach ($templates as $templateName => $template) {
             if (! isset($template['graph']['check_command'])) {
                 throw new ConfigurationError(
                     'Icinga check command for template "%s" in file "%s" missing', $templateName, $path
@@ -265,13 +262,13 @@ class Templates
                 }
             }
 
-            $templates[$checkCommand] = (new Template())
+            $templates[$templateName] = (new Template())
                 ->setCurves($curves)
                 ->setUrlParams($urlParams);
         }
 
-        foreach ($templates as $checkCommand => $template) {
-            $this->templates[$checkCommand] = $template;
+        foreach ($templates as $templateName => $template) {
+            $this->templates[$templateName] = $template;
         }
 
         return $this;

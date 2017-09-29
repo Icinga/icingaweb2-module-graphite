@@ -137,10 +137,6 @@ abstract class Graphs extends AbstractWidget
                     }
 
                     $result[] = '</div>';
-
-                    // A monitored object has only one check command per definition of Icinga 2.
-                    // And there is at most one graph template per check command per our definition.
-                    break;
                 }
             }
         }
