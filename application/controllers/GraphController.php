@@ -31,7 +31,7 @@ class GraphController extends MonitoringAwareController
     /**
      * The URL parameters for the graph
      *
-     * @var string[string]
+     * @var string[]
      */
     protected $graphParams = [];
 

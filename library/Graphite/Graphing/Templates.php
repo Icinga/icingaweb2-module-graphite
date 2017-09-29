@@ -20,7 +20,7 @@ class Templates
     /**
      * All templates by their name
      *
-     * @var Template[string]
+     * @var Template[]
      */
     protected $templates = [];
 
@@ -280,7 +280,7 @@ class Templates
     /**
      * Get all loaded templates by their name
      *
-     * @return Template[string]
+     * @return Template[]
      */
     public function getTemplates()
     {

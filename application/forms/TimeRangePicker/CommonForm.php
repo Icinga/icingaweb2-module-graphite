@@ -15,7 +15,7 @@ class CommonForm extends Form
      *
      * One month equals 30 days and one year equals 365.25 days. This should cover enough cases.
      *
-     * @var int[string]
+     * @var int[]
      */
     protected $rangeFactors = [
         'minutes'   => 60,
@@ -29,7 +29,7 @@ class CommonForm extends Form
     /**
      * The elements' default values
      *
-     * @var string[string]|null
+     * @var string[]|null
      */
     protected $defaultFormData;
 

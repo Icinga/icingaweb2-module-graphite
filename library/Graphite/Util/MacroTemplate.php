@@ -52,7 +52,7 @@ class MacroTemplate
     /**
      * Return a string based on this template with the macros resolved from the given variables
      *
-     * @param   string[string]  $variables
+     * @param   string[]  $variables
      * @param   string          $default    The default value for missing variables.
      *                                      By default the macro just isn't replaced.
      *
@@ -91,7 +91,7 @@ class MacroTemplate
      *
      * @param   string  $resolved       A result of {@link resolve()}
      *
-     * @return  string[string]|false    Variables as passed to {@link resolve()} if successful
+     * @return  string[]|false    Variables as passed to {@link resolve()} if successful
      */
     public function reverseResolve($resolved)
     {

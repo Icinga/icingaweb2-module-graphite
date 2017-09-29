@@ -32,7 +32,7 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
     /**
      * Extension of {@link base}
      *
-     * @var string[string]
+     * @var string[]
      */
     protected $filter = [];
 

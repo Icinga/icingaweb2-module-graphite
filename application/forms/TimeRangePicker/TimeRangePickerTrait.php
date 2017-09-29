@@ -16,7 +16,7 @@ trait TimeRangePickerTrait
     }
 
     /**
-     * @return string[string]
+     * @return string[]
      */
     public static function getAbsoluteRangeParameters()
     {
