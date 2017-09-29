@@ -44,8 +44,7 @@ values or similar.
 
 Just extract/clone this module to a `graphite` subfolder in your Icinga
 Web 2 module path. Enable the graphite module in your Icinga Web 2 frontend
-(Configuration -> Modules -> graphite -> enable) and it should work out of
-the box.
+(*Configuration* > *Modules* > *graphite* > *enable*).
 
 NB: It is best practice to install 3rd party modules into a distinct module
 folder for example `/usr/share/icingaweb2/modules`. In case you don't know where this
@@ -53,21 +52,9 @@ might be please check the module path in your Icinga Web 2 configuration.
 
 ## Configuration
 
-Copy the sample configuration to `/etc/icingaweb2/modules` like so:
-
-    mkdir -p /etc/icingaweb2/modules/graphite
-    cp -rv sample-config/icinga2/* /etc/icingaweb2/modules/graphite
-
-Change permissions:
-
-    chown -R root:icingaweb2 /etc/icingaweb2/modules/graphite
-    chmod -R 2755 /etc/icingaweb2/modules/graphite
-
-Edit `/etc/icingaweb2/modules/graphite/config.ini` and set `web\_url`
-to the Graphite web host.
-
-    [graphite]
-    web_url = http://my.graphite.web
+Open Icinga Web 2 (web UI) and navigate to *Configuration* > *Modules* >
+*graphite* > *Backend*. Fill in the Graphite Web root URL
+(e.g. `http://192.0.2.1:8003/`) and the HTTP basic auth credentials (if any).
 
 You don't need any configuration in your Icinga 2 installation (e.g.
 additional custom vars).
