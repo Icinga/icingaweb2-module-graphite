@@ -30,8 +30,14 @@ trait GraphingTrait
     protected static function getAllTemplates()
     {
         if (static::$allTemplates === null) {
-            static::$allTemplates = (new Templates())
-                ->loadDir(Config::resolvePath('modules/graphite/templates'));
+            $allTemplates = new Templates();
+
+            $path = Config::resolvePath('modules/graphite/templates');
+            if (file_exists($path)) {
+                $allTemplates->loadDir($path);
+            }
+
+            static::$allTemplates = $allTemplates;
         }
 
         return static::$allTemplates;
