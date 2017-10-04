@@ -65,6 +65,7 @@ class GraphiteWebClient
     public function request(Url $url, $method = 'GET', array $headers = [], $body = null)
     {
         $headers['User-Agent'] = 'icingaweb2-module-graphite';
+        $headers['Connection'] = 'keep-alive';
         if ($this->user !== null) {
             $headers['Authorization'] = 'Basic ' . base64_encode("{$this->user}:{$this->password}");
         }
