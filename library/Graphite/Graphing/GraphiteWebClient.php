@@ -3,6 +3,9 @@
 namespace Icinga\Module\Graphite\Graphing;
 
 use Icinga\Web\Url;
+use iplx\Http\Client;
+use iplx\Http\ClientInterface;
+use iplx\Http\Request;
 
 /**
  * HTTP interface to Graphite Web
@@ -31,12 +34,21 @@ class GraphiteWebClient
     protected $password;
 
     /**
+     * HTTP client
+     *
+     * @var ClientInterface
+     */
+    protected $httpClient;
+
+    /**
      * Constructor
      *
      * @param   Url $baseUrl    Base URL of every Graphite Web HTTP request
      */
     public function __construct(Url $baseUrl)
     {
+        $this->httpClient = new Client();
+
         $this->setBaseUrl($baseUrl);
     }
 
@@ -52,30 +64,17 @@ class GraphiteWebClient
      */
     public function request(Url $url, $method = 'GET', array $headers = [], $body = null)
     {
-        $httpOptions = ['method' => $method, 'header' => ''];
-
         $headers['User-Agent'] = 'icingaweb2-module-graphite';
         if ($this->user !== null) {
             $headers['Authorization'] = 'Basic ' . base64_encode("{$this->user}:{$this->password}");
         }
 
-        foreach ($headers as $header => $headerValue) {
-            $httpOptions['header'] .= "$header: $headerValue\r\n";
-        }
+        $url = Url::fromPath(rtrim($this->baseUrl->getAbsoluteUrl(), '/') . '/' . ltrim($url->getPath(), '/'))
+            ->setParams($url->getParams())
+            ->getAbsoluteUrl();
 
-        if ($body !== null) {
-            $httpOptions['content'] = $body;
-        }
-
-        // TODO(ak): use our CurlClient (one nice day)
         // TODO(ak): keep connections alive (TCP handshakes are a bit expensive and TLS handshakes are very expensive)
-        return file_get_contents(
-            Url::fromPath(rtrim($this->baseUrl->getAbsoluteUrl(), '/') . '/' . ltrim($url->getPath(), '/'))
-                ->setParams($url->getParams())
-                ->getAbsoluteUrl(),
-            false,
-            stream_context_create(['http' => $httpOptions])
-        );
+        return (string) $this->httpClient->send(new Request($method, $url, $headers, $body))->getBody();
     }
 
     /**

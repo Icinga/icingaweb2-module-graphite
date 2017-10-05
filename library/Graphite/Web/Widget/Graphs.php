@@ -63,6 +63,13 @@ abstract class Graphs extends AbstractWidget
     protected $checkCommand;
 
     /**
+     * Additional CSS classes for the <div/>s around the images
+     *
+     * @var string[]
+     */
+    protected $classes = [];
+
+    /**
      * Factory, based on the given object
      *
      * @param   MonitoredObject $object
@@ -129,12 +136,16 @@ abstract class Graphs extends AbstractWidget
         $imageBaseUrl = $this->getImageBaseUrl();
         $templates = static::getAllTemplates()->getTemplates();
 
+        $classes = $this->classes;
+        $classes[] = 'images';
+        $div = '<div class="' . implode(' ', $classes) . '">';
+
         foreach ($templates as $templateName => $template) {
             if ($this->designedForMyMonitoredObjectType($template)
                 && $template->getCheckCommand() === $this->checkCommand) {
                 $charts = $template->getCharts(static::getMetricsDataSource(), $filter);
                 if (! empty($charts)) {
-                    $result[] = '<div class="images">';
+                    $result[] = $div;
 
                     if (! $this->compact) {
                         $result[] = '<h3>';
@@ -284,6 +295,30 @@ abstract class Graphs extends AbstractWidget
     public function setHeight($height)
     {
         $this->height = $height;
+
+        return $this;
+    }
+
+    /**
+     * Get additional CSS classes for the <div/>s around the images
+     *
+     * @return string[]
+     */
+    public function getClasses()
+    {
+        return $this->classes;
+    }
+
+    /**
+     * Set additional CSS classes for the <div/>s around the images
+     *
+     * @param string[] $classes
+     *
+     * @return $this
+     */
+    public function setClasses($classes)
+    {
+        $this->classes = $classes;
 
         return $this;
     }

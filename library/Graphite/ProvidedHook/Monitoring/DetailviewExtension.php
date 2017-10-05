@@ -20,6 +20,7 @@ class DetailviewExtension extends DetailviewExtensionHook
                 ->setCompact()
                 ->setWidth(440)
                 ->setHeight(220)
+                ->setClasses(['monitored-object-detail-view'])
                 ->handleRequest();
     }
 }
