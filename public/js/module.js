@@ -103,3 +103,64 @@
 
 }(Icinga));
 
+(function(Icinga, $) {
+    'use strict';
+
+    var extractUrlParams = /^([^?]*)\?(.+)$/;
+    var parseUrlParam = /^([^=]+)=(.*)$/;
+
+    function updateGraphSizes() {
+        $("div.images.monitored-object-detail-view img.graphiteImg").each(function() {
+            var e = $(this);
+            var src = e.attr("src");
+
+            if (typeof(src) !== "undefined") {
+                var matchParams = extractUrlParams.exec(src);
+
+                if (matchParams !== null) {
+                    var urlParams = Object.create(null);
+
+                    matchParams[2].split("&").forEach(function(urlParam) {
+                        var matchParam = parseUrlParam.exec(urlParam);
+                        if (matchParam !== null) {
+                            urlParams[matchParam[1]] = matchParam[2];
+                        }
+                    });
+
+                    if (typeof(urlParams.width) !== "undefined") {
+                        var realWidth = e.width().toString();
+
+                        if (urlParams.width !== realWidth) {
+                            urlParams.width = realWidth;
+
+                            var renderedUrlParams = [];
+
+                            for (var urlParam in urlParams) {
+                                renderedUrlParams.push(urlParam + "=" + urlParams[urlParam]);
+                            }
+
+                            e.attr("src", matchParams[1] + "?" + renderedUrlParams.join("&"));
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function MonitoredObjectDetailViewExtensionUpdater(icinga) {
+        Icinga.EventListener.call(this, icinga);
+
+        this.on('rendered', this.onRendered, this);
+    }
+
+    MonitoredObjectDetailViewExtensionUpdater.prototype = Object.create(Icinga.EventListener.prototype);
+
+    MonitoredObjectDetailViewExtensionUpdater.prototype.onRendered = function() {
+        $(window).on('resize', updateGraphSizes);
+        updateGraphSizes();
+    };
+
+    Icinga.Behaviors = Icinga.Behaviors || {};
+
+    Icinga.Behaviors.MonitoredObjectDetailViewGraphiteExtensionUpdater = MonitoredObjectDetailViewExtensionUpdater;
+}(Icinga, jQuery));
