@@ -2,10 +2,27 @@
 
 namespace Icinga\Module\Graphite\Graphing;
 
+use Icinga\Application\Config;
+use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Graphite\Util\MacroTemplate;
+use InvalidArgumentException;
 
 class Template
 {
+    /**
+     * The configured icinga.graphite_writer_host_name_template
+     *
+     * @var MacroTemplate
+     */
+    protected static $hostNameTemplate;
+
+    /**
+     * The configured icinga.graphite_writer_service_name_template
+     *
+     * @var MacroTemplate
+     */
+    protected static $serviceNameTemplate;
+
     /**
      * All curves to show in a chart by name with Graphite Web metric filters and Graphite functions
      *
@@ -44,14 +61,26 @@ class Template
      *
      * @param   MetricsDataSource   $dataSource
      * @param   string[]            $filter
+     * @param   string              $checkCommand   The check command of the monitored object we fetch charts for
      *
      * @return  Chart[]
      */
-    public function getCharts(MetricsDataSource $dataSource, array $filter)
+    public function getCharts(MetricsDataSource $dataSource, array $filter, $checkCommand)
     {
         $metrics = [];
         foreach ($this->curves as $curveName => $curve) {
-            $query = $dataSource->select()->from($curve[0]);
+            $query = $dataSource->select()->from($curve[0]->resolve([
+                'host_name_template'    => static::getHostNameTemplate()->resolve([
+                    'host.check_command'    => $checkCommand,
+                    ''                      => '$$'
+                ]),
+                'service_name_template' => static::getServiceNameTemplate()->resolve([
+                    'service.check_command' => $checkCommand,
+                    ''                      => '$$'
+                ]),
+                ''                      => '$$'
+            ]));
+
             foreach ($filter as $key => $value) {
                 $query->where($key, $value);
             }
@@ -203,5 +232,67 @@ class Template
         $this->checkCommand = $checkCommand;
 
         return $this;
+    }
+
+    /**
+     * Get {@link hostNameTemplate}
+     *
+     * @return MacroTemplate
+     *
+     * @throws  ConfigurationError  If the configuration is invalid
+     */
+    protected static function getHostNameTemplate()
+    {
+        if (static::$hostNameTemplate === null) {
+            $config = Config::module('graphite');
+            $template = $config->get(
+                'icinga',
+                'graphite_writer_host_name_template',
+                'icinga2.$host.name$.host.$host.check_command$'
+            );
+
+            try {
+                static::$hostNameTemplate = new MacroTemplate($template);
+            } catch (InvalidArgumentException $e) {
+                throw new ConfigurationError(
+                    'Bad icinga.graphite_writer_host_name_template in "%s": %s',
+                    $config->getConfigFile(),
+                    $e->getMessage()
+                );
+            }
+        }
+
+        return static::$hostNameTemplate;
+    }
+
+    /**
+     * Get {@link serviceNameTemplate}
+     *
+     * @return MacroTemplate
+     *
+     * @throws  ConfigurationError  If the configuration is invalid
+     */
+    protected static function getServiceNameTemplate()
+    {
+        if (static::$serviceNameTemplate === null) {
+            $config = Config::module('graphite');
+            $template = $config->get(
+                'icinga',
+                'graphite_writer_service_name_template',
+                'icinga2.$host.name$.services.$service.name$.$service.check_command$'
+            );
+
+            try {
+                static::$serviceNameTemplate = new MacroTemplate($template);
+            } catch (InvalidArgumentException $e) {
+                throw new ConfigurationError(
+                    'Bad icinga.graphite_writer_service_name_template in "%s": %s',
+                    $config->getConfigFile(),
+                    $e->getMessage()
+                );
+            }
+        }
+
+        return static::$serviceNameTemplate;
     }
 }

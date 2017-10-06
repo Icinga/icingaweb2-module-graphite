@@ -43,12 +43,12 @@ class Host extends Graphs
     protected function designedForMyMonitoredObjectType(Template $template)
     {
         foreach ($template->getCurves() as $curve) {
-            if (in_array('service.name', $curve[0]->getMacros())) {
-                return false;
+            if (in_array('host_name_template', $curve[0]->getMacros())) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     protected function getMonitoredObjectFilter()

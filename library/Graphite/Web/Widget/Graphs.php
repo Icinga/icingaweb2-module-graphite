@@ -158,7 +158,7 @@ abstract class Graphs extends AbstractWidget
         foreach ($templates as $templateName => $template) {
             if ($this->designedForMyMonitoredObjectType($template)
                 && $template->getCheckCommand() === $checkCommand) {
-                $charts = $template->getCharts(static::getMetricsDataSource(), $filter);
+                $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
                 if (! empty($charts)) {
                     $result[] = $div;
 
