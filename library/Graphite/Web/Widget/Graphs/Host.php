@@ -18,12 +18,14 @@ class Host extends Graphs
     /**
      * Constructor
      *
-     * @param   string  $host           The host to render the graphs of
-     * @param   string  $checkCommand   The check command of the monitored object we display graphs for
+     * @param   string      $host                   The host to render the graphs of
+     * @param   string      $checkCommand           The check command of the monitored object we display graphs for
+     * @param   string|null $obscuredCheckCommand   The "real" check command (if any) of the monitored object
+     *                                              we display graphs for
      */
-    public function __construct($host, $checkCommand)
+    public function __construct($host, $checkCommand, $obscuredCheckCommand)
     {
-        parent::__construct($checkCommand);
+        parent::__construct($checkCommand, $obscuredCheckCommand);
 
         $this->host = $host;
     }
