@@ -49,7 +49,12 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 )
                 . '</h2>';
         }
-        echo (new Service($service->host_name, $service->service_description, $service->service_check_command))
+        echo (new Service(
+            $service->host_name,
+            $service->service_description,
+            $service->service_check_command,
+            $service->_service_check_command
+        ))
             ->setCompact()
             ->handleRequest();
     }
