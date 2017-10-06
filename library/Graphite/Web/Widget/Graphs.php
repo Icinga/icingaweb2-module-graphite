@@ -56,6 +56,13 @@ abstract class Graphs extends AbstractWidget
     protected $compact = false;
 
     /**
+     * The check command of the monitored object we display graphs for
+     *
+     * @var string
+     */
+    protected $checkCommand;
+
+    /**
      * Additional CSS classes for the <div/>s around the images
      *
      * @var string[]
@@ -74,12 +81,29 @@ abstract class Graphs extends AbstractWidget
         switch ($object->getType()) {
             case 'host':
                 /** @var Host $object */
-                return (new HostGraphs($object->getName()));
+                return new HostGraphs(
+                    $object->getName(),
+                    $object->host_check_command
+                );
 
             case 'service':
                 /** @var Service $object */
-                return (new ServiceGraphs($object->getHost()->getName(), $object->getName()));
+                return new ServiceGraphs(
+                    $object->getHost()->getName(),
+                    $object->getName(),
+                    $object->service_check_command
+                );
         }
+    }
+
+    /**
+     * Constructor
+     *
+     * @param   string  $checkCommand   The check command of the monitored object we display graphs for
+     */
+    public function __construct($checkCommand)
+    {
+        $this->checkCommand = $checkCommand;
     }
 
     /**
@@ -111,17 +135,15 @@ abstract class Graphs extends AbstractWidget
         $filter = $this->getMonitoredObjectFilter();
         $imageBaseUrl = $this->getImageBaseUrl();
         $templates = static::getAllTemplates()->getTemplates();
-        $templateNames = array_keys($templates);
 
         $classes = $this->classes;
         $classes[] = 'images';
         $div = '<div class="' . implode(' ', $classes) . '">';
 
-        shuffle($templateNames);
-
-        foreach ($templateNames as $templateName) {
-            if ($this->designedForMyMonitoredObjectType($templates[$templateName])) {
-                $charts = $templates[$templateName]->getCharts(static::getMetricsDataSource(), $filter);
+        foreach ($templates as $templateName => $template) {
+            if ($this->designedForMyMonitoredObjectType($template)
+                && $template->getCheckCommand() === $this->checkCommand) {
+                $charts = $template->getCharts(static::getMetricsDataSource(), $filter);
                 if (! empty($charts)) {
                     $result[] = $div;
 
