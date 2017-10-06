@@ -100,10 +100,24 @@ class MacroTemplate
             return false;
         }
 
+        $macro = false;
+        $macros = [];
+        $currentCapturedSubPatternIndex = 0;
+
+        foreach ($this->template as $part) {
+            if ($macro && ! isset($macros[$part])) {
+                $macros[$part] = ++$currentCapturedSubPatternIndex;
+            }
+
+            $macro = ! $macro;
+        }
+
+        $macros = array_flip($macros);
+
         $result = [];
         foreach ($matches as $index => $match) {
-            if (! is_int($index)) {
-                $result[hex2bin(explode('_', $index, 2)[1])] = $match;
+            if ($index > 0) {
+                $result[$macros[$index]] = $match;
             }
         }
 
@@ -174,9 +188,7 @@ class MacroTemplate
                         $result[] = '}';
                     } else {
                         $macros[$part] = ++$currentCapturedSubPatternIndex;
-                        $result[] = '(?P<macro_';
-                        $result[] = bin2hex($part);
-                        $result[] = '>.*)';
+                        $result[] = '(.*)';
                     }
                 } else {
                     $result[] = preg_quote($part, '/');
