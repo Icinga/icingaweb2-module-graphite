@@ -25,13 +25,15 @@ class Service extends Graphs
     /**
      * Constructor
      *
-     * @param   string  $host           The host to render the graphs of
-     * @param   string  $service        The service to render the graphs of
-     * @param   string  $checkCommand   The check command of the monitored object we display graphs for
+     * @param   string      $host                   The host to render the graphs of
+     * @param   string      $service                The service to render the graphs of
+     * @param   string      $checkCommand           The check command of the monitored object we display graphs for
+     * @param   string|null $obscuredCheckCommand   The "real" check command (if any) of the monitored object
+     *                                              we display graphs for
      */
-    public function __construct($host, $service, $checkCommand)
+    public function __construct($host, $service, $checkCommand, $obscuredCheckCommand)
     {
-        parent::__construct($checkCommand);
+        parent::__construct($checkCommand, $obscuredCheckCommand);
 
         $this->host = $host;
         $this->service = $service;
@@ -50,7 +52,7 @@ class Service extends Graphs
     protected function designedForMyMonitoredObjectType(Template $template)
     {
         foreach ($template->getCurves() as $curve) {
-            if (in_array('service.name', $curve[0]->getMacros())) {
+            if (in_array('service_name_template', $curve[0]->getMacros())) {
                 return true;
             }
         }

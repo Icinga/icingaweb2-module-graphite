@@ -49,7 +49,7 @@ class GraphController extends MonitoringAwareController
     public function hostAction()
     {
         $host = $this->applyMonitoringRestriction(
-            $this->backend->select()->from('hoststatus', ['host_name'])
+            $this->backend->select()->from('hoststatus', ['host_check_command'])
         )
             ->where('host_name', $this->filterParams->getRequired('host.name'))
             ->limit(1) // just to be sure to save a few CPU cycles
@@ -59,13 +59,13 @@ class GraphController extends MonitoringAwareController
             throw new HttpNotFoundException('%s', $this->translate('No such host'));
         }
 
-        $this->supplyImage();
+        $this->supplyImage($host->host_check_command);
     }
 
     public function serviceAction()
     {
         $service = $this->applyMonitoringRestriction(
-            $this->backend->select()->from('servicestatus', ['host_name', 'service_description'])
+            $this->backend->select()->from('servicestatus', ['service_check_command'])
         )
             ->where('host_name', $this->filterParams->getRequired('host.name'))
             ->where('service_description', $this->filterParams->getRequired('service.name'))
@@ -76,13 +76,15 @@ class GraphController extends MonitoringAwareController
             throw new HttpNotFoundException('%s', $this->translate('No such service'));
         }
 
-        $this->supplyImage();
+        $this->supplyImage($service->service_check_command);
     }
 
     /**
      * Do all monitored object type independend actions
+     *
+     * @param   string  $checkCommand   The check command of the monitored object we supply an image for
      */
-    protected function supplyImage()
+    protected function supplyImage($checkCommand)
     {
         $templates = $this->getAllTemplates()->getTemplates();
         if (! isset($templates[$this->graphParams['template']])) {
@@ -91,7 +93,8 @@ class GraphController extends MonitoringAwareController
 
         $charts = $templates[$this->graphParams['template']]->getCharts(
             static::getMetricsDataSource(),
-            array_map('rawurldecode', $this->filterParams->toArray(false))
+            array_map('rawurldecode', $this->filterParams->toArray(false)),
+            $checkCommand
         );
 
         switch (count($charts)) {

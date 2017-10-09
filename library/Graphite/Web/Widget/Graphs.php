@@ -63,6 +63,15 @@ abstract class Graphs extends AbstractWidget
     protected $checkCommand;
 
     /**
+     * The "real" check command (if any) of the monitored object we display graphs for
+     *
+     * E.g. the command executed remotely via check_by_ssh
+     *
+     * @var string|null
+     */
+    protected $obscuredCheckCommand;
+
+    /**
      * Additional CSS classes for the <div/>s around the images
      *
      * @var string[]
@@ -83,7 +92,8 @@ abstract class Graphs extends AbstractWidget
                 /** @var Host $object */
                 return new HostGraphs(
                     $object->getName(),
-                    $object->host_check_command
+                    $object->host_check_command,
+                    $object->_host_check_command
                 );
 
             case 'service':
@@ -91,7 +101,8 @@ abstract class Graphs extends AbstractWidget
                 return new ServiceGraphs(
                     $object->getHost()->getName(),
                     $object->getName(),
-                    $object->service_check_command
+                    $object->service_check_command,
+                    $object->_service_check_command
                 );
         }
     }
@@ -99,11 +110,14 @@ abstract class Graphs extends AbstractWidget
     /**
      * Constructor
      *
-     * @param   string  $checkCommand   The check command of the monitored object we display graphs for
+     * @param   string      $checkCommand           The check command of the monitored object we display graphs for
+     * @param   string|null $obscuredCheckCommand   The "real" check command (if any) of the monitored object
+     *                                              we display graphs for
      */
-    public function __construct($checkCommand)
+    public function __construct($checkCommand, $obscuredCheckCommand)
     {
         $this->checkCommand = $checkCommand;
+        $this->obscuredCheckCommand = $obscuredCheckCommand;
     }
 
     /**
@@ -135,6 +149,7 @@ abstract class Graphs extends AbstractWidget
         $filter = $this->getMonitoredObjectFilter();
         $imageBaseUrl = $this->getImageBaseUrl();
         $templates = static::getAllTemplates()->getTemplates();
+        $checkCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
 
         $classes = $this->classes;
         $classes[] = 'images';
@@ -142,8 +157,8 @@ abstract class Graphs extends AbstractWidget
 
         foreach ($templates as $templateName => $template) {
             if ($this->designedForMyMonitoredObjectType($template)
-                && $template->getCheckCommand() === $this->checkCommand) {
-                $charts = $template->getCharts(static::getMetricsDataSource(), $filter);
+                && $template->getCheckCommand() === $checkCommand) {
+                $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
                 if (! empty($charts)) {
                     $result[] = $div;
 

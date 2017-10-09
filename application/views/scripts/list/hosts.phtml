@@ -39,7 +39,11 @@ if ($filterEditor->getFilter()->isEmpty()) {
                 )
                 . '</h2>';
         }
-        echo (new Host($host->host_name, $host->host_check_command))
+        echo (new Host(
+            $host->host_name,
+            $host->host_check_command,
+            $host->_host_check_command
+        ))
             ->setCompact()
             ->handleRequest();
 

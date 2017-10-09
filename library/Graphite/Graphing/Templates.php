@@ -25,20 +25,6 @@ class Templates
     protected $templates = [];
 
     /**
-     * The configured icinga.graphite_writer_host_name_template
-     *
-     * @var MacroTemplate
-     */
-    protected $hostNameTemplate;
-
-    /**
-     * The configured icinga.graphite_writer_service_name_template
-     *
-     * @var MacroTemplate
-     */
-    protected $serviceNameTemplate;
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -175,18 +161,6 @@ class Templates
                     );
                 }
 
-                $curves[$curve][0] = new MacroTemplate($curves[$curve][0]->resolve([
-                    'host_name_template'    => $this->getHostNameTemplate()->resolve([
-                        'host.check_command'    => $checkCommand,
-                        ''                      => '$$'
-                    ]),
-                    'service_name_template' => $this->getServiceNameTemplate()->resolve([
-                        'service.check_command' => $checkCommand,
-                        ''                      => '$$'
-                    ]),
-                    ''                      => '$$'
-                ]));
-
                 if (isset($template['functions'][$curve])) {
                     try {
                         $curves[$curve][1] = new MacroTemplate($template['functions'][$curve]);
@@ -283,67 +257,5 @@ class Templates
     public function getTemplates()
     {
         return $this->templates;
-    }
-
-    /**
-     * Get {@link hostNameTemplate}
-     *
-     * @return MacroTemplate
-     *
-     * @throws  ConfigurationError  If the configuration is invalid
-     */
-    protected function getHostNameTemplate()
-    {
-        if ($this->hostNameTemplate === null) {
-            $config = Config::module('graphite');
-            $template = $config->get(
-                'icinga',
-                'graphite_writer_host_name_template',
-                'icinga2.$host.name$.host.$host.check_command$'
-            );
-
-            try {
-                $this->hostNameTemplate = new MacroTemplate($template);
-            } catch (InvalidArgumentException $e) {
-                throw new ConfigurationError(
-                    'Bad icinga.graphite_writer_host_name_template in "%s": %s',
-                    $config->getConfigFile(),
-                    $e->getMessage()
-                );
-            }
-        }
-
-        return $this->hostNameTemplate;
-    }
-
-    /**
-     * Get {@link serviceNameTemplate}
-     *
-     * @return MacroTemplate
-     *
-     * @throws  ConfigurationError  If the configuration is invalid
-     */
-    protected function getServiceNameTemplate()
-    {
-        if ($this->serviceNameTemplate === null) {
-            $config = Config::module('graphite');
-            $template = $config->get(
-                'icinga',
-                'graphite_writer_service_name_template',
-                'icinga2.$host.name$.services.$service.name$.$service.check_command$'
-            );
-
-            try {
-                $this->serviceNameTemplate = new MacroTemplate($template);
-            } catch (InvalidArgumentException $e) {
-                throw new ConfigurationError(
-                    'Bad icinga.graphite_writer_service_name_template in "%s": %s',
-                    $config->getConfigFile(),
-                    $e->getMessage()
-                );
-            }
-        }
-
-        return $this->serviceNameTemplate;
     }
 }
