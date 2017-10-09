@@ -73,7 +73,6 @@ class GraphiteWebClient
             ->setParams($url->getParams())
             ->getAbsoluteUrl();
 
-        // TODO(ak): keep connections alive (TCP handshakes are a bit expensive and TLS handshakes are very expensive)
         return (string) $this->httpClient->send(new Request($method, $url, $headers, $body))->getBody();
     }
 
