@@ -12,6 +12,13 @@ use Psr\Http\Message\ResponseInterface;
 class Client implements ClientInterface
 {
     /**
+     * cURL handles for reusing connections
+     *
+     * @var resource[]
+     */
+    protected $handles = [];
+
+    /**
      * Return user agent
      *
      * @return  string
@@ -36,7 +43,19 @@ class Client implements ClientInterface
      */
     public function createHandle(RequestInterface $request)
     {
-        $ch = curl_init((string) $request->getUri()->withFragment(''));
+        $uri = $request->getUri();
+        $server = "{$uri->getScheme()}://{$uri->getHost()}:{$uri->getPort()}";
+
+        if (isset($this->handles[$server])) {
+            $ch = $this->handles[$server];
+        } else {
+            $this->handles[$server] = $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_FOLLOWLOCATION  => 1,
+                CURLOPT_RETURNTRANSFER  => 1
+            ]);
+        }
 
         // Bypass Expect: 100-continue timeouts
         $headers = [];
@@ -48,10 +67,9 @@ class Client implements ClientInterface
         }
 
         $options = [
+            CURLOPT_URL             => (string) $uri->withFragment(''),
             CURLOPT_CUSTOMREQUEST   => $request->getMethod(),
-            CURLOPT_FOLLOWLOCATION  => 1,
             CURLOPT_HTTPHEADER      => $headers,
-            CURLOPT_RETURNTRANSFER  => 1,
             CURLOPT_USERAGENT       => $this->getAgent()
         ];
 

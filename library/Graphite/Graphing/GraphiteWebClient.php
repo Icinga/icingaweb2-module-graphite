@@ -65,6 +65,7 @@ class GraphiteWebClient
     public function request(Url $url, $method = 'GET', array $headers = [], $body = null)
     {
         $headers['User-Agent'] = 'icingaweb2-module-graphite';
+        $headers['Connection'] = 'keep-alive';
         if ($this->user !== null) {
             $headers['Authorization'] = 'Basic ' . base64_encode("{$this->user}:{$this->password}");
         }
@@ -73,7 +74,6 @@ class GraphiteWebClient
             ->setParams($url->getParams())
             ->getAbsoluteUrl();
 
-        // TODO(ak): keep connections alive (TCP handshakes are a bit expensive and TLS handshakes are very expensive)
         return (string) $this->httpClient->send(new Request($method, $url, $headers, $body))->getBody();
     }
 
