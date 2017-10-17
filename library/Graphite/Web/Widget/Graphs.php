@@ -169,21 +169,20 @@ abstract class Graphs extends AbstractWidget
                 if (! empty($charts)) {
                     $result[] = $div;
 
-                    if (! $this->compact) {
-                        $result[] = '<h3>';
-                        $result[] = $view->escape(ucfirst($templateName));
-                        $result[] = '</h3>';
-                        $result[] = $view->partial('show/legend.phtml', ['template' => $templateName]);
-                    }
-
                     foreach ($charts as $chart) {
-                        $result[] = '<img src="';
-                        $result[] = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
+                        $imageUrl = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
                             ->setParam('template', $templateName)
                             ->setParam('start', $this->start)
                             ->setParam('end', $this->end)
                             ->setParam('width', $this->width)
                             ->setParam('height', $this->height);
+
+                        if (! $this->compact) {
+                            $imageUrl->setParam('legend', 1);
+                        }
+
+                        $result[] = '<img src="';
+                        $result[] = (string) $imageUrl;
                         $result[] = '" class="graphiteImg" alt="" width="';
                         $result[] = $this->width;
                         $result[] = '" height="';
