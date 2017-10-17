@@ -97,19 +97,20 @@ class Chart
     public function serveImage(Response $response)
     {
         $params = (new UrlParams())->addValues([
-            'from'              => $this->from,
-            'width'             => $this->width,
-            'height'            => $this->height,
-            'hideLegend'        => (string) ! $this->showLegend,
-            'tz'                => $this->timeZone->getName(),
-            '_salt'             => time() . '.000',
-            'hideGrid'          => 'true',
-            'vTitle'            => 'Percent',
-            'lineMode'          => 'connected',
-            'xFormat'           => '%a %H:%M',
-            'drawNullAsZero'    => 'false',
-            'graphType'         => 'line',
-            '_ext'              => 'whatever.svg'
+            'from'                  => $this->from,
+            'width'                 => $this->width,
+            'height'                => $this->height,
+            'hideLegend'            => (string) ! $this->showLegend,
+            'tz'                    => $this->timeZone->getName(),
+            '_salt'                 => time() . '.000',
+            'vTitle'                => 'Percent',
+            'lineMode'              => 'connected',
+            'xFormat'               => '%a %H:%M',
+            'drawNullAsZero'        => 'false',
+            'graphType'             => 'line',
+            'majorGridLineColor'    => '#0000003F',
+            'minorGridLineColor'    => '#00000000',
+            '_ext'                  => 'whatever.svg'
         ]);
 
         if ($this->until !== null) {
