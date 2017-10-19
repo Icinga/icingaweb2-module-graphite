@@ -139,7 +139,7 @@
                                 renderedUrlParams.push(urlParam + "=" + urlParams[urlParam]);
                             }
 
-                            e.attr("src", matchParams[1] + "?" + renderedUrlParams.join("&"));
+                            e.attr("src", matchParams[1].replace("-dummy", "") + "?" + renderedUrlParams.join("&"));
                         }
                     }
                 }
