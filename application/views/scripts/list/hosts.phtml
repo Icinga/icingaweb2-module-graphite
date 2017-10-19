@@ -23,8 +23,6 @@ if (! $compact): ?>
 <?php
 if ($hosts->hasResult()) {
     foreach ($hosts->peekAhead($compact) as $host) {
-        echo '<div class="graphs-host">';
-
         if (! $compact) {
             echo '<h2>'
                 . $this->qlink(
@@ -44,8 +42,6 @@ if ($hosts->hasResult()) {
         ))
             ->setCompact()
             ->handleRequest();
-
-        echo '</div>';
     }
 
     if (! $compact && $hosts->hasMore()) {
