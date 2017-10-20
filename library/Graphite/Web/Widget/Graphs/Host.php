@@ -35,6 +35,11 @@ class Host extends Graphs
         return Url::fromPath('graphite/graph/host');
     }
 
+    protected function getDummyImageBaseUrl()
+    {
+        return Url::fromPath('graphite/graph-dummy/host');
+    }
+
     protected function filterImageUrl(Url $url)
     {
         return $url->setParam('host.name', $this->host);

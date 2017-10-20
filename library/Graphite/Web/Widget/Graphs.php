@@ -79,6 +79,13 @@ abstract class Graphs extends AbstractWidget
     protected $classes = [];
 
     /**
+     * Whether to serve a transparent dummy image first and let the JS code load the actual graph
+     *
+     * @var bool
+     */
+    protected $preloadDummy = false;
+
+    /**
      * Factory, based on the given object
      *
      * @param   MonitoredObject $object
@@ -147,7 +154,7 @@ abstract class Graphs extends AbstractWidget
         $view = $this->view();
         $result = []; // kind of string builder
         $filter = $this->getMonitoredObjectFilter();
-        $imageBaseUrl = $this->getImageBaseUrl();
+        $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
         $templates = static::getAllTemplates()->getTemplates();
         $checkCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
 
@@ -233,6 +240,13 @@ abstract class Graphs extends AbstractWidget
      * @return Url
      */
     abstract protected function getImageBaseUrl();
+
+    /**
+     * Get the base URL to a dummy image specifying just the monitored object kind
+     *
+     * @return Url
+     */
+    abstract protected function getDummyImageBaseUrl();
 
     /**
      * Extend the {@link getImageBaseUrl()}'s result's parameters with the concrete monitored object
@@ -334,6 +348,30 @@ abstract class Graphs extends AbstractWidget
     public function setClasses($classes)
     {
         $this->classes = $classes;
+
+        return $this;
+    }
+
+    /**
+     * Get whether to serve a transparent dummy image first and let the JS code load the actual graph
+     *
+     * @return bool
+     */
+    public function getPreloadDummy()
+    {
+        return $this->preloadDummy;
+    }
+
+    /**
+     * Set whether to serve a transparent dummy image first and let the JS code load the actual graph
+     *
+     * @param bool $preloadDummy
+     *
+     * @return $this
+     */
+    public function setPreloadDummy($preloadDummy = true)
+    {
+        $this->preloadDummy = $preloadDummy;
 
         return $this;
     }
