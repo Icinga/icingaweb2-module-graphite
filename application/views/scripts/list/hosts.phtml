@@ -24,7 +24,7 @@ if (! $compact): ?>
 if ($hosts->hasResult()) {
     foreach ($hosts->peekAhead($compact) as $host) {
         echo '<div class="grid-item">'
-            . '<h2>';
+            . '<h2>'
             . $this->qlink(
                 $host->host_name === $host->host_display_name
                     ? $host->host_display_name
