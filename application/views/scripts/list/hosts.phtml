@@ -21,9 +21,7 @@ if (! $compact): ?>
 <?php endif ?>
 <div class="content">
 <?php
-if ($filterEditor->getFilter()->isEmpty()) {
-    echo '<p>' . $this->escape($this->translate('Please specify a filter')) . '</p>';
-} elseif ($hosts->hasResult()) {
+if ($hosts->hasResult()) {
     foreach ($hosts->peekAhead($compact) as $host) {
         echo '<div class="graphs-host">';
 
