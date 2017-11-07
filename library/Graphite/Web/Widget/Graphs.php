@@ -170,48 +170,59 @@ abstract class Graphs extends AbstractWidget
         $classes[] = 'images';
         $div = '<div class="' . implode(' ', $classes) . '">';
 
-        $renderedGraphs = 0;
+        $concreteTemplates = [];
+        $defaultTemplates = [];
         foreach ($templates as $templateName => $template) {
-            if ($this->designedForMyMonitoredObjectType($template) && $template->getCheckCommand() === $checkCommand) {
-                $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
-                if (! empty($charts)) {
-                    foreach ($charts as $chart) {
-                        if (empty($result)) {
-                            $result[] = $div;
-                        } elseif ($limit && $renderedGraphs === $limit) {
-                            $result[] = sprintf(
-                                '<input type="checkbox" id="toggle-%1$s" class="collapsible-toggle">'
-                                . '<label for="toggle-%1$s" class="link-button">'
-                                . '<span class="collapsible-show">%2$s</span>'
-                                . '<span class="collapsible-hide">%3$s</span>'
-                                . '</label>'
-                                . '<div class="collapsible">',
-                                $view->protectId($this->getMonitoredObjectIdentifier()),
-                                $view->translate('Show More'),
-                                $view->translate('Show Less')
-                            );
-                        }
+            if ($this->designedForMyMonitoredObjectType($template)) {
+                $templateCheckCommand = $template->getCheckCommand();
 
-                        $imageUrl = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
-                            ->setParam('template', $templateName)
-                            ->setParam('start', $this->start)
-                            ->setParam('end', $this->end)
-                            ->setParam('width', $this->width)
-                            ->setParam('height', $this->height);
+                if ($templateCheckCommand === $checkCommand) {
+                    $concreteTemplates[$templateName] = $template;
+                } elseif ($templateCheckCommand === null) {
+                    $defaultTemplates[$templateName] = $template;
+                }
+            }
+        }
 
-                        if (! $this->compact) {
-                            $imageUrl->setParam('legend', 1);
-                        }
-
-                        $result[] = '<img src="';
-                        $result[] = (string) $imageUrl;
-                        $result[] = '" class="graphiteImg" alt="" width="';
-                        $result[] = $this->width;
-                        $result[] = '" height="';
-                        $result[] = $this->height;
-                        $result[] = '">';
-                        $renderedGraphs++;
+        $renderedGraphs = 0;
+        foreach ((empty($concreteTemplates) ? $defaultTemplates : $concreteTemplates) as $templateName => $template) {
+            $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
+            if (! empty($charts)) {
+                foreach ($charts as $chart) {
+                    if (empty($result)) {
+                        $result[] = $div;
+                    } elseif ($limit && $renderedGraphs === $limit) {
+                        $result[] = sprintf(
+                            '<input type="checkbox" id="toggle-%1$s" class="collapsible-toggle">'
+                            . '<label for="toggle-%1$s" class="link-button">'
+                            . '<span class="collapsible-show">%2$s</span>'
+                            . '<span class="collapsible-hide">%3$s</span>'
+                            . '</label>'
+                            . '<div class="collapsible">',
+                            $view->protectId($this->getMonitoredObjectIdentifier()),
+                            $view->translate('Show More'),
+                            $view->translate('Show Less')
+                        );
                     }
+
+                    $imageUrl = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
+                        ->setParam('template', $templateName)
+                        ->setParam('start', $this->start)
+                        ->setParam('end', $this->end)
+                        ->setParam('width', $this->width)
+                        ->setParam('height', $this->height);
+                    if (! $this->compact) {
+                        $imageUrl->setParam('legend', 1);
+                    }
+
+                    $result[] = '<img src="';
+                    $result[] = (string) $imageUrl;
+                    $result[] = '" class="graphiteImg" alt="" width="';
+                    $result[] = $this->width;
+                    $result[] = '" height="';
+                    $result[] = $this->height;
+                    $result[] = '">';
+                    $renderedGraphs++;
                 }
             }
         }

@@ -86,42 +86,38 @@ class Templates
         }
 
         foreach ($templates as $templateName => $template) {
-            if (! isset($template['graph']['check_command'])) {
-                throw new ConfigurationError(
-                    'Icinga check command for template "%s" in file "%s" missing', $templateName, $path
-                );
-            }
-
-            $checkCommand = $template['graph']['check_command'];
+            $checkCommand = isset($template['graph']['check_command']) ? $template['graph']['check_command'] : null;
             unset($template['graph']['check_command']);
 
-            switch (count($template['graph'])) {
-                case 0:
-                    break;
+            if (isset($template['graph'])) {
+                switch (count($template['graph'])) {
+                    case 0:
+                        break;
 
-                case 1:
-                    throw new ConfigurationError(
-                        'Bad option for template "%s" in file "%s": "graph.%s"',
-                        $templateName,
-                        $path,
-                        array_keys($template['graph'])[0]
-                    );
+                    case 1:
+                        throw new ConfigurationError(
+                            'Bad option for template "%s" in file "%s": "graph.%s"',
+                            $templateName,
+                            $path,
+                            array_keys($template['graph'])[0]
+                        );
 
-                default:
-                    $standalone = array_keys($template['graph']);
-                    sort($standalone);
+                    default:
+                        $standalone = array_keys($template['graph']);
+                        sort($standalone);
 
-                    throw new ConfigurationError(
-                        'Bad options for template "%s" in file "%s": %s',
-                        $templateName,
-                        $path,
-                        implode(', ', array_map(
-                            function($option) {
-                                return "\"graph.$option\"";
-                            },
-                            $standalone
-                        ))
-                    );
+                        throw new ConfigurationError(
+                            'Bad options for template "%s" in file "%s": %s',
+                            $templateName,
+                            $path,
+                            implode(', ', array_map(
+                                function($option) {
+                                    return "\"graph.$option\"";
+                                },
+                                $standalone
+                            ))
+                        );
+                }
             }
 
             if (! isset($template['metrics_filters']) || empty($template['metrics_filters'])) {
