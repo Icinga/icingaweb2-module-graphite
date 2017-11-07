@@ -23,7 +23,8 @@ if (! $compact): ?>
 <?php
 if ($hosts->hasResult()) {
     foreach ($hosts->peekAhead($compact) as $host) {
-        echo '<h2>'
+        echo '<div class="grid-item">'
+            . '<h2>';
             . $this->qlink(
                 $host->host_name === $host->host_display_name
                     ? $host->host_display_name
@@ -39,6 +40,7 @@ if ($hosts->hasResult()) {
             $host->host_check_command,
             $host->_host_check_command
         ))->handleRequest();
+        echo '</div>';
     }
 
     if (! $compact && $hosts->hasMore()) {

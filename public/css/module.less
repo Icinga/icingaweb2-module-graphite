@@ -80,3 +80,38 @@ form[name=form_timerangepickercustom_graphite] {
     margin: 0.25em;
   }
 }
+
+.grid-item {
+  display: inline-block;
+  border-radius: .25em;
+  border: 1px solid @gray-lighter;
+  min-width: 302px;
+  vertical-align: top;
+  margin-right: 1em;
+  margin-bottom: 1em;
+}
+
+.grid-item  h2 {
+  margin-top: 0;
+  background: @gray-lightest;
+  border-bottom: 1px solid @gray-lighter;
+  padding:.25em .5em;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grid-item > .images:not(:last-child) {
+  margin-right: 1em;
+  display: inline-block;
+}
+
+.grid-item .graphiteImg {
+  margin-right: 1px;
+}
+
+.grid-item > p {
+  padding: .5em;
+  margin-bottom: 0;
+}

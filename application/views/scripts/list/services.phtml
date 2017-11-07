@@ -23,7 +23,8 @@ if (! $compact): ?>
 <?php
 if ($services->hasResult()) {
     foreach ($services->peekAhead($compact) as $service) {
-        echo '<h2>'
+        echo '<div class="grid-item">'
+            . '<h2>'
             . $this->qlink(
                 $service->host_name === $service->host_display_name
                     ? $service->host_display_name
@@ -52,6 +53,7 @@ if ($services->hasResult()) {
             $service->service_check_command,
             $service->_service_check_command
         ))->handleRequest();
+        echo '</div>';
     }
 
     if (! $compact && $services->hasMore()) {
