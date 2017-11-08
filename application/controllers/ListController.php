@@ -43,7 +43,7 @@ class ListController extends MonitoringAwareController
         $this->setupSortControl(['host_display_name' => mt('monitoring', 'Hostname')], $hosts);
 
         $this->handleTimeRangePickerRequest();
-        $this->view->timeRangePicker = $this->renderTimeRangePicker($this->view);
+        $this->view->timeRangePicker = $this->renderTimeRangePicker();
     }
 
     public function servicesAction()
@@ -74,7 +74,7 @@ class ListController extends MonitoringAwareController
         ], $services);
 
         $this->handleTimeRangePickerRequest();
-        $this->view->timeRangePicker = $this->renderTimeRangePicker($this->view);
+        $this->view->timeRangePicker = $this->renderTimeRangePicker();
     }
 
     /**

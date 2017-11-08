@@ -37,30 +37,11 @@ trait TimeRangePickerTrait
     /**
      * Render all needed forms and links
      *
-     * @param   View    $view
-     *
      * @return  string
      */
-    protected function renderTimeRangePicker(View $view)
+    protected function renderTimeRangePicker()
     {
-        $result = $this->getTimeRangePickerCommonForm();
-        $url = Url::fromRequest();
-
-        if ($url->hasParam(TimeRangePicker::getRangeCustomizationParameter())) {
-            $result .= $this->getTimeRangePickerCustomForm();
-        } else {
-            $result .= $view->qlink(
-                $view->translate('Custom', 'TimeRangePicker'),
-                $url->with(TimeRangePicker::getRangeCustomizationParameter(), '1'),
-                null,
-                [
-                    'class'             => 'button-link',
-                    'data-base-target'  => '_self'
-                ]
-            );
-        }
-
-        return '<div class="timerangepicker-forms">' . $result . '</div>';
+        return '<div class="timerangepicker-forms">' . $this->getTimeRangePickerCommonForm() . '</div>';
     }
 
     /**

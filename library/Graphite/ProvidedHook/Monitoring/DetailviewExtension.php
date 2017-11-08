@@ -15,7 +15,7 @@ class DetailviewExtension extends DetailviewExtensionHook
     {
         $this->handleTimeRangePickerRequest();
         return '<h2>' . mt('graphite', 'Graphs') . '</h2>'
-            . $this->renderTimeRangePicker($this->getView())
+            . $this->renderTimeRangePicker()
             . Graphs::forMonitoredObject($object)
                 ->setCompact()
                 ->setWidth(440)
