@@ -4,6 +4,7 @@ namespace Icinga\Module\Graphite\Forms\TimeRangePicker;
 
 use Icinga\Web\Form;
 use Zend_Form_Decorator_HtmlTag;
+use Zend_Form_Element;
 use Zend_Form_Element_Select;
 
 class CommonForm extends Form
@@ -41,6 +42,34 @@ class CommonForm extends Form
 
     public function createElements(array $formData)
     {
+        $url = clone $this->getRedirectUrl();
+        $urlParams = $url->getParams();
+        $customizationParameter = TimeRangePickerTrait::getRangeCustomizationParameter();
+
+        if ($urlParams->has($customizationParameter)) {
+            $urlParams->remove($customizationParameter);
+        } else {
+            $urlParams->add($customizationParameter, '1');
+        }
+
+        $this->addElement($this->reduceDecorators($this->createElement(
+            'note',
+            'custom_range',
+            [
+                'description'   => $this->translate('Specify custom time range'),
+                'escape'        => false,
+                'value'         => $this->getView()->qlink(
+                    null,
+                    $url,
+                    null,
+                    [
+                        'class' => 'button-link',
+                        'icon'  => 'service'
+                    ]
+                )
+            ]
+        )));
+
         $this->addElements([
             $this->createSelect(
                 'minutes',
@@ -129,16 +158,27 @@ class CommonForm extends Form
             'autosubmit'    => true
         ]);
 
+        return $this->reduceDecorators($element);
+    }
+
+    /**
+     * Reduce the decorators set of the given element to the minimum
+     *
+     * @param   Zend_Form_Element   $element
+     *
+     * @return  Zend_Form_Element
+     */
+    protected function reduceDecorators(Zend_Form_Element $element)
+    {
         $decorators = $element->getDecorators();
-        $element->setDecorators([
+
+        return $element->setDecorators([
             'Zend_Form_Decorator_ViewHelper'    => $decorators['Zend_Form_Decorator_ViewHelper'],
             'Zend_Form_Decorator_HtmlTag'       => new Zend_Form_Decorator_HtmlTag([
                 'tag'   => 'span',
-                'title' => $description
+                'title' => $element->getDescription()
             ])
         ]);
-
-        return $element;
     }
 
     /**
