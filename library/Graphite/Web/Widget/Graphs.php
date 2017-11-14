@@ -79,6 +79,13 @@ abstract class Graphs extends AbstractWidget
     protected $classes = [];
 
     /**
+     * The amount of graphs to show
+     *
+     * @var int
+     */
+    protected $maxVisibleGraphs;
+
+    /**
      * Whether to serve a transparent dummy image first and let the JS code load the actual graph
      *
      * @var bool
@@ -157,19 +164,34 @@ abstract class Graphs extends AbstractWidget
         $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
         $templates = static::getAllTemplates()->getTemplates();
         $checkCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
+        $limit = $this->maxVisibleGraphs;
 
         $classes = $this->classes;
         $classes[] = 'images';
         $div = '<div class="' . implode(' ', $classes) . '">';
 
+        $renderedGraphs = 0;
         foreach ($templates as $templateName => $template) {
-            if ($this->designedForMyMonitoredObjectType($template)
-                && $template->getCheckCommand() === $checkCommand) {
+            if ($this->designedForMyMonitoredObjectType($template) && $template->getCheckCommand() === $checkCommand) {
                 $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
                 if (! empty($charts)) {
-                    $result[] = $div;
-
                     foreach ($charts as $chart) {
+                        if (empty($result)) {
+                            $result[] = $div;
+                        } elseif ($limit && $renderedGraphs === $limit) {
+                            $result[] = sprintf(
+                                '<input type="checkbox" id="toggle-%1$s" class="collapsible-toggle">'
+                                . '<label for="toggle-%1$s" class="link-button">'
+                                . '<span class="collapsible-show">%2$s</span>'
+                                . '<span class="collapsible-hide">%3$s</span>'
+                                . '</label>'
+                                . '<div class="collapsible">',
+                                $view->protectId($this->getMonitoredObjectIdentifier()),
+                                $view->translate('Show More'),
+                                $view->translate('Show Less')
+                            );
+                        }
+
                         $imageUrl = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
                             ->setParam('template', $templateName)
                             ->setParam('start', $this->start)
@@ -188,14 +210,22 @@ abstract class Graphs extends AbstractWidget
                         $result[] = '" height="';
                         $result[] = $this->height;
                         $result[] = '">';
+                        $renderedGraphs++;
                     }
-
-                    $result[] = '</div>';
                 }
             }
         }
 
-        return empty($result) ? "<p>{$view->escape($view->translate('No graphs found'))}</p>" : implode($result);
+        if (! empty($result)) {
+            if ($limit && $renderedGraphs > $limit) {
+                $result[] = '</div>';
+            }
+
+            $result[] = '</div>';
+            return implode($result);
+        } else {
+            return "<p>{$view->escape($view->translate('No graphs found'))}</p>";
+        }
     }
 
     /**
@@ -225,6 +255,13 @@ abstract class Graphs extends AbstractWidget
      * @return  bool
      */
     abstract protected function designedForMyMonitoredObjectType(Template $template);
+
+    /**
+     * Return a identifier specifying the monitored object we display graphs for
+     *
+     * @return  string
+     */
+    abstract protected function getMonitoredObjectIdentifier();
 
     /**
      * Return a filter specifying the monitored object we display graphs for
@@ -348,6 +385,29 @@ abstract class Graphs extends AbstractWidget
     {
         $this->classes = $classes;
 
+        return $this;
+    }
+
+    /**
+     * Get the amount of graphs to show
+     *
+     * @return  int
+     */
+    public function getMaxVisbileGraphs()
+    {
+        return $this->maxVisibleGraphs;
+    }
+
+    /**
+     * Set the amount of graphs to show
+     *
+     * @param   int     $count
+     *
+     * @return  $this
+     */
+    public function setMaxVisibleGraphs($count)
+    {
+        $this->maxVisibleGraphs = (int) $count;
         return $this;
     }
 
