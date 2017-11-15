@@ -48,16 +48,6 @@ trait TimeRangePickerTrait
 
         if ($url->hasParam(TimeRangePicker::getRangeCustomizationParameter())) {
             $result .= $this->getTimeRangePickerCustomForm();
-        } else {
-            $result .= $view->qlink(
-                $view->translate('Custom', 'TimeRangePicker'),
-                $url->with(TimeRangePicker::getRangeCustomizationParameter(), '1'),
-                null,
-                [
-                    'class'             => 'button-link',
-                    'data-base-target'  => '_self'
-                ]
-            );
         }
 
         return '<div class="timerangepicker-forms">' . $result . '</div>';
