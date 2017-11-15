@@ -65,6 +65,11 @@ class Service extends Graphs
         return false;
     }
 
+    protected function getMonitoredObjectIdentifier()
+    {
+        return $this->host . ':' . $this->service;
+    }
+
     protected function getMonitoredObjectFilter()
     {
         return ['host.name' => $this->host, 'service.name' =>  $this->service];

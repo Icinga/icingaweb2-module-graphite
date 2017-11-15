@@ -56,6 +56,11 @@ class Host extends Graphs
         return false;
     }
 
+    protected function getMonitoredObjectIdentifier()
+    {
+        return $this->host;
+    }
+
     protected function getMonitoredObjectFilter()
     {
         return ['host.name' => $this->host];
