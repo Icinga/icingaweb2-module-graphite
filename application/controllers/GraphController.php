@@ -19,7 +19,7 @@ class GraphController extends MonitoringAwareController
      *
      * @var string[]
      */
-    protected $graphParamsNames = ['start', 'end', 'width', 'height', 'legend', 'template'];
+    protected $graphParamsNames = ['start', 'end', 'width', 'height', 'legend', 'template', 'cachebuster'];
 
     /**
      * The URL parameters for metrics filtering

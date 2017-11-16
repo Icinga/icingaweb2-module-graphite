@@ -109,6 +109,63 @@
     var extractUrlParams = /^([^?]*)\?(.+)$/;
     var parseUrlParam = /^([^=]+)=(.*)$/;
 
+    function GraphiteCachebusterUpdater(icinga) {
+        Icinga.EventListener.call(this, icinga);
+
+        this.on('rendered', this.onRendered, this);
+    }
+
+    GraphiteCachebusterUpdater.prototype = new Icinga.EventListener();
+
+    GraphiteCachebusterUpdater.prototype.onRendered = function(event) {
+        $(event.target).find('img.graphiteImg').each(function() {
+            var e = $(this);
+            var src = e.attr('src');
+
+            if (typeof(src) !== 'undefined') {
+                var matchParams = extractUrlParams.exec(src);
+
+                if (matchParams !== null) {
+                    var urlParams = Object.create(null);
+
+                    matchParams[2].split('&').forEach(function(urlParam) {
+                        var matchParam = parseUrlParam.exec(urlParam);
+                        if (matchParam !== null) {
+                            urlParams[matchParam[1]] = matchParam[2];
+                        }
+                    });
+
+                    if (typeof(urlParams.cachebuster) !== 'undefined') {
+                        var cachebuster = parseInt(urlParams.cachebuster);
+
+                        if (cachebuster === cachebuster) {
+                            urlParams.cachebuster = (cachebuster + 1).toString();
+
+                            var renderedUrlParams = [];
+
+                            for (var urlParam in urlParams) {
+                                renderedUrlParams.push(urlParam + '=' + urlParams[urlParam]);
+                            }
+
+                            e.attr('src', matchParams[1] + '?' + renderedUrlParams.join('&'));
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    Icinga.Behaviors = Icinga.Behaviors || {};
+
+    Icinga.Behaviors.GraphiteCachebusterUpdater = GraphiteCachebusterUpdater;
+}(Icinga, jQuery));
+
+(function(Icinga, $) {
+    'use strict';
+
+    var extractUrlParams = /^([^?]*)\?(.+)$/;
+    var parseUrlParam = /^([^=]+)=(.*)$/;
+
     function updateGraphSizes() {
         $("div.images.monitored-object-detail-view img.graphiteImg").each(function() {
             var e = $(this);
