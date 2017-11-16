@@ -24,27 +24,11 @@ trait TimeRangePickerTrait
     }
 
     /**
-     * @return string
-     */
-    public static function getRangeCustomizationParameter()
-    {
-        return 'graph_range_custom';
-    }
-
-    /**
      * @return string[]
      */
     public static function getAllRangeParameters()
     {
         return array_values(array_merge([static::getRelativeRangeParameter()], static::getAbsoluteRangeParameters()));
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getAllParameters()
-    {
-        return array_values(array_merge(static::getAllRangeParameters(), [static::getRangeCustomizationParameter()]));
     }
 
     /**

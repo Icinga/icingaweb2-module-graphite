@@ -100,9 +100,7 @@ class CustomForm extends Form
                 ->set($absoluteRangeParameters['end'], $start);
         }
 
-        $this->getRedirectUrl()->remove(
-            [static::getRelativeRangeParameter(), static::getRangeCustomizationParameter()]
-        );
+        $this->getRedirectUrl()->remove(static::getRelativeRangeParameter());
     }
 
     /**

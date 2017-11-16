@@ -43,24 +43,19 @@ trait TimeRangePickerTrait
      */
     protected function renderTimeRangePicker(View $view)
     {
-        $result = $this->getTimeRangePickerCommonForm();
-        $url = Url::fromRequest();
+        $url = Url::fromRequest()->getAbsoluteUrl();
 
-        if ($url->hasParam(TimeRangePicker::getRangeCustomizationParameter())) {
-            $result .= $this->getTimeRangePickerCustomForm();
-        } else {
-            $result .= $view->qlink(
-                $view->translate('Custom', 'TimeRangePicker'),
-                $url->with(TimeRangePicker::getRangeCustomizationParameter(), '1'),
-                null,
-                [
-                    'class'             => 'button-link',
-                    'data-base-target'  => '_self'
-                ]
-            );
-        }
-
-        return '<div class="timerangepicker-forms">' . $result . '</div>';
+        return '<div class="flyover" id="graphite-customrange-'
+            . md5($url)
+            . '">'
+            . $view->qlink(null, '#', null, [
+                'title' => $view->translate('Specify custom time range'),
+                'class' => 'button-link flyover-toggle',
+                'icon'  => 'service'
+            ])
+            . $this->getTimeRangePickerCustomForm()->setAttrib('class', 'flyover-content')
+            . '</div>'
+            . $this->getTimeRangePickerCommonForm();
     }
 
     /**
