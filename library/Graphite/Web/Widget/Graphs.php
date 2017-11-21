@@ -210,14 +210,17 @@ abstract class Graphs extends AbstractWidget
                         ->setParam('start', $this->start)
                         ->setParam('end', $this->end)
                         ->setParam('width', $this->width)
-                        ->setParam('height', $this->height);
+                        ->setParam('height', $this->height)
+                        ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
                     if (! $this->compact) {
                         $imageUrl->setParam('legend', 1);
                     }
 
-                    $result[] = '<img src="';
+                    $result[] = '<img id="graphiteImg-';
+                    $result[] = md5((string) $imageUrl->without('cachebuster'));
+                    $result[] = '" src="';
                     $result[] = (string) $imageUrl;
-                    $result[] = '" class="graphiteImg" alt="" width="';
+                    $result[] = '" class="detach graphiteImg" alt="" width="';
                     $result[] = $this->width;
                     $result[] = '" height="';
                     $result[] = $this->height;
