@@ -45,8 +45,8 @@ trait TimeRangePickerTrait
     {
         $url = Url::fromRequest()->getAbsoluteUrl();
 
-        return '<div class="flyover flyover-arrow-top" id="graphite-customrange-'
-            . md5($url)
+        return '<div class="flyover flyover-arrow-top" id="'
+            . $view->protectId('graphite-customrange')
             . '">'
             . $view->qlink(null, '#', null, [
                 'title' => $view->translate('Specify custom time range'),
