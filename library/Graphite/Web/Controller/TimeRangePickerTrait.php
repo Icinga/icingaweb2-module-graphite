@@ -45,17 +45,17 @@ trait TimeRangePickerTrait
     {
         $url = Url::fromRequest()->getAbsoluteUrl();
 
-        return '<div class="flyover flyover-arrow-top" id="'
+        return $this->getTimeRangePickerCommonForm()
+            . '<div class="flyover flyover-arrow-top" id="'
             . $view->protectId('graphite-customrange')
             . '">'
             . $view->qlink(null, '#', null, [
                 'title' => $view->translate('Specify custom time range'),
                 'class' => 'button-link flyover-toggle',
-                'icon'  => 'service'
+                'icon'  => 'calendar'
             ])
             . $this->getTimeRangePickerCustomForm()->setAttrib('class', 'flyover-content')
-            . '</div>'
-            . $this->getTimeRangePickerCommonForm();
+            . '</div>';
     }
 
     /**

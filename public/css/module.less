@@ -68,9 +68,13 @@ div.graphs-host {
   }
 }
 
-form[name=form_timerangepickercommon_graphite] select {
-  width: 7.5em;
-  margin-right: 0.25em;
+form[name=form_timerangepickercommon_graphite] {
+  display: inline;
+
+  select {
+    width: 7.5em;
+    margin-right: 0.25em;
+  }
 }
 
 form[name=form_timerangepickercustom_graphite] {
@@ -84,7 +88,6 @@ form[name=form_timerangepickercustom_graphite] {
 }
 
 .flyover[id^="graphite-customrange-"] {
-  float: left;
-  clear: left;
-  margin-right: 0.5em;
+  display: inline-block;
+  margin-left: 0.5em;
 }
