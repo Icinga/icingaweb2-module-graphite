@@ -41,8 +41,9 @@ class BackendForm extends ConfigForm
                 'password',
                 'graphite_web_password',
                 [
-                    'label'         => $this->translate('Graphite Web password'),
-                    'description'   => $this->translate('The above user\'s password')
+                    'renderPassword'    => true,
+                    'label'             => $this->translate('Graphite Web password'),
+                    'description'       => $this->translate('The above user\'s password')
                 ]
             ]
         ]);
