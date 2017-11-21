@@ -144,7 +144,6 @@ class Chart
             'tz'                    => $this->timeZone->getName(),
             '_salt'                 => time() . '.000',
             'vTitle'                => 'Percent',
-            'lineMode'              => 'connected',
             'drawNullAsZero'        => 'false',
             'graphType'             => 'line',
             'majorGridLineColor'    => '#0000003F',
