@@ -251,11 +251,11 @@ abstract class Graphs extends AbstractWidget
         $params = $request->getUrl()->getParams();
         $relative = $params->get(TimeRangePickerTrait::getRelativeRangeParameter());
         if ($relative !== null) {
-            return ["-{$relative}s", null];
+            return ["-$relative", null];
         }
 
         $absolute = TimeRangePickerTrait::getAbsoluteRangeParameters();
-        return [$params->get($absolute['start'], '-1hours'), $params->get($absolute['end'])];
+        return [$params->get($absolute['start'], '-3600'), $params->get($absolute['end'])];
     }
 
     /**
