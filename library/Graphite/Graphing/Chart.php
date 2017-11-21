@@ -11,6 +11,13 @@ use Icinga\Web\UrlParams;
 class Chart
 {
     /**
+     * Time point formats for the X axis by their time span limits
+     *
+     * @var string[]
+     */
+    protected $xFormat;
+
+    /**
      * Used to render the chart
      *
      * @var GraphiteWebClient
@@ -82,6 +89,14 @@ class Chart
      */
     public function __construct(GraphiteWebClient $graphiteWebClient, Template $template, array $metrics)
     {
+        $this->xFormat = [
+            60 * 60                         => '%H:%M',
+            60 * 60 * 24                    => '%H:00',
+            60 * 60 * 24 * 7                => '%a',
+            60 * 60 * 24 * 30               => 'W%V',
+            (int) (60 * 60 * 24 * 365.25)   => '%Y-%m',
+            -1                              => '%Y'
+        ];
         $this->graphiteWebClient = $graphiteWebClient;
         $this->template = $template;
         $this->metrics = $metrics;
@@ -97,24 +112,34 @@ class Chart
     public function serveImage(Response $response)
     {
         $params = (new UrlParams())->addValues([
-            'from'              => $this->from,
-            'width'             => $this->width,
-            'height'            => $this->height,
-            'hideLegend'        => (string) ! $this->showLegend,
-            'tz'                => $this->timeZone->getName(),
-            '_salt'             => time() . '.000',
-            'hideGrid'          => 'true',
-            'vTitle'            => 'Percent',
-            'lineMode'          => 'connected',
-            'xFormat'           => '%a %H:%M',
-            'drawNullAsZero'    => 'false',
-            'graphType'         => 'line',
-            '_ext'              => 'whatever.svg'
+            'from'                  => $this->from,
+            'width'                 => $this->width,
+            'height'                => $this->height,
+            'hideLegend'            => (string) ! $this->showLegend,
+            'tz'                    => $this->timeZone->getName(),
+            '_salt'                 => time() . '.000',
+            'vTitle'                => 'Percent',
+            'lineMode'              => 'connected',
+            'drawNullAsZero'        => 'false',
+            'graphType'             => 'line',
+            'majorGridLineColor'    => '#0000003F',
+            'minorGridLineColor'    => '#00000000',
+            '_ext'                  => 'whatever.svg'
         ]);
 
         if ($this->until !== null) {
             $params->set('until', $this->until);
         }
+
+        $timeSpan = ($this->until === null ? time() : $this->until) - $this->from - 30;
+
+        foreach ($this->xFormat as $timeSpanLimit => $xFormat) {
+            if ($timeSpan <= $timeSpanLimit) {
+                break;
+            }
+        }
+
+        $params->set('xFormat', $xFormat);
 
         $variables = $this->getMetricVariables();
         foreach ($this->template->getUrlParams() as $key => $value) {

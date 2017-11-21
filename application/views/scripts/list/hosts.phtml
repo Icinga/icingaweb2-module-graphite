@@ -23,28 +23,23 @@ if (! $compact): ?>
 <?php
 if ($hosts->hasResult()) {
     foreach ($hosts->peekAhead($compact) as $host) {
-        echo '<div class="graphs-host">';
+        echo '<div class="grid-item">'
+            . '<h2>'
+            . $this->qlink(
+                $host->host_name === $host->host_display_name
+                    ? $host->host_display_name
+                    : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
+                Url::fromPath('monitoring/host/show', ['host' => $host->host_name]),
+                null,
+                ['data-base-target' => '_next']
+            )
+            . '</h2>';
 
-        if (! $compact) {
-            echo '<h2>'
-                . $this->qlink(
-                    $host->host_name === $host->host_display_name
-                        ? $host->host_display_name
-                        : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
-                    Url::fromPath('monitoring/host/show', ['host' => $host->host_name]),
-                    null,
-                    ['data-base-target' => '_next']
-                )
-                . '</h2>';
-        }
         echo (new Host(
             $host->host_name,
             $host->host_check_command,
             $host->_host_check_command
-        ))
-            ->setCompact()
-            ->handleRequest();
-
+        ))->handleRequest();
         echo '</div>';
     }
 

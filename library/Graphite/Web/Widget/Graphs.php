@@ -79,6 +79,13 @@ abstract class Graphs extends AbstractWidget
     protected $classes = [];
 
     /**
+     * The amount of graphs to show
+     *
+     * @var int
+     */
+    protected $maxVisibleGraphs;
+
+    /**
      * Whether to serve a transparent dummy image first and let the JS code load the actual graph
      *
      * @var bool
@@ -157,46 +164,79 @@ abstract class Graphs extends AbstractWidget
         $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
         $templates = static::getAllTemplates()->getTemplates();
         $checkCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
+        $limit = $this->maxVisibleGraphs;
 
         $classes = $this->classes;
         $classes[] = 'images';
         $div = '<div class="' . implode(' ', $classes) . '">';
 
+        $concreteTemplates = [];
+        $defaultTemplates = [];
         foreach ($templates as $templateName => $template) {
-            if ($this->designedForMyMonitoredObjectType($template)
-                && $template->getCheckCommand() === $checkCommand) {
-                $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
-                if (! empty($charts)) {
-                    $result[] = $div;
+            if ($this->designedForMyMonitoredObjectType($template)) {
+                $templateCheckCommand = $template->getCheckCommand();
 
-                    if (! $this->compact) {
-                        $result[] = '<h3>';
-                        $result[] = $view->escape(ucfirst($templateName));
-                        $result[] = '</h3>';
-                        $result[] = $view->partial('show/legend.phtml', ['template' => $templateName]);
-                    }
-
-                    foreach ($charts as $chart) {
-                        $result[] = '<img src="';
-                        $result[] = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
-                            ->setParam('template', $templateName)
-                            ->setParam('start', $this->start)
-                            ->setParam('end', $this->end)
-                            ->setParam('width', $this->width)
-                            ->setParam('height', $this->height);
-                        $result[] = '" class="graphiteImg" alt="" width="';
-                        $result[] = $this->width;
-                        $result[] = '" height="';
-                        $result[] = $this->height;
-                        $result[] = '">';
-                    }
-
-                    $result[] = '</div>';
+                if ($templateCheckCommand === $checkCommand) {
+                    $concreteTemplates[$templateName] = $template;
+                } elseif ($templateCheckCommand === null) {
+                    $defaultTemplates[$templateName] = $template;
                 }
             }
         }
 
-        return empty($result) ? "<p>{$view->escape($view->translate('No graphs found'))}</p>" : implode($result);
+        $renderedGraphs = 0;
+        foreach ((empty($concreteTemplates) ? $defaultTemplates : $concreteTemplates) as $templateName => $template) {
+            $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
+            if (! empty($charts)) {
+                foreach ($charts as $chart) {
+                    if (empty($result)) {
+                        $result[] = $div;
+                    } elseif ($limit && $renderedGraphs === $limit) {
+                        $result[] = sprintf(
+                            '<input type="checkbox" id="toggle-%1$s" class="collapsible-toggle">'
+                            . '<label for="toggle-%1$s" class="link-button">'
+                            . '<span class="collapsible-show">%2$s</span>'
+                            . '<span class="collapsible-hide">%3$s</span>'
+                            . '</label>'
+                            . '<div class="collapsible">',
+                            $view->protectId($this->getMonitoredObjectIdentifier()),
+                            $view->translate('Show More'),
+                            $view->translate('Show Less')
+                        );
+                    }
+
+                    $imageUrl = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
+                        ->setParam('template', $templateName)
+                        ->setParam('start', $this->start)
+                        ->setParam('end', $this->end)
+                        ->setParam('width', $this->width)
+                        ->setParam('height', $this->height);
+                    if (! $this->compact) {
+                        $imageUrl->setParam('legend', 1);
+                    }
+
+                    $result[] = '<img src="';
+                    $result[] = (string) $imageUrl;
+                    $result[] = '" class="graphiteImg" alt="" width="';
+                    $result[] = $this->width;
+                    $result[] = '" height="';
+                    $result[] = $this->height;
+                    $result[] = '">';
+                    $renderedGraphs++;
+                }
+            }
+        }
+
+        if (! empty($result)) {
+            if ($limit && $renderedGraphs > $limit) {
+                $result[] = '</div>';
+            }
+
+            $result[] = '</div>';
+            return implode($result);
+        } else {
+            return "<p>{$view->escape($view->translate('No graphs found'))}</p>";
+        }
     }
 
     /**
@@ -226,6 +266,13 @@ abstract class Graphs extends AbstractWidget
      * @return  bool
      */
     abstract protected function designedForMyMonitoredObjectType(Template $template);
+
+    /**
+     * Return a identifier specifying the monitored object we display graphs for
+     *
+     * @return  string
+     */
+    abstract protected function getMonitoredObjectIdentifier();
 
     /**
      * Return a filter specifying the monitored object we display graphs for
@@ -349,6 +396,29 @@ abstract class Graphs extends AbstractWidget
     {
         $this->classes = $classes;
 
+        return $this;
+    }
+
+    /**
+     * Get the amount of graphs to show
+     *
+     * @return  int
+     */
+    public function getMaxVisbileGraphs()
+    {
+        return $this->maxVisibleGraphs;
+    }
+
+    /**
+     * Set the amount of graphs to show
+     *
+     * @param   int     $count
+     *
+     * @return  $this
+     */
+    public function setMaxVisibleGraphs($count)
+    {
+        $this->maxVisibleGraphs = (int) $count;
         return $this;
     }
 

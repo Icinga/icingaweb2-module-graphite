@@ -1,7 +1,4 @@
 div.images {
-
-    display: inline-block;
-
     h3 {
         clear: both;
     }
@@ -11,6 +8,55 @@ div.images {
         border: none;
     }
 
+}
+
+.collapsible {
+  clear: right;  // Because the label is floating right
+
+  height: 0;
+  opacity: 0;
+  visibility: hidden;
+
+  -webkit-transition: opacity 0.2s linear, visibility 0.2s;
+  -moz-transition: opacity 0.2s linear, visibility 0.2s;
+  -o-transition: opacity 0.2s linear, visibility 0.2s;
+  transition: opacity 0.2s linear, visibility 0.2s;
+}
+
+input[type="checkbox"].collapsible-toggle {
+  display: none;
+
+  & + label {
+    float: right;
+    margin-right: 1em;
+
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  &:checked ~ .collapsible {
+    height: auto;
+    opacity: 1;
+    visibility: visible;
+
+    -webkit-transition: opacity 0.2s linear;
+    -moz-transition: opacity 0.2s linear;
+    -o-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;
+  }
+  & ~ label span.collapsible-hide {
+    display: none;
+  }
+
+  &:checked ~ label span.collapsible-show {
+    display: none;
+  }
+  &:checked ~ label span.collapsible-hide {
+    display: inline;
+  }
 }
 
 div.images.monitored-object-detail-view {
@@ -58,16 +104,6 @@ ul.legend {
   }
 }
 
-div.graphs-host {
-  display: inline-block;
-  vertical-align: top;
-  margin-right: 2em;
-
-  > p {
-    width: 300px;
-  }
-}
-
 form[name=form_timerangepickercommon_graphite] {
   display: inline;
 
@@ -90,4 +126,39 @@ form[name=form_timerangepickercustom_graphite] {
 .flyover[id^="graphite-customrange-"] {
   display: inline-block;
   margin-left: 0.5em;
+}
+
+.grid-item {
+  display: inline-block;
+  border-radius: .25em;
+  border: 1px solid @gray-lighter;
+  min-width: 302px;
+  vertical-align: top;
+  margin-right: 1em;
+  margin-bottom: 1em;
+}
+
+.grid-item  h2 {
+  margin-top: 0;
+  background: @gray-lightest;
+  border-bottom: 1px solid @gray-lighter;
+  padding:.25em .5em;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grid-item > .images:not(:last-child) {
+  margin-right: 1em;
+  display: inline-block;
+}
+
+.grid-item .graphiteImg {
+  margin-right: 1px;
+}
+
+.grid-item > p {
+  padding: .5em;
+  margin-bottom: 0;
 }

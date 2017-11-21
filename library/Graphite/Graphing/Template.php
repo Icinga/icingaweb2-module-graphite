@@ -44,7 +44,7 @@ class Template
     /**
      * The check command this template is designed for
      *
-     * @var string
+     * @var string|null
      */
     protected $checkCommand;
 
@@ -213,7 +213,7 @@ class Template
     /**
      * Get the check command this template is designed for
      *
-     * @return string
+     * @return string|null
      */
     public function getCheckCommand()
     {
@@ -223,7 +223,7 @@ class Template
     /**
      * Set the check command this template is designed for
      *
-     * @param string $checkCommand
+     * @param string|null $checkCommand
      *
      * @return $this
      */
