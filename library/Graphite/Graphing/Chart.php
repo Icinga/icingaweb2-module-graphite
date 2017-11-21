@@ -43,7 +43,7 @@ class Chart
      *
      * @var string
      */
-    protected $from = '-4hours';
+    protected $from = '-14400';
 
     /**
      * The chart's end
@@ -111,8 +111,33 @@ class Chart
      */
     public function serveImage(Response $response)
     {
+        $now = time();
+
+        $from = (int) $this->from;
+        if ($from < 0) {
+            $from += $now;
+        }
+
+        if ((string) $this->until === '') {
+            $until = $now;
+        } else {
+            $until = (int) $this->until;
+            if ($until < 0) {
+                $until += $now;
+            }
+        }
+
+        $timeSpan = $until - $from - 30;
+
+        foreach ($this->xFormat as $timeSpanLimit => $xFormat) {
+            if ($timeSpan <= $timeSpanLimit) {
+                break;
+            }
+        }
+
         $params = (new UrlParams())->addValues([
-            'from'                  => $this->from,
+            'from'                  => $from,
+            'until'                 => $until,
             'width'                 => $this->width,
             'height'                => $this->height,
             'hideLegend'            => (string) ! $this->showLegend,
@@ -124,22 +149,9 @@ class Chart
             'graphType'             => 'line',
             'majorGridLineColor'    => '#0000003F',
             'minorGridLineColor'    => '#00000000',
+            'xFormat'               => $xFormat,
             '_ext'                  => 'whatever.svg'
         ]);
-
-        if ($this->until !== null) {
-            $params->set('until', $this->until);
-        }
-
-        $timeSpan = ($this->until === null ? time() : $this->until) - $this->from - 30;
-
-        foreach ($this->xFormat as $timeSpanLimit => $xFormat) {
-            if ($timeSpan <= $timeSpanLimit) {
-                break;
-            }
-        }
-
-        $params->set('xFormat', $xFormat);
 
         $variables = $this->getMetricVariables();
         foreach ($this->template->getUrlParams() as $key => $value) {
