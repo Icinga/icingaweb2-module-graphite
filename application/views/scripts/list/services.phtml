@@ -6,6 +6,8 @@ use Icinga\Web\Url;
 /** @var \Icinga\Web\View $this */
 /** @var \Icinga\Web\Widget\FilterEditor $filterEditor */
 /** @var \Icinga\Module\Monitoring\DataView\DataView $services */
+/** @var \Icinga\Web\Url $hostBaseUrl */
+/** @var \Icinga\Web\Url $serviceBaseUrl */
 
 if (! $compact): ?>
 <div class="controls">
@@ -29,7 +31,7 @@ if ($services->hasResult()) {
                 $service->host_name === $service->host_display_name
                     ? $service->host_display_name
                     : $service->host_display_name . ' (' . $this->escape($service->host_name) . ')',
-                Url::fromPath('monitoring/host/show', ['host' => $service->host_name]),
+                $hostBaseUrl->with(['host' => $service->host_name]),
                 null,
                 ['data-base-target' => '_next']
             )
@@ -38,9 +40,9 @@ if ($services->hasResult()) {
                 $service->service_description === $service->service_display_name
                     ? $service->service_display_name
                     : $service->service_display_name . ' (' . $this->escape($service->service_description) . ')',
-                Url::fromPath('monitoring/service/show', [
-                    'host' => $service->host_name,
-                    'service' => $service->service_description
+                $serviceBaseUrl->with([
+                    'host'      => $service->host_name,
+                    'service'   => $service->service_description
                 ]),
                 null,
                 ['data-base-target' => '_next']

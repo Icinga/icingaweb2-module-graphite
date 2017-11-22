@@ -3,6 +3,7 @@
 namespace Icinga\Module\Graphite\Controllers;
 
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePicker;
+use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePickerFormTrait;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
 use Icinga\Module\Monitoring\DataView\DataView;
@@ -37,6 +38,12 @@ class ListController extends MonitoringAwareController
             ])
         );
 
+        $this->view->baseUrl = $baseUrl = Url::fromPath('monitoring/host/show');
+        TimeRangePickerFormTrait::copyAllRangeParameters(
+            $baseUrl->getParams(),
+            $this->getRequest()->getUrl()->getParams()
+        );
+
         $this->filterQuery($hosts);
         $this->setupPaginationControl($hosts);
         $this->setupLimitControl();
@@ -63,6 +70,18 @@ class ListController extends MonitoringAwareController
                 'service_check_command',
                 '_service_check_command'
             ])
+        );
+
+        $this->view->hostBaseUrl = $hostBaseUrl = Url::fromPath('monitoring/host/show');
+        TimeRangePickerFormTrait::copyAllRangeParameters(
+            $hostBaseUrl->getParams(),
+            $this->getRequest()->getUrl()->getParams()
+        );
+
+        $this->view->serviceBaseUrl = $serviceBaseUrl = Url::fromPath('monitoring/service/show');
+        TimeRangePickerFormTrait::copyAllRangeParameters(
+            $serviceBaseUrl->getParams(),
+            $this->getRequest()->getUrl()->getParams()
         );
 
         $this->filterQuery($services);

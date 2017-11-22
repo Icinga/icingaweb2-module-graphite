@@ -6,6 +6,7 @@ use Icinga\Web\Url;
 /** @var \Icinga\Web\View $this */
 /** @var \Icinga\Web\Widget\FilterEditor $filterEditor */
 /** @var \Icinga\Module\Monitoring\DataView\DataView $hosts */
+/** @var \Icinga\Web\Url $baseUrl */
 
 if (! $compact): ?>
 <div class="controls">
@@ -29,7 +30,7 @@ if ($hosts->hasResult()) {
                 $host->host_name === $host->host_display_name
                     ? $host->host_display_name
                     : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
-                Url::fromPath('monitoring/host/show', ['host' => $host->host_name]),
+                $baseUrl->with(['host' => $host->host_name]),
                 null,
                 ['data-base-target' => '_next']
             )
