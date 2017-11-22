@@ -50,6 +50,7 @@ class CustomForm extends Form
                 'date',
                 'start_date',
                 [
+                    'placeholder'   => 'YYYY-MM-DD',
                     'label'         => $this->translate('Start'),
                     'description'   => $this->translate('Start of the date/time range')
                 ]
@@ -58,6 +59,7 @@ class CustomForm extends Form
                 'time',
                 'start_time',
                 [
+                    'placeholder'   => 'HH:MM',
                     'label'         => $this->translate('Start'),
                     'description'   => $this->translate('Start of the date/time range')
                 ]
@@ -66,6 +68,7 @@ class CustomForm extends Form
                 'date',
                 'end_date',
                 [
+                    'placeholder'   => 'YYYY-MM-DD',
                     'label'         => $this->translate('End'),
                     'description'   => $this->translate('End of the date/time range')
                 ]
@@ -74,6 +77,7 @@ class CustomForm extends Form
                 'time',
                 'end_time',
                 [
+                    'placeholder'   => 'HH:MM',
                     'label'         => $this->translate('End'),
                     'description'   => $this->translate('End of the date/time range')
                 ]
