@@ -76,7 +76,7 @@ Allows to define additional URL parameters to be passed to Graphite's render
 API.
 
 Each option represents a single parameter's name and value. A list of all
-supported parameters can be found [here](http://graphite.readthedocs.io/en/latest/render_api.html#graph-parameters).
+supported parameters can be found [here](https://graphite.readthedocs.io/en/latest/render_api.html#graph-parameters).
 
 If you have used a macro for the curve's perfdata-label you may utilize it
 here as well:
@@ -89,7 +89,7 @@ Allows to define Graphite functions which are applied to the metric of a
 specific curve on the graph.
 
 Each option's key must match a curve's name in order to apply the function
-to the curve's metric. A list of all supported functions can be found [here](http://graphite.readthedocs.io/en/latest/functions.html#functions).
+to the curve's metric. A list of all supported functions can be found [here](https://graphite.readthedocs.io/en/latest/functions.html#functions).
 
 The metric in question can be referenced in the function call using the macro
 `$metric$` as shown in the following example:
