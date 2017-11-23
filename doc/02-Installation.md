@@ -18,7 +18,7 @@ Adjust its configuration in `/etc/icinga2/features-enabled/graphite.conf`:
 library "perfdata"
 
 object GraphiteWriter "graphite" {
-  host = "127.0.0.1"
+  host = "192.0.2.42"
   port = 2003
   enable_send_thresholds = true
 }

@@ -6,7 +6,7 @@ Open up the Icinga Web 2 frontend and navigate to:
 
     Configuration > Modules > graphite > Backend
 
-Enter the Graphite Web URL. (e.g. `http://1.2.3.4:8003/`)
+Enter the Graphite Web URL. (e.g. `http://192.0.2.42:8003/`)
 
 The HTTP basic authentication credentials are only required
 if your Graphite Web is protected by such a mechanism.
