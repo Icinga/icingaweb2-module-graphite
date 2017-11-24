@@ -6,8 +6,8 @@ This module integrates an existing [Graphite](https://graphite.readthedocs.io/en
 installation in your [Icinga Web 2](https://www.icinga.com/products/icinga-web-2/)
 frontend.
 
-![Service List](doc/img/service-list.png)
-![Detail View](doc/img/service-detail-view.png)
+![Service List](doc/img/service-list.png) | ![Detail View](doc/img/service-detail-view.png)
+------------------------------------------|------------------------------------------------
 
 It provides a new menu section with two general overviews for hosts and
 services as well as an extension to the host and service detail view of
