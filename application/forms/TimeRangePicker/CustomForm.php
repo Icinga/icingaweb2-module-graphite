@@ -93,6 +93,15 @@ class CustomForm extends Form
         $this->urlToForm('end');
     }
 
+    public function addSubmitButton()
+    {
+        $result = parent::addSubmitButton();
+
+        $this->getElement('btn_submit')->class = 'flyover-toggle';
+
+        return $result;
+    }
+
     public function onSuccess()
     {
         $start = $this->formToUrl('start', '00:00');
