@@ -93,6 +93,13 @@ abstract class Graphs extends AbstractWidget
     protected $preloadDummy = false;
 
     /**
+     * Cache for {@link getGraphsList()}
+     *
+     * @var string
+     */
+    protected $graphsList;
+
+    /**
      * Factory, based on the given object
      *
      * @param   MonitoredObject $object
@@ -155,91 +162,111 @@ abstract class Graphs extends AbstractWidget
         return $this;
     }
 
-    public function render()
+    /**
+     * Render the graphs list
+     *
+     * @return string
+     */
+    protected function getGraphsList()
     {
-        /** @var View $view */
-        $view = $this->view();
-        $result = []; // kind of string builder
-        $filter = $this->getMonitoredObjectFilter();
-        $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
-        $templates = static::getAllTemplates()->getTemplates();
-        $checkCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
-        $limit = $this->maxVisibleGraphs;
+        if ($this->graphsList === null) {
+            /** @var View $view */
+            $view = $this->view();
+            $result = []; // kind of string builder
+            $filter = $this->getMonitoredObjectFilter();
+            $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
+            $templates = static::getAllTemplates()->getTemplates();
+            $checkCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
+            $limit = $this->maxVisibleGraphs;
 
-        $classes = $this->classes;
-        $classes[] = 'images';
-        $div = '<div class="' . implode(' ', $classes) . '">';
+            $classes = $this->classes;
+            $classes[] = 'images';
+            $div = '<div class="' . implode(' ', $classes) . '">';
 
-        $concreteTemplates = [];
-        $defaultTemplates = [];
-        foreach ($templates as $templateName => $template) {
-            if ($this->designedForMyMonitoredObjectType($template)) {
-                $templateCheckCommand = $template->getCheckCommand();
+            $concreteTemplates = [];
+            $defaultTemplates = [];
+            foreach ($templates as $templateName => $template) {
+                if ($this->designedForMyMonitoredObjectType($template)) {
+                    $templateCheckCommand = $template->getCheckCommand();
 
-                if ($templateCheckCommand === $checkCommand) {
-                    $concreteTemplates[$templateName] = $template;
-                } elseif ($templateCheckCommand === null) {
-                    $defaultTemplates[$templateName] = $template;
+                    if ($templateCheckCommand === $checkCommand) {
+                        $concreteTemplates[$templateName] = $template;
+                    } elseif ($templateCheckCommand === null) {
+                        $defaultTemplates[$templateName] = $template;
+                    }
                 }
             }
-        }
 
-        $renderedGraphs = 0;
-        foreach ((empty($concreteTemplates) ? $defaultTemplates : $concreteTemplates) as $templateName => $template) {
-            $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
-            if (! empty($charts)) {
-                foreach ($charts as $chart) {
-                    if (empty($result)) {
-                        $result[] = $div;
-                    } elseif ($limit && $renderedGraphs === $limit) {
-                        $result[] = sprintf(
-                            '<input type="checkbox" id="toggle-%1$s" class="expandable-toggle">'
-                            . '<label for="toggle-%1$s" class="link-button">'
-                            . '<span class="expandable-expand-label">%2$s</span>'
-                            . '<span class="expandable-collapse-label">%3$s</span>'
-                            . '</label>'
-                            . '<div class="expandable-content">',
-                            $view->protectId($this->getMonitoredObjectIdentifier()),
-                            $view->translate('Show More'),
-                            $view->translate('Show Less')
-                        );
+            $renderedGraphs = 0;
+            foreach ((empty($concreteTemplates) ? $defaultTemplates : $concreteTemplates) as $templateName => $template) {
+                $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
+                if (! empty($charts)) {
+                    foreach ($charts as $chart) {
+                        if (empty($result)) {
+                            $result[] = $div;
+                        } elseif ($limit && $renderedGraphs === $limit) {
+                            $result[] = sprintf(
+                                '<input type="checkbox" id="toggle-%1$s" class="expandable-toggle">'
+                                    . '<label for="toggle-%1$s" class="link-button">'
+                                    . '<span class="expandable-expand-label">%2$s</span>'
+                                    . '<span class="expandable-collapse-label">%3$s</span>'
+                                    . '</label>'
+                                    . '<div class="expandable-content">',
+                                $view->protectId($this->getMonitoredObjectIdentifier()),
+                                $view->translate('Show More'),
+                                $view->translate('Show Less')
+                            );
+                        }
+
+                        $imageUrl = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
+                            ->setParam('template', $templateName)
+                            ->setParam('start', $this->start)
+                            ->setParam('end', $this->end)
+                            ->setParam('width', $this->width)
+                            ->setParam('height', $this->height)
+                            ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
+                        if (! $this->compact) {
+                            $imageUrl->setParam('legend', 1);
+                        }
+
+                        $result[] = '<img id="graphiteImg-';
+                        $result[] = md5((string) $imageUrl->without('cachebuster'));
+                        $result[] = '" src="';
+                        $result[] = (string) $imageUrl;
+                        $result[] = '" class="detach graphiteImg" alt="" width="';
+                        $result[] = $this->width;
+                        $result[] = '" height="';
+                        $result[] = $this->height;
+                        $result[] = '">';
+                        $renderedGraphs++;
                     }
-
-                    $imageUrl = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
-                        ->setParam('template', $templateName)
-                        ->setParam('start', $this->start)
-                        ->setParam('end', $this->end)
-                        ->setParam('width', $this->width)
-                        ->setParam('height', $this->height)
-                        ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
-                    if (! $this->compact) {
-                        $imageUrl->setParam('legend', 1);
-                    }
-
-                    $result[] = '<img id="graphiteImg-';
-                    $result[] = md5((string) $imageUrl->without('cachebuster'));
-                    $result[] = '" src="';
-                    $result[] = (string) $imageUrl;
-                    $result[] = '" class="detach graphiteImg" alt="" width="';
-                    $result[] = $this->width;
-                    $result[] = '" height="';
-                    $result[] = $this->height;
-                    $result[] = '">';
-                    $renderedGraphs++;
                 }
             }
-        }
 
-        if (! empty($result)) {
-            if ($limit && $renderedGraphs > $limit) {
+            if (! empty($result)) {
+                if ($limit && $renderedGraphs > $limit) {
+                    $result[] = '</div>';
+                }
+
                 $result[] = '</div>';
             }
 
-            $result[] = '</div>';
-            return implode($result);
-        } else {
+            $this->graphsList = implode($result);
+        }
+
+        return $this->graphsList;
+    }
+
+    public function render()
+    {
+        $result = $this->getGraphsList();
+
+        if ($result === '') {
+            $view = $this->view();
             return "<p>{$view->escape($view->translate('No graphs found'))}</p>";
         }
+
+        return $result;
     }
 
     /**
@@ -447,5 +474,15 @@ abstract class Graphs extends AbstractWidget
         $this->preloadDummy = $preloadDummy;
 
         return $this;
+    }
+
+    /**
+     * Whether there are any graphs to display
+     *
+     * @return bool
+     */
+    public function hasGraphs()
+    {
+        return $this->getGraphsList() !== '';
     }
 }
