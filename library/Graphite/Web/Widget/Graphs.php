@@ -193,12 +193,12 @@ abstract class Graphs extends AbstractWidget
                         $result[] = $div;
                     } elseif ($limit && $renderedGraphs === $limit) {
                         $result[] = sprintf(
-                            '<input type="checkbox" id="toggle-%1$s" class="collapsible-toggle">'
+                            '<input type="checkbox" id="toggle-%1$s" class="expandable-toggle">'
                             . '<label for="toggle-%1$s" class="link-button">'
-                            . '<span class="collapsible-show">%2$s</span>'
-                            . '<span class="collapsible-hide">%3$s</span>'
+                            . '<span class="expandable-expand-label">%2$s</span>'
+                            . '<span class="expandable-collapse-label">%3$s</span>'
                             . '</label>'
-                            . '<div class="collapsible">',
+                            . '<div class="expandable-content">',
                             $view->protectId($this->getMonitoredObjectIdentifier()),
                             $view->translate('Show More'),
                             $view->translate('Show Less')
