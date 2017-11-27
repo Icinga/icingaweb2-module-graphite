@@ -61,14 +61,14 @@ trait GraphingTrait
         if (static::$metricsDataSource === null) {
             $config = Config::module('graphite');
             $graphite = $config->getSection('graphite');
-            if (! isset($graphite->web_url)) {
-                throw new ConfigurationError('Missing "graphite.web_url" in "%s"', $config->getConfigFile());
+            if (! isset($graphite->url)) {
+                throw new ConfigurationError('Missing "graphite.url" in "%s"', $config->getConfigFile());
             }
 
             static::$metricsDataSource = new MetricsDataSource(
-                (new GraphiteWebClient(Url::fromPath($graphite->web_url)))
-                    ->setUser($graphite->web_user)
-                    ->setPassword($graphite->web_password)
+                (new GraphiteWebClient(Url::fromPath($graphite->url)))
+                    ->setUser($graphite->user)
+                    ->setPassword($graphite->password)
             );
         }
 

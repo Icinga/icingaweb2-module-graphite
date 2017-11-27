@@ -18,7 +18,7 @@ class BackendForm extends ConfigForm
         $this->addElements([
             [
                 'text',
-                'graphite_web_url',
+                'graphite_url',
                 [
                     'required'      => true,
                     'label'         => $this->translate('Graphite Web URL'),
@@ -28,7 +28,7 @@ class BackendForm extends ConfigForm
             ],
             [
                 'text',
-                'graphite_web_user',
+                'graphite_user',
                 [
                     'label'         => $this->translate('Graphite Web user'),
                     'description'   => $this->translate(
@@ -39,7 +39,7 @@ class BackendForm extends ConfigForm
             ],
             [
                 'password',
-                'graphite_web_password',
+                'graphite_password',
                 [
                     'renderPassword'    => true,
                     'label'             => $this->translate('Graphite Web password'),
