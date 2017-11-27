@@ -72,5 +72,5 @@ Graphite and Graphite Web running, e.g. as docker instance:
 Icinga Web 2 with Graphite module enabled
 
     [graphite]
-    web_url = http://localhost:9090
+    base_url = http://localhost:9090
 
