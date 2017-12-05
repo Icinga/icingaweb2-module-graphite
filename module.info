@@ -1,0 +1,4 @@
+Module: graphite
+Version: 0.9.0
+Description: Icinga Graphite module
+Depends: monitoring
