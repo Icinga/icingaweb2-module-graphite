@@ -2,8 +2,10 @@
 
 namespace iplx\Http;
 
+use Psr\Http\Message\StreamInterface;
+
 /**
- * cURL handle representation
+ * Internal cURL handle representation
  */
 class Handle
 {
@@ -13,6 +15,13 @@ class Handle
      * @var resource
      */
     public $handle;
+
+    /**
+     * Response body
+     *
+     * @var StreamInterface
+     */
+    public $responseBody;
 
     /**
      * Received response headers

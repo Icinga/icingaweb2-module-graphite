@@ -20,6 +20,13 @@ class Request implements RequestInterface
     protected $method;
 
     /**
+     * The request target
+     *
+     * @var string|null
+     */
+    protected $requestTarget;
+
+    /**
      * URI of the request
      *
      * @var UriInterface
@@ -42,16 +49,37 @@ class Request implements RequestInterface
         $this->setHeaders($headers);
         $this->body = Stream::create($body);
         $this->protocolVersion = $protocolVersion;
+
+        $this->provideHostHeader();
     }
 
     public function getRequestTarget()
     {
-        // TODO: Implement getRequestTarget() method.
+        if ($this->requestTarget !== null) {
+            return $this->requestTarget;
+        }
+
+        $requestTarget = $this->uri->getPath();
+
+        // Weak type checks to also check null
+
+        if ($requestTarget == '') {
+            $requestTarget = '/';
+        }
+
+        if ($this->uri->getQuery() != '') {
+            $requestTarget .= '?' . $this->uri->getQuery();
+        }
+
+        return $requestTarget;
     }
 
     public function withRequestTarget($requestTarget)
     {
-        // TODO: Implement withRequestTarget() method.
+        $request = clone $this;
+        $request->requestTarget = $requestTarget;
+
+        return $request;
     }
 
     public function getMethod()
@@ -74,6 +102,42 @@ class Request implements RequestInterface
 
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
-        // TODO: Implement withUri() method.
+        $request = clone $this;
+        $request->uri = $uri;
+
+        if (! $preserveHost) {
+            $this->provideHostHeader(true);
+        }
+
+        return $this;
+    }
+
+    protected function provideHostHeader($force = false)
+    {
+        if ($this->hasHeader('host')) {
+            if (! $force) {
+                return;
+            }
+
+            $header = $this->headerNames['host'];
+        } else {
+            $header = 'Host';
+        }
+
+        $host = $this->uri->getHost();
+
+        // Weak type check to also check null
+        if ($host == '') {
+            $host = '';
+        } else {
+            $port = $this->uri->getPort();
+
+            if ($port !== null) {
+                $host .= ":$port";
+            }
+        }
+
+        $this->headerNames['host'] = $header;
+        $this->headerValues['host'] = [$host];
     }
 }
