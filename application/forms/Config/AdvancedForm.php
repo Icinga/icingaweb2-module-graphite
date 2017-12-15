@@ -4,6 +4,7 @@ namespace Icinga\Module\Graphite\Forms\Config;
 
 use Icinga\Forms\ConfigForm;
 use Icinga\Module\Graphite\Web\Form\Validator\MacroTemplateValidator;
+use Zend_Validate_Regex;
 
 class AdvancedForm extends ConfigForm
 {
@@ -38,6 +39,18 @@ class AdvancedForm extends ConfigForm
                         . ' attribute service_name_template (if specified)'
                     ),
                     'validators'    => [new MacroTemplateValidator()]
+                ]
+            ],
+            [
+                'text',
+                'icinga_customvar_obscured_check_command',
+                [
+                    'label'         => $this->translate('Obscured check command custom variable'),
+                    'description'   => $this->translate(
+                        'The Icinga custom variable with the "actual" check command obscured'
+                            . ' by e.g. check_by_ssh (defaults to check_command)'
+                    ),
+                    'validators'    => [new Zend_Validate_Regex('/\A\w*\z/')]
                 ]
             ]
         ]);

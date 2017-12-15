@@ -6,6 +6,7 @@ use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRan
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePickerFormTrait;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
+use Icinga\Module\Graphite\Web\Widget\Graphs;
 use Icinga\Module\Monitoring\DataView\DataView;
 use Icinga\Web\Url;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
@@ -34,7 +35,7 @@ class ListController extends MonitoringAwareController
                 'host_name',
                 'host_display_name',
                 'host_check_command',
-                '_host_check_command'
+                '_host_check_command' => '_host_' . Graphs::getObscuredCheckCommandCustomVar()
             ])
         );
 
@@ -68,7 +69,7 @@ class ListController extends MonitoringAwareController
                 'service_description',
                 'service_display_name',
                 'service_check_command',
-                '_service_check_command'
+                '_service_check_command' => '_service_' . Graphs::getObscuredCheckCommandCustomVar()
             ])
         );
 

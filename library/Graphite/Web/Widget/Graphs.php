@@ -2,6 +2,7 @@
 
 namespace Icinga\Module\Graphite\Web\Widget;
 
+use Icinga\Application\Config;
 use Icinga\Application\Icinga;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
@@ -19,6 +20,13 @@ use Icinga\Web\Widget\AbstractWidget;
 abstract class Graphs extends AbstractWidget
 {
     use GraphingTrait;
+
+    /**
+     * The Icinga custom variable with the "real" check command (if any) of monitored objects we display graphs for
+     *
+     * @var string
+     */
+    protected static $obscuredCheckCommandCustomVar;
 
     /**
      * Graph image width
@@ -114,7 +122,7 @@ abstract class Graphs extends AbstractWidget
                 return new HostGraphs(
                     $object->getName(),
                     $object->host_check_command,
-                    $object->_host_check_command
+                    $object->{'_host_' . Graphs::getObscuredCheckCommandCustomVar()}
                 );
 
             case 'service':
@@ -123,9 +131,24 @@ abstract class Graphs extends AbstractWidget
                     $object->getHost()->getName(),
                     $object->getName(),
                     $object->service_check_command,
-                    $object->_service_check_command
+                    $object->{'_service_' . Graphs::getObscuredCheckCommandCustomVar()}
                 );
         }
+    }
+
+    /**
+     * Get the Icinga custom variable with the "real" check command (if any) of monitored objects we display graphs for
+     *
+     * @return string
+     */
+    public static function getObscuredCheckCommandCustomVar()
+    {
+        if (static::$obscuredCheckCommandCustomVar === null) {
+            static::$obscuredCheckCommandCustomVar = Config::module('graphite')
+                ->get('icinga', 'customvar_obscured_check_command', 'check_command');
+        }
+
+        return static::$obscuredCheckCommandCustomVar;
     }
 
     /**
