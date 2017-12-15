@@ -17,6 +17,33 @@ class AdvancedForm extends ConfigForm
     {
         $this->addElements([
             [
+                'number',
+                'ui_default_time_range',
+                [
+                    'label'         => $this->translate('Default time range'),
+                    'description'   => $this->translate('The default time range for graphs'),
+                    'min'           => 1,
+                    'value'         => 1
+                ]
+            ],
+            [
+                'select',
+                'ui_default_time_range_unit',
+                [
+                    'label'         => $this->translate('Default time range unit'),
+                    'description'   => $this->translate('The above range\'s unit'),
+                    'multiOptions'  => [
+                        'minutes'   => $this->translate('Minutes'),
+                        'hours'     => $this->translate('Hours'),
+                        'days'      => $this->translate('Days'),
+                        'weeks'     => $this->translate('Weeks'),
+                        'months'    => $this->translate('Months'),
+                        'years'     => $this->translate('Years')
+                    ],
+                    'value'         => 'hours'
+                ]
+            ],
+            [
                 'text',
                 'icinga_graphite_writer_host_name_template',
                 [

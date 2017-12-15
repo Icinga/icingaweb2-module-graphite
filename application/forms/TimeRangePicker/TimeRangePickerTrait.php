@@ -2,6 +2,8 @@
 
 namespace Icinga\Module\Graphite\Forms\TimeRangePicker;
 
+use Icinga\Application\Config;
+use Icinga\Exception\ConfigurationError;
 use Icinga\Web\Url;
 use Icinga\Web\UrlParams;
 
@@ -73,5 +75,37 @@ trait TimeRangePickerTrait
         }
 
         return preg_match('/^(?:0|[1-9]\d*)$/', $seconds) ? (int) $seconds : false;
+    }
+
+    /**
+     * Get the default relative time range for graphs
+     *
+     * @return int
+     *
+     * @throws ConfigurationError
+     */
+    public static function getDefaultRelativeTimeRange()
+    {
+        $rangeFactors = [
+            'minutes'   => 60,
+            'hours'     => 3600,
+            'days'      => 86400,
+            'weeks'     => 604800,
+            'months'    => 2592000,
+            'years'     => 31557600
+        ];
+
+        $config = Config::module('graphite');
+        $unit = $config->get('ui', 'default_time_range_unit', 'hours');
+
+        if (! isset($rangeFactors[$unit])) {
+            throw new ConfigurationError(
+                'Bad ui.default_time_range_unit %s in file %s',
+                var_export($unit, true),
+                var_export($config->getConfigFile(), true)
+            );
+        }
+
+        return (int) $config->get('ui', 'default_time_range', 1) * $rangeFactors[$unit];
     }
 }
