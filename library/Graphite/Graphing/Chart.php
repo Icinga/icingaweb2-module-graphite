@@ -50,7 +50,7 @@ class Chart
      *
      * @var int
      */
-    protected $width = 300;
+    protected $width = 350;
 
     /**
      * The chart's height

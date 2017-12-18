@@ -33,14 +33,14 @@ abstract class Graphs extends AbstractWidget
      *
      * @var string
      */
-    protected $width = '300';
+    protected $width = '350';
 
     /**
      * Graph image height
      *
      * @var string
      */
-    protected $height = '150';
+    protected $height = '200';
 
     /**
      * Graph range start
