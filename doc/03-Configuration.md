@@ -17,6 +17,14 @@ Open up the Icinga Web 2 frontend and navigate to:
 
     Configuration > Modules > graphite > Advanced
 
+### UI
+
+The settings *Default time range* and *Default time range unit* set the default
+time range for displayed graphs both in the graphs lists and in monitored
+objects' detail views.
+
+### Icinga 2 (Core)
+
 The settings *Host name template* and *Service name template* both are only
 required if you are using a different naming schema than the default Icinga 2
 is using. (As outlined [here](https://www.icinga.com/docs/icinga2/latest/doc/14-features/#current-graphite-schema))
