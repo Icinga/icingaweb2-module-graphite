@@ -24,24 +24,27 @@ if (! $compact): ?>
 <?php
 if ($hosts->hasResult()) {
     foreach ($hosts->peekAhead($compact) as $host) {
-        echo '<div class="grid-item">'
-            . '<h2>'
-            . $this->qlink(
-                $host->host_name === $host->host_display_name
-                    ? $host->host_display_name
-                    : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
-                $baseUrl->with(['host' => $host->host_name]),
-                null,
-                ['data-base-target' => '_next']
-            )
-            . '</h2>';
-
-        echo (new Host(
+        $hostGraphs = (string) (new Host(
             $host->host_name,
             $host->host_check_command,
             $host->_host_check_command
         ))->handleRequest();
-        echo '</div>';
+
+        if ($hostGraphs !== '') {
+            echo '<div class="grid-item">'
+                . '<h2>'
+                . $this->qlink(
+                    $host->host_name === $host->host_display_name
+                        ? $host->host_display_name
+                        : $host->host_display_name . ' (' . $this->escape($host->host_name) . ')',
+                    $baseUrl->with(['host' => $host->host_name]),
+                    null,
+                    ['data-base-target' => '_next']
+                )
+                . '</h2>'
+                . $hostGraphs
+                . '</div>';
+        }
     }
 
     if (! $compact && $hosts->hasMore()) {

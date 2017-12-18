@@ -23,6 +23,9 @@ The settings *Default time range* and *Default time range unit* set the default
 time range for displayed graphs both in the graphs lists and in monitored
 objects' detail views.
 
+If you'd like to suppress the *No graphs found* messages, check *Disable "no
+graphs found"*. (This may cause unexpected blank pages in the graphs lists.)
+
 ### Icinga 2 (Core)
 
 The settings *Host name template* and *Service name template* both are only

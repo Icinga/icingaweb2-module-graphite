@@ -45,6 +45,16 @@ class AdvancedForm extends ConfigForm
                 ]
             ],
             [
+                'checkbox',
+                'ui_disable_no_graphs_found',
+                [
+                    'label'         => $this->translate('Disable "no graphs found"'),
+                    'description'   => $this->translate(
+                        'If no graphs were found for a monitored object, just display nothing at all'
+                    ),
+                ]
+            ],
+            [
                 'text',
                 'icinga_graphite_writer_host_name_template',
                 [
