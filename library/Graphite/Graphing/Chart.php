@@ -11,13 +11,6 @@ use Icinga\Web\UrlParams;
 class Chart
 {
     /**
-     * Time point formats for the X axis by their time span limits
-     *
-     * @var string[]
-     */
-    protected $xFormat;
-
-    /**
      * Used to render the chart
      *
      * @var GraphiteWebClient
@@ -89,14 +82,6 @@ class Chart
      */
     public function __construct(GraphiteWebClient $graphiteWebClient, Template $template, array $metrics)
     {
-        $this->xFormat = [
-            60 * 60                         => '%H:%M',
-            60 * 60 * 24                    => '%H:00',
-            60 * 60 * 24 * 7                => '%a',
-            60 * 60 * 24 * 30               => 'W%V',
-            (int) (60 * 60 * 24 * 365.25)   => '%Y-%m',
-            -1                              => '%Y'
-        ];
         $this->graphiteWebClient = $graphiteWebClient;
         $this->template = $template;
         $this->metrics = $metrics;
@@ -127,14 +112,6 @@ class Chart
             }
         }
 
-        $timeSpan = $until - $from - 30;
-
-        foreach ($this->xFormat as $timeSpanLimit => $xFormat) {
-            if ($timeSpan <= $timeSpanLimit) {
-                break;
-            }
-        }
-
         $params = (new UrlParams())->addValues([
             'from'                  => $from,
             'until'                 => $until,
@@ -148,7 +125,6 @@ class Chart
             'graphType'             => 'line',
             'majorGridLineColor'    => '#0000003F',
             'minorGridLineColor'    => '#00000000',
-            'xFormat'               => $xFormat,
             '_ext'                  => 'whatever.svg'
         ]);
 
