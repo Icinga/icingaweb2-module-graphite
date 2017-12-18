@@ -69,6 +69,7 @@ trait GraphingTrait
                 (new GraphiteWebClient(Url::fromPath($graphite->url)))
                     ->setUser($graphite->user)
                     ->setPassword($graphite->password)
+                    ->setInsecure($graphite->insecure)
             );
         }
 
