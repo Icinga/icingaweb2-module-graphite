@@ -308,7 +308,11 @@ abstract class Graphs extends AbstractWidget
         }
 
         $absolute = TimeRangePickerTrait::getAbsoluteRangeParameters();
-        return [$params->get($absolute['start'], '-3600'), $params->get($absolute['end'])];
+        $start = $params->get($absolute['start']);
+        return [
+            $start === null ? -TimeRangePickerTrait::getDefaultRelativeTimeRange() : $start,
+            $params->get($absolute['end'])
+        ];
     }
 
     /**

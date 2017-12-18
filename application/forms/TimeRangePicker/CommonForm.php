@@ -146,12 +146,15 @@ class CommonForm extends Form
      */
     protected function urlToForm()
     {
-        if ($this->preSelectDefault()) {
-            return;
-        }
-
         $params = $this->getRedirectUrl()->getParams();
         $seconds = $this->getRelativeSeconds($params);
+
+        if ($seconds === null && count(array_intersect_key(
+            $params->toArray(false),
+            array_keys($this->getAllRangeParameters())
+        )) === 0) {
+            $seconds = $this->getDefaultRelativeTimeRange();
+        }
 
         if ($seconds !== null) {
             if ($seconds !== false) {
@@ -190,24 +193,5 @@ class CommonForm extends Form
                 return;
             }
         }
-    }
-
-    /**
-     * If no range is specified, pre-select "1 hour"
-     *
-     * @return  bool    Whether no range is specified
-     */
-    protected function preSelectDefault()
-    {
-        $params = $this->getRedirectUrl()->getParams();
-        foreach (static::getAllRangeParameters() as $parameter) {
-            if ($params->has($parameter)) {
-                return false;
-            }
-        }
-
-        $this->getElement('hours')->setValue('1');
-
-        return true;
     }
 }
