@@ -21,6 +21,10 @@ The settings *Host name template* and *Service name template* both are only
 required if you are using a different naming schema than the default Icinga 2
 is using. (As outlined [here](https://www.icinga.com/docs/icinga2/latest/doc/14-features/#current-graphite-schema))
 
+The setting *Obscured check command custom variable* is only required if there
+are wrapped check commands (see below) and the "actual" check command is stored
+in another custom variable than `check_command`.
+
 ## Wrapped check commands
 
 If a monitored object is checked remotely and not via an Icinga 2 agent, but
