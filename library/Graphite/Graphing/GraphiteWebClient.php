@@ -34,6 +34,13 @@ class GraphiteWebClient
     protected $password;
 
     /**
+     * Don't verify the remote's TLS certificate
+     *
+     * @var bool
+     */
+    protected $insecure = false;
+
+    /**
      * HTTP client
      *
      * @var ClientInterface
@@ -74,7 +81,12 @@ class GraphiteWebClient
             ->getAbsoluteUrl();
 
         // TODO(ak): keep connections alive (TCP handshakes are a bit expensive and TLS handshakes are very expensive)
-        return (string) $this->httpClient->send(new Request($method, $url, $headers, $body))->getBody();
+        return (string) $this->httpClient->send(
+            new Request($method, $url, $headers, $body),
+            ['curl' => [
+                CURLOPT_SSL_VERIFYPEER => ! $this->insecure
+            ]]
+        )->getBody();
     }
 
     /**
@@ -145,6 +157,30 @@ class GraphiteWebClient
     public function setPassword($password)
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Get whether not to verify the remote's TLS certificate
+     *
+     * @return bool
+     */
+    public function getInsecure()
+    {
+        return $this->insecure;
+    }
+
+    /**
+     * Set whether not to verify the remote's TLS certificate
+     *
+     * @param bool $insecure
+     *
+     * @return $this
+     */
+    public function setInsecure($insecure = true)
+    {
+        $this->insecure = $insecure;
 
         return $this;
     }

@@ -45,6 +45,14 @@ class BackendForm extends ConfigForm
                     'label'             => $this->translate('Graphite Web password'),
                     'description'       => $this->translate('The above user\'s password')
                 ]
+            ],
+            [
+                'checkbox',
+                'graphite_insecure',
+                [
+                    'label'         => $this->translate('Connect insecurely'),
+                    'description'   => $this->translate('Check this to not verify the remote\'s TLS certificate')
+                ]
             ]
         ]);
     }
