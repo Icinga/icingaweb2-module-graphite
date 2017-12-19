@@ -284,7 +284,7 @@ abstract class Graphs extends AbstractWidget
     {
         $result = $this->getGraphsList();
 
-        if ($result === '') {
+        if ($result === '' && ! Config::module('graphite')->get('ui', 'disable_no_graphs_found')) {
             $view = $this->view();
             return "<p>{$view->escape($view->translate('No graphs found'))}</p>";
         }
