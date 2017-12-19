@@ -22,7 +22,7 @@ class Stream implements StreamInterface
     public function __construct($stream)
     {
         if (! is_resource($stream)) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException('Invalid stream resource');
         }
 
         $this->stream = $stream;
@@ -100,7 +100,7 @@ class Stream implements StreamInterface
         $position = ftell($this->stream);
 
         if ($position === false) {
-            throw new RuntimeException();
+            throw new RuntimeException('Unable to determine stream position');
         }
 
         return $position;
@@ -123,7 +123,7 @@ class Stream implements StreamInterface
         $this->assertSeekable();
 
         if (fseek($this->stream, $offset, $whence) === -1) {
-            throw new RuntimeException();
+            throw new RuntimeException('Unable to seek to stream position');
         }
     }
 
@@ -144,7 +144,7 @@ class Stream implements StreamInterface
         $written = fwrite($this->stream, $string);
 
         if ($written === false) {
-            throw new RuntimeException();
+            throw new RuntimeException('Unable to write to stream');
         }
 
         return $written;
@@ -162,7 +162,7 @@ class Stream implements StreamInterface
         $data = fread($this->stream, $length);
 
         if ($data === false) {
-            throw new RuntimeException();
+            throw new RuntimeException('Unable to read from stream');
         }
 
         return $data;
@@ -175,7 +175,7 @@ class Stream implements StreamInterface
         $contents = stream_get_contents($this->stream);
 
         if ($contents === false) {
-            throw new RuntimeException();
+            throw new RuntimeException('Unable to read stream contents');
         }
 
         return $contents;
@@ -183,13 +183,27 @@ class Stream implements StreamInterface
 
     public function getMetadata($key = null)
     {
-        // TODO: Implement getMetadata() method.
+        if (! isset($this->stream)) {
+            return $key === null ? [] : null;
+        }
+
+        $meta = stream_get_meta_data($this->stream);
+
+        if ($key === null) {
+            return $meta;
+        }
+
+        if (isset($meta[$key])) {
+            return $meta[$key];
+        }
+
+        return null;
     }
 
     public function assertAttached()
     {
         if (! isset($this->stream)) {
-            throw new RuntimeException();
+            throw new RuntimeException('Stream is detached');
         }
     }
 
@@ -198,7 +212,7 @@ class Stream implements StreamInterface
         $this->assertAttached();
 
         if (! $this->isSeekable()) {
-            throw new RuntimeException();
+            throw new RuntimeException('Stream is not seekable');
         }
     }
 
@@ -207,7 +221,7 @@ class Stream implements StreamInterface
         $this->assertAttached();
 
         if (! $this->isReadable()) {
-            throw new RuntimeException();
+            throw new RuntimeException('Stream is not readable');
         }
     }
 
@@ -216,10 +230,18 @@ class Stream implements StreamInterface
         $this->assertAttached();
 
         if (! $this->isWritable()) {
-            throw new RuntimeException();
+            throw new RuntimeException('Stream is not writable');
         }
     }
 
+    /**
+     * Open a stream
+     *
+     * @param   string  $filename
+     * @param   string  $mode
+     *
+     * @return  static
+     */
     public static function open($filename = 'php://temp', $mode = 'r+')
     {
         $stream = fopen($filename, $mode);
@@ -227,8 +249,19 @@ class Stream implements StreamInterface
         return new static($stream);
     }
 
-    public static function create($resource = null)
+    /**
+     * Create a stream
+     *
+     * @param   StreamInterface|string|resource $resource
+     *
+     * @return  StreamInterface
+     */
+    public static function create($resource)
     {
+        if ($resource instanceof StreamInterface) {
+            return $resource;
+        }
+
         if (is_scalar($resource)) {
             $stream = fopen('php://temp', 'r+');
 

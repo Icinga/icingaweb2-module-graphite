@@ -15,7 +15,7 @@ class Uri implements UriInterface
 
     protected $user;
 
-    protected $password;
+    protected $pass;
 
     protected $path;
 
@@ -32,7 +32,7 @@ class Uri implements UriInterface
         }
 
         foreach ($parts as $component => $value) {
-            $this->applyComponent($component, $value);
+            $this->$component = $value;
         }
     }
 
@@ -68,8 +68,8 @@ class Uri implements UriInterface
     {
         $userInfo = $this->user;
 
-        if ($this->password !== null) {
-            $userInfo .= ":{$this->password}";
+        if ($this->pass !== null) {
+            $userInfo .= ":{$this->pass}";
         }
 
         return $userInfo;
@@ -103,7 +103,7 @@ class Uri implements UriInterface
     public function withScheme($scheme)
     {
         $uri = clone $this;
-        $uri->applyComponent('scheme', $scheme);
+        $uri->scheme = $scheme;
 
         return $uri;
     }
@@ -111,8 +111,8 @@ class Uri implements UriInterface
     public function withUserInfo($user, $password = null)
     {
         $uri = clone $this;
-        $uri->applyComponent('user', $user);
-        $uri->applyComponent('password', $password);
+        $uri->user = $user;
+        $uri->pass = $password;
 
         return $uri;
     }
@@ -120,7 +120,7 @@ class Uri implements UriInterface
     public function withHost($host)
     {
         $uri = clone $this;
-        $uri->applyComponent('host', $host);
+        $uri->host = $host;
 
         return $uri;
     }
@@ -128,7 +128,7 @@ class Uri implements UriInterface
     public function withPort($port)
     {
         $uri = clone $this;
-        $uri->applyComponent('port', $port);
+        $uri->port = $port;
 
         return $uri;
     }
@@ -136,7 +136,7 @@ class Uri implements UriInterface
     public function withPath($path)
     {
         $uri = clone $this;
-        $uri->applyComponent('path', $path);
+        $uri->path = $path;
 
         return $uri;
     }
@@ -144,7 +144,7 @@ class Uri implements UriInterface
     public function withQuery($query)
     {
         $uri = clone $this;
-        $uri->applyComponent('query', $query);
+        $uri->query = $query;
 
         return $uri;
     }
@@ -152,7 +152,7 @@ class Uri implements UriInterface
     public function withFragment($fragment)
     {
         $uri = clone $this;
-        $uri->applyComponent('fragment', $fragment);
+        $uri->fragment = $fragment;
 
         return $uri;
     }
@@ -198,42 +198,5 @@ class Uri implements UriInterface
         }
 
         return $uri;
-    }
-
-    protected function applyComponent($name, $value)
-    {
-        switch ($name) {
-            case 'scheme':
-                $this->scheme = $value;
-                break;
-
-            case 'host':
-                $this->host = $value;
-                break;
-
-            case 'port':
-                $this->port = $value;
-                break;
-
-            case 'user':
-                $this->user = $value;
-                break;
-
-            case 'pass':
-                $this->password = $value;
-                break;
-
-            case 'path':
-                $this->path = $value;
-                break;
-
-            case 'query':
-                $this->query = $value;
-                break;
-
-            case 'fragment':
-                $this->fragment = $value;
-                break;
-        }
     }
 }
