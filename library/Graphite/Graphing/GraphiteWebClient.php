@@ -76,13 +76,14 @@ class GraphiteWebClient
             $headers['Authorization'] = 'Basic ' . base64_encode("{$this->user}:{$this->password}");
         }
 
-        $url = Url::fromPath(rtrim($this->baseUrl->getAbsoluteUrl(), '/') . '/' . ltrim($url->getPath(), '/'))
-            ->setParams($url->getParams())
-            ->getAbsoluteUrl();
+        $completeUrl = clone $this->baseUrl;
+        $completeUrl
+            ->setPath(ltrim(rtrim($completeUrl->getPath(), '/') . '/' . ltrim($url->getPath(), '/'), '/'))
+            ->setParams($url->getParams());
 
         // TODO(ak): keep connections alive (TCP handshakes are a bit expensive and TLS handshakes are very expensive)
         return (string) $this->httpClient->send(
-            new Request($method, $url, $headers, $body),
+            new Request($method, $completeUrl->getAbsoluteUrl(), $headers, $body),
             ['curl' => [
                 CURLOPT_SSL_VERIFYPEER => ! $this->insecure
             ]]
