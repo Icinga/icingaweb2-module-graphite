@@ -84,7 +84,7 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
 
     public function where($condition, $value = null)
     {
-        $this->filter[$condition] = preg_replace('/[^a-zA-Z0-9\*\-:]/', '_', $value);
+        $this->filter[$condition] = preg_replace('/[^a-zA-Z0-9\*\-:[\]]/', '_', $value);
 
         return $this;
     }
