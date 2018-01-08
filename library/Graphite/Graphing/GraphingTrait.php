@@ -5,6 +5,7 @@ namespace Icinga\Module\Graphite\Graphing;
 use Icinga\Application\Config;
 use Icinga\Application\Icinga;
 use Icinga\Exception\ConfigurationError;
+use Icinga\Module\Graphite\Web\FakeSchemeRequest;
 use Icinga\Web\Url;
 
 trait GraphingTrait
@@ -66,7 +67,7 @@ trait GraphingTrait
             }
 
             static::$metricsDataSource = new MetricsDataSource(
-                (new GraphiteWebClient(Url::fromPath($graphite->url)))
+                (new GraphiteWebClient(Url::fromPath($graphite->url, [], new FakeSchemeRequest())))
                     ->setUser($graphite->user)
                     ->setPassword($graphite->password)
                     ->setInsecure($graphite->insecure)
