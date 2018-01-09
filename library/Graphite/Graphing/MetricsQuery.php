@@ -107,15 +107,10 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
 
     public function fetchColumn()
     {
-        $res = Json::decode($this->dataSource->getClient()->request(
-            Url::fromPath('metrics/expand', ['query' => preg_replace_callback(
-                '/[[\]]/',
-                function (array $matches) {
-                    return "[$matches[0]]";
-                },
-                $this->base->resolve($this->filter, '*')
-            )])
-        ));
+        $client = $this->dataSource->getClient();
+        $res = Json::decode($client->request(Url::fromPath('metrics/expand', [
+            'query' => $client->escapeMetricPath($this->base->resolve($this->filter, '*'))
+        ])));
         natsort($res->results);
         return array_values($res->results);
     }

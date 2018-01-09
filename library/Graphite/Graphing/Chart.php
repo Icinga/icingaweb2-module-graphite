@@ -134,7 +134,9 @@ class Chart
         }
 
         foreach ($this->metrics as $curveName => $metric) {
-            $params->add('target', $this->template->getCurves()[$curveName][1]->resolve(['metric' => $metric]));
+            $params->add('target', $this->template->getCurves()[$curveName][1]->resolve([
+                'metric' => $this->graphiteWebClient->escapeMetricPath($metric)
+            ]));
         }
 
         $image = $this->graphiteWebClient->request(Url::fromPath('/render')->setParams($params), 'POST', [
