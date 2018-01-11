@@ -210,11 +210,11 @@ abstract class Graphs extends AbstractWidget
             $defaultTemplates = [];
             foreach ($templates as $templateName => $template) {
                 if ($this->designedForMyMonitoredObjectType($template)) {
-                    $templateCheckCommand = $template->getCheckCommand();
+                    $templateCheckCommands = $template->getCheckCommands();
 
-                    if ($templateCheckCommand === $checkCommand) {
+                    if (in_array($checkCommand, $templateCheckCommands)) {
                         $concreteTemplates[$templateName] = $template;
-                    } elseif ($templateCheckCommand === null) {
+                    } elseif (empty($templateCheckCommands)) {
                         $defaultTemplates[$templateName] = $template;
                     }
                 }

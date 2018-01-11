@@ -86,7 +86,9 @@ class Templates
         }
 
         foreach ($templates as $templateName => $template) {
-            $checkCommand = isset($template['graph']['check_command']) ? $template['graph']['check_command'] : null;
+            $checkCommands = isset($template['graph']['check_command'])
+                ? array_unique(preg_split('/\s*,\s*/', $template['graph']['check_command'], -1, PREG_SPLIT_NO_EMPTY))
+                : [];
             unset($template['graph']['check_command']);
 
             if (isset($template['graph'])) {
@@ -231,7 +233,7 @@ class Templates
             $templates[$templateName] = empty($curves) ? null : (new Template())
                 ->setCurves($curves)
                 ->setUrlParams($urlParams)
-                ->setCheckCommand($checkCommand);
+                ->setCheckCommands($checkCommands);
         }
 
         foreach ($templates as $templateName => $template) {

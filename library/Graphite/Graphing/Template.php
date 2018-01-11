@@ -42,11 +42,11 @@ class Template
     protected $urlParams = [];
 
     /**
-     * The check command this template is designed for
+     * The check commands this template is designed for
      *
-     * @var string|null
+     * @var string[]
      */
-    protected $checkCommand;
+    protected $checkCommands = [];
 
     /**
      * Constructor
@@ -211,25 +211,25 @@ class Template
     }
 
     /**
-     * Get the check command this template is designed for
+     * Get the check commands this template is designed for
      *
-     * @return string|null
+     * @return string[]
      */
-    public function getCheckCommand()
+    public function getCheckCommands()
     {
-        return $this->checkCommand;
+        return $this->checkCommands;
     }
 
     /**
-     * Set the check command this template is designed for
+     * Set the check commands this template is designed for
      *
-     * @param string|null $checkCommand
+     * @param string[] $checkCommands
      *
      * @return $this
      */
-    public function setCheckCommand($checkCommand)
+    public function setCheckCommands(array $checkCommands)
     {
-        $this->checkCommand = $checkCommand;
+        $this->checkCommands = $checkCommands;
 
         return $this;
     }

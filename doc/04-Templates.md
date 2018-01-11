@@ -38,6 +38,14 @@ of a Icinga 2 [check-command](https://www.icinga.com/docs/icinga2/latest/doc/03-
 To get multiple graphs for hosts and services with this check-command, multiple
 templates can reference the same check-command.
 
+If multiple check commands do effectively the same thing and yield the same
+perfdata, all of them may be specified separated by comma. E.g.:
+
+```ini
+[ping-rta.graph]
+check_command = "ping, ping4, ping6"
+```
+
 **metrics_filters**
 
 Define what metric to use and how many curves to display in the resulting graph.  
