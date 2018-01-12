@@ -18,11 +18,18 @@ use SplFileInfo;
 class Templates
 {
     /**
-     * All templates by their name
+     * All templates by their check command and name
+     *
+     * @var Template[][]
+     */
+    protected $templates = [];
+
+    /**
+     * All default templates by their name
      *
      * @var Template[]
      */
-    protected $templates = [];
+    protected $defaultTemplates = [];
 
     /**
      * Constructor
@@ -232,15 +239,30 @@ class Templates
 
             $templates[$templateName] = empty($curves) ? null : (new Template())
                 ->setCurves($curves)
-                ->setUrlParams($urlParams)
-                ->setCheckCommands($checkCommands);
+                ->setUrlParams($urlParams);
         }
 
         foreach ($templates as $templateName => $template) {
             if ($template === null) {
-                unset($this->templates[$templateName]);
+                if (empty($checkCommands)) {
+                    unset($this->defaultTemplates[$templateName]);
+                } else {
+                    foreach ($checkCommands as $checkCommand) {
+                        unset($this->templates[$checkCommand][$templateName]);
+
+                        if (empty($this->templates[$checkCommand])) {
+                            unset($this->templates[$checkCommand]);
+                        }
+                    }
+                }
             } else {
-                $this->templates[$templateName] = $template;
+                if (empty($checkCommands)) {
+                    $this->defaultTemplates[$templateName] = $template;
+                } else {
+                    foreach ($checkCommands as $checkCommand) {
+                        $this->templates[$checkCommand][$templateName] = $template;
+                    }
+                }
             }
         }
 
@@ -248,12 +270,14 @@ class Templates
     }
 
     /**
-     * Get all loaded templates by their name
+     * Get all loaded templates for the given check command by their name, fall back to the default one(s)
      *
-     * @return Template[]
+     * @param   string  $checkCommand
+     *
+     * @return  Template[]
      */
-    public function getTemplates()
+    public function getTemplates($checkCommand)
     {
-        return $this->templates;
+        return isset($this->templates[$checkCommand]) ? $this->templates[$checkCommand] : $this->defaultTemplates;
     }
 }

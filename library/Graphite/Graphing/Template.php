@@ -42,13 +42,6 @@ class Template
     protected $urlParams = [];
 
     /**
-     * The check commands this template is designed for
-     *
-     * @var string[]
-     */
-    protected $checkCommands = [];
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -206,30 +199,6 @@ class Template
     public function setUrlParams(array $urlParams)
     {
         $this->urlParams = $urlParams;
-
-        return $this;
-    }
-
-    /**
-     * Get the check commands this template is designed for
-     *
-     * @return string[]
-     */
-    public function getCheckCommands()
-    {
-        return $this->checkCommands;
-    }
-
-    /**
-     * Set the check commands this template is designed for
-     *
-     * @param string[] $checkCommands
-     *
-     * @return $this
-     */
-    public function setCheckCommands(array $checkCommands)
-    {
-        $this->checkCommands = $checkCommands;
 
         return $this;
     }

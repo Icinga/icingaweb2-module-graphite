@@ -198,30 +198,16 @@ abstract class Graphs extends AbstractWidget
             $result = []; // kind of string builder
             $filter = $this->getMonitoredObjectFilter();
             $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
-            $templates = static::getAllTemplates()->getTemplates();
-            $checkCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
             $limit = $this->maxVisibleGraphs;
 
             $classes = $this->classes;
             $classes[] = 'images';
             $div = '<div class="' . implode(' ', $classes) . '">';
 
-            $concreteTemplates = [];
-            $defaultTemplates = [];
-            foreach ($templates as $templateName => $template) {
-                if ($this->designedForMyMonitoredObjectType($template)) {
-                    $templateCheckCommands = $template->getCheckCommands();
-
-                    if (in_array($checkCommand, $templateCheckCommands)) {
-                        $concreteTemplates[$templateName] = $template;
-                    } elseif (empty($templateCheckCommands)) {
-                        $defaultTemplates[$templateName] = $template;
-                    }
-                }
-            }
-
             $renderedGraphs = 0;
-            foreach ((empty($concreteTemplates) ? $defaultTemplates : $concreteTemplates) as $templateName => $template) {
+            foreach (static::getAllTemplates()->getTemplates(
+                $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand
+            ) as $templateName => $template) {
                 $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
                 if (! empty($charts)) {
                     foreach ($charts as $chart) {
@@ -314,15 +300,6 @@ abstract class Graphs extends AbstractWidget
             $params->get($absolute['end'])
         ];
     }
-
-    /**
-     * Return whether the given template is designed for the type of the monitored object we display graphs for
-     *
-     * @param   Template    $template
-     *
-     * @return  bool
-     */
-    abstract protected function designedForMyMonitoredObjectType(Template $template);
 
     /**
      * Return a identifier specifying the monitored object we display graphs for
