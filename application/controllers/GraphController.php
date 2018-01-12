@@ -86,7 +86,7 @@ class GraphController extends MonitoringAwareController
      */
     protected function supplyImage($checkCommand)
     {
-        $templates = $this->getAllTemplates()->getTemplates();
+        $templates = $this->getAllTemplates()->getTemplates($checkCommand);
         if (! isset($templates[$this->graphParams['template']])) {
             throw new HttpNotFoundException($this->translate('No such template'));
         }

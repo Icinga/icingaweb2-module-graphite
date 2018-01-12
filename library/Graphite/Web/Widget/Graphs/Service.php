@@ -54,17 +54,6 @@ class Service extends Graphs
         return $url->setParam('host.name', $this->host)->setParam('service.name',  $this->service);
     }
 
-    protected function designedForMyMonitoredObjectType(Template $template)
-    {
-        foreach ($template->getCurves() as $curve) {
-            if (in_array('service_name_template', $curve[0]->getMacros())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     protected function getMonitoredObjectIdentifier()
     {
         return $this->host . ':' . $this->service;

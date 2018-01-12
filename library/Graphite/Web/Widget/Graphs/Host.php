@@ -45,17 +45,6 @@ class Host extends Graphs
         return $url->setParam('host.name', $this->host);
     }
 
-    protected function designedForMyMonitoredObjectType(Template $template)
-    {
-        foreach ($template->getCurves() as $curve) {
-            if (in_array('host_name_template', $curve[0]->getMacros())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     protected function getMonitoredObjectIdentifier()
     {
         return $this->host;
