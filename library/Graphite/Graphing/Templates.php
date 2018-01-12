@@ -120,50 +120,17 @@ class Templates
                 }
             }
 
-            if (! isset($template['metrics_filters']) || empty($template['metrics_filters'])) {
-                throw new ConfigurationError(
-                    'Metrics filters for template "%s" in file "%s" missing', $templateName, $path
-                );
-            }
-
             /** @var MacroTemplate[][] $curves */
             $curves = [];
 
-            foreach ($template['metrics_filters'] as $curve => $metricsFilter) {
-                try {
-                    $curves[$curve][0] = new MacroTemplate($metricsFilter);
-                } catch (InvalidArgumentException $e) {
-                    throw new ConfigurationError(
-                        'Bad metrics filter "%s" for curve "%s" of template "%s" in file "%s": %s',
-                        $metricsFilter,
-                        $curve,
-                        $templateName,
-                        $path,
-                        $e->getMessage()
-                    );
-                }
-
-                if (count(array_intersect(
-                    $curves[$curve][0]->getMacros(),
-                    ['host_name_template', 'service_name_template']
-                )) !== 1) {
-                    throw new ConfigurationError(
-                        'Bad metrics filter "%s" for curve "%s" of template "%s" in file "%s": must include'
-                        . ' either the macro $host_name_template$ or $service_name_template$, but not both',
-                        $metricsFilter,
-                        $curve,
-                        $templateName,
-                        $path
-                    );
-                }
-
-                if (isset($template['functions'][$curve])) {
+            if (isset($template['metrics_filters'])) {
+                foreach ($template['metrics_filters'] as $curve => $metricsFilter) {
                     try {
-                        $curves[$curve][1] = new MacroTemplate($template['functions'][$curve]);
+                        $curves[$curve][0] = new MacroTemplate($metricsFilter);
                     } catch (InvalidArgumentException $e) {
                         throw new ConfigurationError(
-                            'Bad function "%s" for curve "%s" of template "%s" in file "%s": %s',
-                            $template['functions'][$curve],
+                            'Bad metrics filter "%s" for curve "%s" of template "%s" in file "%s": %s',
+                            $metricsFilter,
                             $curve,
                             $templateName,
                             $path,
@@ -171,20 +138,49 @@ class Templates
                         );
                     }
 
-                    if ($curves[$curve][1]->getMacros() !== ['metric']) {
+                    if (count(array_intersect(
+                        $curves[$curve][0]->getMacros(),
+                        ['host_name_template', 'service_name_template']
+                    )) !== 1) {
                         throw new ConfigurationError(
-                            'Bad function "%s" for curve "%s" of template "%s" in file "%s":'
-                            . ' function definitions of templates must include the macro $metric$ and no other ones',
-                            $template['functions'][$curve],
+                            'Bad metrics filter "%s" for curve "%s" of template "%s" in file "%s": must include'
+                            . ' either the macro $host_name_template$ or $service_name_template$, but not both',
+                            $metricsFilter,
                             $curve,
                             $templateName,
                             $path
                         );
                     }
 
-                    unset($template['functions'][$curve]);
-                } else {
-                    $curves[$curve][1] = new MacroTemplate('$metric$');
+                    if (isset($template['functions'][$curve])) {
+                        try {
+                            $curves[$curve][1] = new MacroTemplate($template['functions'][$curve]);
+                        } catch (InvalidArgumentException $e) {
+                            throw new ConfigurationError(
+                                'Bad function "%s" for curve "%s" of template "%s" in file "%s": %s',
+                                $template['functions'][$curve],
+                                $curve,
+                                $templateName,
+                                $path,
+                                $e->getMessage()
+                            );
+                        }
+
+                        if ($curves[$curve][1]->getMacros() !== ['metric']) {
+                            throw new ConfigurationError(
+                                'Bad function "%s" for curve "%s" of template "%s" in file "%s":'
+                                . ' function definitions of templates must include the macro $metric$ and no other ones',
+                                $template['functions'][$curve],
+                                $curve,
+                                $templateName,
+                                $path
+                            );
+                        }
+
+                        unset($template['functions'][$curve]);
+                    } else {
+                        $curves[$curve][1] = new MacroTemplate('$metric$');
+                    }
                 }
             }
 
@@ -232,14 +228,18 @@ class Templates
                 }
             }
 
-            $templates[$templateName] = (new Template())
+            $templates[$templateName] = empty($curves) ? null : (new Template())
                 ->setCurves($curves)
                 ->setUrlParams($urlParams)
                 ->setCheckCommand($checkCommand);
         }
 
         foreach ($templates as $templateName => $template) {
-            $this->templates[$templateName] = $template;
+            if ($template === null) {
+                unset($this->templates[$templateName]);
+            } else {
+                $this->templates[$templateName] = $template;
+            }
         }
 
         return $this;
