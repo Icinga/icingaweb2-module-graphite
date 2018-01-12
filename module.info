@@ -1,4 +1,6 @@
 Module: graphite
 Version: 0.9.0
 Description: Icinga Graphite module
+ This module integrates an existing Graphite installation in your Icinga Web 2
+ frontend.
 Depends: monitoring
