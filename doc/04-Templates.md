@@ -92,6 +92,17 @@ here as well:
 
     title = "Disk usage on $disk$"
 
+You may also define URL parameters once for all templates (including the ones
+shipped with this module) in the `default_url_params` section in
+`/etc/icingaweb2/modules/graphite/config.ini`:
+
+    [default_url_params]
+    yUnitSystem = "none"
+
+These may be overridden in the template itself:
+
+    yUnitSystem = "binary"
+
 **functions**
 
 Allows to define Graphite functions which are applied to the metric of a

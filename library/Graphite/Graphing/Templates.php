@@ -32,10 +32,32 @@ class Templates
     protected $defaultTemplates = [];
 
     /**
+     * Default URL params for all templates
+     *
+     * @var string[]
+     */
+    protected $defaultUrlParams = [];
+
+    /**
      * Constructor
      */
     public function __construct()
     {
+        $config = Config::module('graphite');
+
+        foreach ($config->getSection('default_url_params') as $param => $value) {
+            try {
+                $this->defaultUrlParams[$param] = new MacroTemplate($value);
+            } catch (InvalidArgumentException $e) {
+                throw new ConfigurationError(
+                    'Invalid URL parameter "%s" ("%s") in file "%s"',
+                    $param,
+                    $value,
+                    $config->getConfigFile(),
+                    $e
+                );
+            }
+        }
     }
 
     /**
@@ -219,7 +241,8 @@ class Templates
                 }
             }
 
-            $urlParams = [];
+            $urlParams = $this->defaultUrlParams;
+
             if (isset($template['urlparams'])) {
                 foreach ($template['urlparams'] as $key => $value) {
                     try {
