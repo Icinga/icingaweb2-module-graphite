@@ -23,7 +23,7 @@ class AdvancedForm extends ConfigForm
                 [
                     'label'         => $this->translate('Default time range'),
                     'description'   => $this->translate('The default time range for graphs'),
-                    'min'           => 1,
+                    'min'           => 0,
                     'value'         => 1
                 ]
             ],
