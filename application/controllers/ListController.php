@@ -11,6 +11,7 @@ use Icinga\Module\Monitoring\DataView\DataView;
 use Icinga\Web\Url;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
 use Icinga\Web\Widget\Tabextension\MenuAction;
+use Icinga\Web\Widget\Tabextension\OutputFormat;
 
 class ListController extends MonitoringAwareController
 {
@@ -19,7 +20,10 @@ class ListController extends MonitoringAwareController
     public function init()
     {
         parent::init();
-        $this->getTabs()->extend(new DashboardAction())->extend(new MenuAction());
+        $this->getTabs()
+            ->extend(new OutputFormat([OutputFormat::TYPE_CSV, OutputFormat::TYPE_JSON]))
+            ->extend(new DashboardAction())
+            ->extend(new MenuAction());
     }
 
     public function hostsAction()
