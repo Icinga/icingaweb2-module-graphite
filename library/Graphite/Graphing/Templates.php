@@ -114,8 +114,10 @@ class Templates
             $templates[$matches[1]][$matches[2]] = $options->toArray();
         }
 
+        $checkCommands = [];
+
         foreach ($templates as $templateName => $template) {
-            $checkCommands = isset($template['graph']['check_command'])
+            $checkCommands[$templateName] = isset($template['graph']['check_command'])
                 ? array_unique(preg_split('/\s*,\s*/', $template['graph']['check_command'], -1, PREG_SPLIT_NO_EMPTY))
                 : [];
             unset($template['graph']['check_command']);
@@ -267,10 +269,10 @@ class Templates
 
         foreach ($templates as $templateName => $template) {
             if ($template === null) {
-                if (empty($checkCommands)) {
+                if (empty($checkCommands[$templateName])) {
                     unset($this->defaultTemplates[$templateName]);
                 } else {
-                    foreach ($checkCommands as $checkCommand) {
+                    foreach ($checkCommands[$templateName] as $checkCommand) {
                         unset($this->templates[$checkCommand][$templateName]);
 
                         if (empty($this->templates[$checkCommand])) {
@@ -279,10 +281,10 @@ class Templates
                     }
                 }
             } else {
-                if (empty($checkCommands)) {
+                if (empty($checkCommands[$templateName])) {
                     $this->defaultTemplates[$templateName] = $template;
                 } else {
-                    foreach ($checkCommands as $checkCommand) {
+                    foreach ($checkCommands[$templateName] as $checkCommand) {
                         $this->templates[$checkCommand][$templateName] = $template;
                     }
                 }
