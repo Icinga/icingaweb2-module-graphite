@@ -193,41 +193,20 @@ abstract class Graphs extends AbstractWidget
     protected function getGraphsList()
     {
         if ($this->graphsList === null) {
-            /** @var View $view */
-            $view = $this->view();
             $result = []; // kind of string builder
             $filter = $this->getMonitoredObjectFilter();
             $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
-            $limit = $this->maxVisibleGraphs;
 
-            $classes = $this->classes;
-            $classes[] = 'images';
-            $div = '<div class="' . implode(' ', $classes) . '">';
-
-            $renderedGraphs = 0;
             foreach (static::getAllTemplates()->getTemplates(
                 $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand
             ) as $templateName => $template) {
                 $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
                 if (! empty($charts)) {
-                    foreach ($charts as $chart) {
-                        if (empty($result)) {
-                            $result[] = $div;
-                        } elseif ($limit && $renderedGraphs === $limit) {
-                            $result[] = sprintf(
-                                '<input type="checkbox" id="toggle-%1$s" class="expandable-toggle">'
-                                    . '<label for="toggle-%1$s" class="link-button">'
-                                    . '<span class="expandable-expand-label">%2$s</span>'
-                                    . '<span class="expandable-collapse-label">%3$s</span>'
-                                    . '</label>'
-                                    . '<div class="expandable-content">',
-                                $view->protectId($this->getMonitoredObjectIdentifier()),
-                                $view->translate('Show More'),
-                                $view->translate('Show Less')
-                            );
-                        }
+                    $currentGraphs = [];
 
-                        $imageUrl = $this->filterImageUrl($imageBaseUrl->with($chart->getMetricVariables()))
+                    foreach ($charts as $chart) {
+                        $metricVariables = $chart->getMetricVariables();
+                        $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
                             ->setParam('template', $templateName)
                             ->setParam('start', $this->start)
                             ->setParam('end', $this->end)
@@ -238,25 +217,66 @@ abstract class Graphs extends AbstractWidget
                             $imageUrl->setParam('legend', 1);
                         }
 
-                        $result[] = '<img id="graphiteImg-';
-                        $result[] = md5((string) $imageUrl->without('cachebuster'));
-                        $result[] = '" src="';
-                        $result[] = (string) $imageUrl;
-                        $result[] = '" class="detach graphiteImg" alt="" width="';
-                        $result[] = $this->width;
-                        $result[] = '" height="';
-                        $result[] = $this->height;
-                        $result[] = '">';
-                        $renderedGraphs++;
+                        $bestIntersect = -1;
+                        $bestPos = count($result);
+
+                        foreach ($result as $graphPos => & $graph) {
+                            $currentIntersect = count(array_intersect_assoc($graph[1], $metricVariables));
+
+                            if ($currentIntersect >= $bestIntersect) {
+                                $bestIntersect = $currentIntersect;
+                                $bestPos = $graphPos + 1;
+                            }
+                        }
+                        unset($graph);
+
+                        $currentGraphs[] = [
+                            '<img id="graphiteImg-'
+                                . md5((string) $imageUrl->without('cachebuster'))
+                                . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
+                                . " width=\"$this->width\" height=\"$this->height\">",
+                            $metricVariables,
+                            $bestPos
+                        ];
                     }
+
+                    foreach (array_reverse($currentGraphs) as & $graph) {
+                        list($img, $metricVariables, $bestPos) = $graph;
+                        array_splice($result, $bestPos, 0, [[$img, $metricVariables]]);
+                    }
+                    unset($graph);
                 }
             }
 
             if (! empty($result)) {
-                if ($limit && $renderedGraphs > $limit) {
+                foreach ($result as & $graph) {
+                    $graph = $graph[0];
+                }
+                unset($graph);
+
+                if ($this->maxVisibleGraphs && count($result) > $this->maxVisibleGraphs) {
+                    /** @var View $view */
+                    $view = $this->view();
+
+                    array_splice($result, $this->maxVisibleGraphs, 0, [sprintf(
+                        '<input type="checkbox" id="toggle-%1$s" class="expandable-toggle">'
+                            . '<label for="toggle-%1$s" class="link-button">'
+                            . '<span class="expandable-expand-label">%2$s</span>'
+                            . '<span class="expandable-collapse-label">%3$s</span>'
+                            . '</label>'
+                            . '<div class="expandable-content">',
+                        $view->protectId($this->getMonitoredObjectIdentifier()),
+                        $view->translate('Show More'),
+                        $view->translate('Show Less')
+                    )]);
+
                     $result[] = '</div>';
                 }
 
+                $classes = $this->classes;
+                $classes[] = 'images';
+
+                array_unshift($result, '<div class="' . implode(' ', $classes) . '">');
                 $result[] = '</div>';
             }
 
