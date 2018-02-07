@@ -86,66 +86,51 @@ class Template
             }
         }
 
-        if (empty($metrics)) {
-            return [];
-        }
+        switch (count($metrics)) {
+            case 0:
+                return [];
 
-        $intersectingVariables = [];
-        foreach ($metrics as $curveName1 => $_) {
-            foreach ($metrics as $curveName2 => $_) {
-                if ($curveName1 !== $curveName2 && ! isset($intersectingVariables[$curveName2][$curveName1])) {
-                    $vars = array_intersect(
-                        $this->curves[$curveName1][0]->getMacros(),
-                        $this->curves[$curveName2][0]->getMacros()
-                    );
-                    if (! empty($vars)) {
-                        $intersectingVariables[$curveName1][$curveName2] = $vars;
+            case 1:
+                $metricsCombinations = [];
+
+                foreach ($metrics as $curveName => & $curveMetrics) {
+                    foreach ($curveMetrics as $metric => & $_) {
+                        $metricsCombinations[] = [$curveName => $metric];
                     }
+                    unset($_);
                 }
-            }
-        }
+                unset($curveMetrics);
 
-        $iterState = [];
-        foreach ($metrics as $curveName => $metric) {
-            $iterState[$curveName] = [0, array_keys($metric)];
-        }
+                break;
 
-        $metricsCombinations = [];
-        $currentMetrics = [];
-        do {
-            foreach ($metrics as $curveName => $metric) {
-                $currentMetrics[$curveName] = $iterState[$curveName][1][ $iterState[$curveName][0] ];
-            }
+            default:
+                $possibleCombinations = [];
+                $handledCurves = [];
+                foreach ($metrics as $curveName1 => & $metrics1) {
+                    $handledCurves[$curveName1] = true;
 
-            $acceptCombination = true;
-            foreach ($intersectingVariables as $curveName1 => $intersectingWith) {
-                foreach ($intersectingWith as $curveName2 => $vars) {
-                    foreach ($vars as $key) {
-                        if ($metrics[$curveName1][ $currentMetrics[$curveName1] ][$key]
-                            !== $metrics[$curveName2][ $currentMetrics[$curveName2] ][$key]) {
-                            $acceptCombination = false;
-                            break 3;
+                    foreach ($metrics as $curveName2 => & $metrics2) {
+                        if (! isset($handledCurves[$curveName2])) {
+                            foreach ($metrics1 as $metric1 => & $vars1) {
+                                foreach ($metrics2 as $metric2 => & $vars2) {
+                                    if (count(array_intersect_assoc($vars1, $vars2))
+                                        === count(array_intersect_key($vars1, $vars2))
+                                    ) {
+                                        $possibleCombinations[$curveName1][$curveName2][$metric1][$metric2] = true;
+                                    }
+                                }
+                                unset($vars2);
+                            }
+                            unset($vars1);
                         }
                     }
+                    unset($metrics2);
                 }
-            }
+                unset($metrics1);
 
-            if ($acceptCombination) {
-                $metricsCombinations[] = $currentMetrics;
-            }
-
-            $overflow = true;
-            foreach ($iterState as $curveName => & $iterSubState) {
-                if (isset($iterSubState[1][ ++$iterSubState[0] ])) {
-                    $overflow = false;
-                    break;
-                } else {
-                    $iterSubState[0] = 0;
-                }
-            }
-
-            unset($iterSubState);
-        } while (! $overflow);
+                $metricsCombinations = [];
+                $this->combineMetrics($metrics, $possibleCombinations, $metricsCombinations);
+        }
 
         $charts = [];
         foreach ($metricsCombinations as $metricsCombination) {
@@ -153,6 +138,64 @@ class Template
         }
 
         return $charts;
+    }
+
+    /**
+     * Fill the given metrics combinations from the given metrics as restricted by the given possible combinations
+     *
+     * @param   string[][][]    $metrics
+     * @param   bool[][][][]    $possibleCombinations
+     * @param   string[][]      $metricsCombinations
+     * @param   string[]        $currentCombination
+     */
+    protected function combineMetrics(array & $metrics, array & $possibleCombinations, array & $metricsCombinations, array $currentCombination = [])
+    {
+        if (empty($currentCombination)) {
+            foreach ($metrics as $curveName => & $curveMetrics) {
+                foreach ($curveMetrics as $metric => & $_) {
+                    $this->combineMetrics(
+                        $metrics,
+                        $possibleCombinations,
+                        $metricsCombinations,
+                        [$curveName => $metric]
+                    );
+                }
+                unset($_);
+
+                break;
+            }
+            unset($curveMetrics);
+        } elseif (count($currentCombination) === count($metrics)) {
+            $metricsCombinations[] = $currentCombination;
+        } else {
+            foreach ($metrics as $nextCurveName => & $_) {
+                if (! isset($currentCombination[$nextCurveName])) {
+                    break;
+                }
+            }
+            unset($_);
+
+            $allowedNextCurveMetricsPerCurrentCurveName = [];
+            foreach ($currentCombination as $currentCurveName => $currentCurveMetric) {
+                $allowedNextCurveMetricsPerCurrentCurveName[$currentCurveName]
+                    = $possibleCombinations[$currentCurveName][$nextCurveName][$currentCurveMetric];
+            }
+
+            $allowedNextCurveMetrics = $allowedNextCurveMetricsPerCurrentCurveName[$currentCurveName];
+            unset($allowedNextCurveMetricsPerCurrentCurveName[$currentCurveName]);
+
+            foreach ($allowedNextCurveMetricsPerCurrentCurveName as & $allowedMetrics) {
+                $allowedNextCurveMetrics = array_intersect_key($allowedNextCurveMetrics, $allowedMetrics);
+            }
+            unset($allowedMetrics);
+
+            foreach ($allowedNextCurveMetrics as $allowedNextCurveMetric => $_) {
+                $nextCombination = $currentCombination;
+                $nextCombination[$nextCurveName] = $allowedNextCurveMetric;
+
+                $this->combineMetrics($metrics, $possibleCombinations, $metricsCombinations, $nextCombination);
+            }
+        }
     }
 
     /**
