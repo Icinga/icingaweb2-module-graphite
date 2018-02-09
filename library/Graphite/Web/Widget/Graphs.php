@@ -240,11 +240,10 @@ abstract class Graphs extends AbstractWidget
                         ];
                     }
 
-                    foreach (array_reverse($currentGraphs) as & $graph) {
+                    foreach (array_reverse($currentGraphs) as $graph) {
                         list($img, $metricVariables, $bestPos) = $graph;
                         array_splice($result, $bestPos, 0, [[$img, $metricVariables]]);
                     }
-                    unset($graph);
                 }
             }
 
