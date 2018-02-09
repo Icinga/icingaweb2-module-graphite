@@ -305,4 +305,14 @@ class Templates
     {
         return isset($this->templates[$checkCommand]) ? $this->templates[$checkCommand] : $this->defaultTemplates;
     }
+
+    /**
+     * Get all loaded templates for all check commands
+     *
+     * @return  Template[][]
+     */
+    public function getAllTemplates()
+    {
+        return $this->templates;
+    }
 }
