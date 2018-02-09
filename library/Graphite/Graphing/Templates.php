@@ -295,7 +295,7 @@ class Templates
     }
 
     /**
-     * Get all loaded templates for the given check command by their name, fall back to the default one(s)
+     * Get all loaded templates for the given check command by their names
      *
      * @param   string  $checkCommand
      *
@@ -303,7 +303,7 @@ class Templates
      */
     public function getTemplates($checkCommand)
     {
-        return isset($this->templates[$checkCommand]) ? $this->templates[$checkCommand] : $this->defaultTemplates;
+        return isset($this->templates[$checkCommand]) ? $this->templates[$checkCommand] : [];
     }
 
     /**
@@ -314,5 +314,15 @@ class Templates
     public function getAllTemplates()
     {
         return $this->templates;
+    }
+
+    /**
+     * Get all loaded default templates by their names
+     *
+     * @return  Template[]
+     */
+    public function getDefaultTemplates()
+    {
+        return $this->defaultTemplates;
     }
 }

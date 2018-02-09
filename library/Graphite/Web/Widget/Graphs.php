@@ -196,10 +196,19 @@ abstract class Graphs extends AbstractWidget
             $result = []; // kind of string builder
             $filter = $this->getMonitoredObjectFilter();
             $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
-
-            foreach (static::getAllTemplates()->getTemplates(
+            $allTemplates = $this->getAllTemplates();
+            $templates = $allTemplates->getTemplates(
                 $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand
-            ) as $templateName => $template) {
+            );
+
+            if (empty($templates)) {
+                $templates = $allTemplates->getDefaultTemplates();
+                $urlParam = 'default_template';
+            } else {
+                $urlParam = 'template';
+            }
+
+            foreach ($templates as $templateName => $template) {
                 if ($this->designedForMyMonitoredObjectType($template)) {
                     $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
                     if (! empty($charts)) {
@@ -208,7 +217,7 @@ abstract class Graphs extends AbstractWidget
                         foreach ($charts as $chart) {
                             $metricVariables = $chart->getMetricVariables();
                             $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
-                                ->setParam('template', $templateName)
+                                ->setParam($urlParam, $templateName)
                                 ->setParam('start', $this->start)
                                 ->setParam('end', $this->end)
                                 ->setParam('width', $this->width)
