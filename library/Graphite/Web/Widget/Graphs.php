@@ -200,49 +200,51 @@ abstract class Graphs extends AbstractWidget
             foreach (static::getAllTemplates()->getTemplates(
                 $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand
             ) as $templateName => $template) {
-                $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
-                if (! empty($charts)) {
-                    $currentGraphs = [];
+                if ($this->designedForMyMonitoredObjectType($template)) {
+                    $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
+                    if (! empty($charts)) {
+                        $currentGraphs = [];
 
-                    foreach ($charts as $chart) {
-                        $metricVariables = $chart->getMetricVariables();
-                        $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
-                            ->setParam('template', $templateName)
-                            ->setParam('start', $this->start)
-                            ->setParam('end', $this->end)
-                            ->setParam('width', $this->width)
-                            ->setParam('height', $this->height)
-                            ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
-                        if (! $this->compact) {
-                            $imageUrl->setParam('legend', 1);
-                        }
-
-                        $bestIntersect = -1;
-                        $bestPos = count($result);
-
-                        foreach ($result as $graphPos => & $graph) {
-                            $currentIntersect = count(array_intersect_assoc($graph[1], $metricVariables));
-
-                            if ($currentIntersect >= $bestIntersect) {
-                                $bestIntersect = $currentIntersect;
-                                $bestPos = $graphPos + 1;
+                        foreach ($charts as $chart) {
+                            $metricVariables = $chart->getMetricVariables();
+                            $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
+                                ->setParam('template', $templateName)
+                                ->setParam('start', $this->start)
+                                ->setParam('end', $this->end)
+                                ->setParam('width', $this->width)
+                                ->setParam('height', $this->height)
+                                ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
+                            if (! $this->compact) {
+                                $imageUrl->setParam('legend', 1);
                             }
-                        }
-                        unset($graph);
 
-                        $currentGraphs[] = [
-                            '<img id="graphiteImg-'
+                            $bestIntersect = -1;
+                            $bestPos = count($result);
+
+                            foreach ($result as $graphPos => & $graph) {
+                                $currentIntersect = count(array_intersect_assoc($graph[1], $metricVariables));
+
+                                if ($currentIntersect >= $bestIntersect) {
+                                    $bestIntersect = $currentIntersect;
+                                    $bestPos = $graphPos + 1;
+                                }
+                            }
+                            unset($graph);
+
+                            $currentGraphs[] = [
+                                '<img id="graphiteImg-'
                                 . md5((string) $imageUrl->without('cachebuster'))
                                 . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
                                 . " width=\"$this->width\" height=\"$this->height\">",
-                            $metricVariables,
-                            $bestPos
-                        ];
-                    }
+                                $metricVariables,
+                                $bestPos
+                            ];
+                        }
 
-                    foreach (array_reverse($currentGraphs) as $graph) {
-                        list($img, $metricVariables, $bestPos) = $graph;
-                        array_splice($result, $bestPos, 0, [[$img, $metricVariables]]);
+                        foreach (array_reverse($currentGraphs) as $graph) {
+                            list($img, $metricVariables, $bestPos) = $graph;
+                            array_splice($result, $bestPos, 0, [[$img, $metricVariables]]);
+                        }
                     }
                 }
             }
@@ -356,6 +358,15 @@ abstract class Graphs extends AbstractWidget
      * @return  Url         The given URL
      */
     abstract protected function filterImageUrl(Url $url);
+
+    /**
+     * Return whether the given template is designed for the type of the monitored object we display graphs for
+     *
+     * @param   Template    $template
+     *
+     * @return  bool
+     */
+    abstract protected function designedForMyMonitoredObjectType(Template $template);
 
     /**
      * Get {@link compact}

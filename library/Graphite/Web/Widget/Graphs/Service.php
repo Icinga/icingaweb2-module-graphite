@@ -63,4 +63,15 @@ class Service extends Graphs
     {
         return ['host.name' => $this->host, 'service.name' =>  $this->service];
     }
+
+    protected function designedForMyMonitoredObjectType(Template $template)
+    {
+        foreach ($template->getCurves() as $curve) {
+            if (in_array('service_name_template', $curve[0]->getMacros())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
