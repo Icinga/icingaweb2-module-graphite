@@ -197,62 +197,73 @@ abstract class Graphs extends AbstractWidget
             $filter = $this->getMonitoredObjectFilter();
             $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
             $allTemplates = $this->getAllTemplates();
-            $templates = $allTemplates->getTemplates(
+            $concreteTemplates = $allTemplates->getTemplates(
                 $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand
             );
 
-            if (empty($templates)) {
-                $templates = $allTemplates->getDefaultTemplates();
-                $urlParam = 'default_template';
-            } else {
-                $urlParam = 'template';
+            $excludedMetrics = [];
+
+            foreach ($concreteTemplates as $concreteTemplate) {
+                foreach ($concreteTemplate->getCurves() as $curve) {
+                    $excludedMetrics[] = $curve[0];
+                }
             }
 
-            foreach ($templates as $templateName => $template) {
-                if ($this->designedForMyMonitoredObjectType($template)) {
-                    $charts = $template->getCharts(static::getMetricsDataSource(), $filter, $this->checkCommand);
-                    if (! empty($charts)) {
-                        $currentGraphs = [];
+            foreach ([
+                ['template', $concreteTemplates, []],
+                ['default_template', $allTemplates->getDefaultTemplates(), $excludedMetrics],
+            ] as $templateSet) {
+                list($urlParam, $templates, $excludeMetrics) = $templateSet;
 
-                        foreach ($charts as $chart) {
-                            $metricVariables = $chart->getMetricVariables();
-                            $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
-                                ->setParam($urlParam, $templateName)
-                                ->setParam('start', $this->start)
-                                ->setParam('end', $this->end)
-                                ->setParam('width', $this->width)
-                                ->setParam('height', $this->height)
-                                ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
-                            if (! $this->compact) {
-                                $imageUrl->setParam('legend', 1);
-                            }
+                foreach ($templates as $templateName => $template) {
+                    if ($this->designedForMyMonitoredObjectType($template)) {
+                        $charts = $template->getCharts(
+                            static::getMetricsDataSource(), $filter, $this->checkCommand, $excludeMetrics
+                        );
 
-                            $bestIntersect = -1;
-                            $bestPos = count($result);
+                        if (! empty($charts)) {
+                            $currentGraphs = [];
 
-                            foreach ($result as $graphPos => & $graph) {
-                                $currentIntersect = count(array_intersect_assoc($graph[1], $metricVariables));
-
-                                if ($currentIntersect >= $bestIntersect) {
-                                    $bestIntersect = $currentIntersect;
-                                    $bestPos = $graphPos + 1;
+                            foreach ($charts as $chart) {
+                                $metricVariables = $chart->getMetricVariables();
+                                $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
+                                    ->setParam($urlParam, $templateName)
+                                    ->setParam('start', $this->start)
+                                    ->setParam('end', $this->end)
+                                    ->setParam('width', $this->width)
+                                    ->setParam('height', $this->height)
+                                    ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
+                                if (! $this->compact) {
+                                    $imageUrl->setParam('legend', 1);
                                 }
+
+                                $bestIntersect = -1;
+                                $bestPos = count($result);
+
+                                foreach ($result as $graphPos => & $graph) {
+                                    $currentIntersect = count(array_intersect_assoc($graph[1], $metricVariables));
+
+                                    if ($currentIntersect >= $bestIntersect) {
+                                        $bestIntersect = $currentIntersect;
+                                        $bestPos = $graphPos + 1;
+                                    }
+                                }
+                                unset($graph);
+
+                                $currentGraphs[] = [
+                                    '<img id="graphiteImg-'
+                                    . md5((string) $imageUrl->without('cachebuster'))
+                                    . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
+                                    . " width=\"$this->width\" height=\"$this->height\">",
+                                    $metricVariables,
+                                    $bestPos
+                                ];
                             }
-                            unset($graph);
 
-                            $currentGraphs[] = [
-                                '<img id="graphiteImg-'
-                                . md5((string) $imageUrl->without('cachebuster'))
-                                . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
-                                . " width=\"$this->width\" height=\"$this->height\">",
-                                $metricVariables,
-                                $bestPos
-                            ];
-                        }
-
-                        foreach (array_reverse($currentGraphs) as $graph) {
-                            list($img, $metricVariables, $bestPos) = $graph;
-                            array_splice($result, $bestPos, 0, [[$img, $metricVariables]]);
+                            foreach (array_reverse($currentGraphs) as $graph) {
+                                list($img, $metricVariables, $bestPos) = $graph;
+                                array_splice($result, $bestPos, 0, [[$img, $metricVariables]]);
+                            }
                         }
                     }
                 }

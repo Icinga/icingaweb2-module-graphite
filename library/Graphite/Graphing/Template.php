@@ -55,10 +55,11 @@ class Template
      * @param   MetricsDataSource   $dataSource
      * @param   string[]            $filter
      * @param   string              $checkCommand   The check command of the monitored object we fetch charts for
+     * @param   MacroTemplate[]     $excludeMetrics
      *
      * @return  Chart[]
      */
-    public function getCharts(MetricsDataSource $dataSource, array $filter, $checkCommand)
+    public function getCharts(MetricsDataSource $dataSource, array $filter, $checkCommand, array & $excludeMetrics = [])
     {
         $metrics = [];
         foreach ($this->curves as $curveName => $curve) {
@@ -79,6 +80,12 @@ class Template
             }
 
             foreach ($query->fetchColumn() as $metric) {
+                foreach ($excludeMetrics as $excludeMetric) {
+                    if ($excludeMetric->reverseResolve($metric) !== false) {
+                        continue 2;
+                    }
+                }
+
                 $vars = $curve[0]->reverseResolve($metric);
                 if ($vars !== false) {
                     $metrics[$curveName][$metric] = $vars;
