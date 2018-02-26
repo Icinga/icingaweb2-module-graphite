@@ -2,7 +2,6 @@
 
 namespace Icinga\Module\Graphite\Graphing;
 
-use DateTimeZone;
 use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Web\Response;
 use Icinga\Web\Url;
@@ -67,13 +66,6 @@ class Chart
     protected $showLegend = true;
 
     /**
-     * The chart's time zone
-     *
-     * @var DateTimeZone
-     */
-    protected $timeZone;
-
-    /**
      * Constructor
      *
      * @param   GraphiteWebClient   $graphiteWebClient  Used to render the chart
@@ -118,7 +110,7 @@ class Chart
             'width'                 => $this->width,
             'height'                => $this->height,
             'hideLegend'            => (string) ! $this->showLegend,
-            'tz'                    => $this->timeZone->getName(),
+            'tz'                    => date_default_timezone_get(),
             '_salt'                 => time() . '.000',
             'vTitle'                => 'Percent',
             'lineMode'              => 'connected',
@@ -294,30 +286,6 @@ class Chart
     public function setShowLegend($showLegend)
     {
         $this->showLegend = $showLegend;
-
-        return $this;
-    }
-
-    /**
-     * Get time zone
-     *
-     * @return DateTimeZone
-     */
-    public function getTimeZone()
-    {
-        return $this->timeZone;
-    }
-
-    /**
-     * Set time zone
-     *
-     * @param DateTimeZone $timeZone
-     *
-     * @return $this
-     */
-    public function setTimeZone(DateTimeZone $timeZone)
-    {
-        $this->timeZone = $timeZone;
 
         return $this;
     }
