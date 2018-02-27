@@ -6,7 +6,6 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Icinga\Module\Graphite\Web\Form\Decorator\Proxy;
-use Icinga\Util\TimezoneDetect;
 use Icinga\Web\Form;
 
 class CustomForm extends Form
@@ -22,13 +21,6 @@ class CustomForm extends Form
      * @var string
      */
     protected $timestamp = '/^(?:0|-?[1-9]\d*)$/';
-
-    /**
-     * The time zone of all dates and times
-     *
-     * @var DateTimeZone
-     */
-    protected $timeZone;
 
     /**
      * Right now
@@ -164,7 +156,7 @@ class CustomForm extends Form
                 list($date, $time) = explode(
                     'T',
                     DateTime::createFromFormat('U', $timestamp)
-                        ->setTimezone($this->getTimeZone())
+                        ->setTimezone(new DateTimeZone(date_default_timezone_get()))
                         ->format($this->dateTimeFormat)
                 );
 
@@ -209,8 +201,7 @@ class CustomForm extends Form
             $dateTime = DateTime::createFromFormat(
                 $this->dateTimeFormat,
                 ($date === '' ? $this->getNow()->format('Y-m-d') : $date)
-                    . 'T' . ($time === '' ? $defaultTime : $time),
-                $this->getTimeZone()
+                    . 'T' . ($time === '' ? $defaultTime : $time)
             );
 
             if ($dateTime === false) {
@@ -227,36 +218,6 @@ class CustomForm extends Form
     }
 
     /**
-     * Get {@link timeZone}
-     *
-     * @return DateTimeZone
-     */
-    public function getTimeZone()
-    {
-        if ($this->timeZone === null) {
-            $timezoneDetect = new TimezoneDetect();
-            $this->timeZone = new DateTimeZone(
-                $timezoneDetect->success() ? $timezoneDetect->getTimezoneName() : date_default_timezone_get()
-            );
-        }
-
-        return $this->timeZone;
-    }
-
-    /**
-     * Set {@link timeZone}
-     *
-     * @param DateTimeZone $timeZone
-     *
-     * @return $this
-     */
-    public function setTimeZone(DateTimeZone $timeZone)
-    {
-        $this->timeZone = $timeZone;
-        return $this;
-    }
-
-    /**
      * Get {@link now}
      *
      * @return DateTime
@@ -264,7 +225,7 @@ class CustomForm extends Form
     public function getNow()
     {
         if ($this->now === null) {
-            $this->now = (new DateTime())->setTimezone($this->getTimeZone());
+            $this->now = new DateTime();
         }
 
         return $this->now;

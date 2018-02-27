@@ -2,13 +2,11 @@
 
 namespace Icinga\Module\Graphite\Controllers;
 
-use DateTimeZone;
 use Icinga\Exception\Http\HttpBadRequestException;
 use Icinga\Exception\Http\HttpNotFoundException;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
-use Icinga\Util\TimezoneDetect;
 use Icinga\Web\UrlParams;
 
 class GraphController extends MonitoringAwareController
@@ -110,16 +108,12 @@ class GraphController extends MonitoringAwareController
                 throw new HttpNotFoundException($this->translate('No such graph'));
 
             case 1:
-                $timezoneDetect = new TimezoneDetect();
                 $charts[0]
                     ->setFrom($this->graphParams['start'])
                     ->setUntil($this->graphParams['end'])
                     ->setWidth($this->graphParams['width'])
                     ->setHeight($this->graphParams['height'])
                     ->setShowLegend((bool) $this->graphParams['legend'])
-                    ->setTimeZone(new DateTimeZone(
-                        $timezoneDetect->success() ? $timezoneDetect->getTimezoneName() : date_default_timezone_get()
-                    ))
                     ->serveImage($this->getResponse());
 
             default:
