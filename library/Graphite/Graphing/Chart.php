@@ -7,6 +7,7 @@ use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Web\Response;
 use Icinga\Web\Url;
 use Icinga\Web\UrlParams;
+use RuntimeException;
 
 class Chart
 {
@@ -140,10 +141,36 @@ class Chart
             ]));
         }
 
-        $image = $this->graphiteWebClient->request(Url::fromPath('/render')->setParams($params), 'POST', [
+        $url = Url::fromPath('/render')->setParams($params);
+        $headers = [
             'Accept-language'   => 'en',
             'Content-type'      => 'application/x-www-form-urlencoded'
-        ]);
+        ];
+
+        for (;;) {
+            try {
+                $image = $this->graphiteWebClient->request($url, 'POST', $headers);
+            } catch (RuntimeException $e) {
+                if (preg_match('/\b500\b/', $e->getMessage())) {
+                    // A 500 Internal Server Error, probably because of
+                    // a division by zero because of a too low time range to render.
+
+                    $until = (int) $url->getParam('until');
+                    $diff = $until - (int) $url->getParam('from');
+
+                    // Try to render a higher time range, but give up
+                    // once our default (1h) has been reached (non successfully).
+                    if ($diff < 3600) {
+                        $url->setParam('from', $until - $diff * 2);
+                        continue;
+                    }
+                }
+
+                throw $e;
+            }
+
+            break;
+        }
 
         $response
             ->setHeader('Content-Type', 'image/png', true)
