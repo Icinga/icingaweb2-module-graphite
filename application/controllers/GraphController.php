@@ -18,7 +18,13 @@ class GraphController extends MonitoringAwareController
      *
      * @var string[]
      */
-    protected $graphParamsNames = ['start', 'end', 'width', 'height', 'legend', 'template', 'cachebuster'];
+    protected $graphParamsNames = [
+        'start', 'end',
+        'width', 'height',
+        'legend',
+        'template', 'default_template',
+        'cachebuster'
+    ];
 
     /**
      * The URL parameters for metrics filtering
@@ -89,15 +95,21 @@ class GraphController extends MonitoringAwareController
      */
     protected function supplyImage($checkCommand, $obscuredCheckCommand)
     {
-        $templates = $this->getAllTemplates()->getTemplates(
-            $obscuredCheckCommand === null ? $checkCommand : $obscuredCheckCommand
-        );
+        if (isset($this->graphParams['default_template'])) {
+            $urlParam = 'default_template';
+            $templates = $this->getAllTemplates()->getDefaultTemplates();
+        } else {
+            $urlParam = 'template';
+            $templates = $this->getAllTemplates()->getTemplates(
+                $obscuredCheckCommand === null ? $checkCommand : $obscuredCheckCommand
+            );
+        }
 
-        if (! isset($templates[$this->graphParams['template']])) {
+        if (! isset($templates[$this->graphParams[$urlParam]])) {
             throw new HttpNotFoundException($this->translate('No such template'));
         }
 
-        $charts = $templates[$this->graphParams['template']]->getCharts(
+        $charts = $templates[$this->graphParams[$urlParam]]->getCharts(
             static::getMetricsDataSource(),
             array_map('rawurldecode', $this->filterParams->toArray(false)),
             $checkCommand
