@@ -254,7 +254,8 @@ abstract class Graphs extends AbstractWidget
                                     '<img id="graphiteImg-'
                                     . md5((string) $imageUrl->without('cachebuster'))
                                     . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
-                                    . " width=\"$this->width\" height=\"$this->height\">",
+                                    . " width=\"$this->width\" height=\"$this->height\""
+                                    . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">",
                                     $metricVariables,
                                     $bestPos
                                 ];
