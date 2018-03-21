@@ -4,6 +4,8 @@ namespace Icinga\Module\Graphite\Web\Widget;
 
 use Icinga\Application\Config;
 use Icinga\Application\Icinga;
+use Icinga\Authentication\Auth;
+use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Graphing\Template;
@@ -317,7 +319,22 @@ abstract class Graphs extends AbstractWidget
 
     public function render()
     {
-        $result = $this->getGraphsList();
+        try {
+            $result = $this->getGraphsList();
+        } catch (ConfigurationError $e) {
+            $view = $this->view();
+
+            return "<p>{$view->escape($e->getMessage())}</p>"
+                . '<p>' . vsprintf(
+                    $view->escape($view->translate('Please %scorrect%s the configuration of the Graphite module.')),
+                    Auth::getInstance()->hasPermission('config/modules')
+                        ? explode(
+                            '$LINK_TEXT$',
+                            $view->qlink('$LINK_TEXT$', 'graphite/config/backend', null, ['class' => 'action-link'])
+                        )
+                        : ['', '']
+                ) . '</p>';
+        }
 
         if ($result === '' && $this->getShowNoGraphsFound()) {
             $view = $this->view();
