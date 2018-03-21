@@ -45,7 +45,8 @@ trait TimeRangePickerTrait
     {
         $url = Url::fromRequest()->getAbsoluteUrl();
 
-        return $this->getTimeRangePickerCommonForm()
+        return '<div>'
+            . $this->getTimeRangePickerCommonForm()
             . '<div class="flyover flyover-arrow-top" id="'
             . $view->protectId('graphite-customrange')
             . '">'
@@ -55,6 +56,7 @@ trait TimeRangePickerTrait
                 'icon'  => 'calendar'
             ])
             . $this->getTimeRangePickerCustomForm()->setAttrib('class', 'flyover-content')
+            . '</div>'
             . '</div>';
     }
 

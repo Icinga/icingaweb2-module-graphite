@@ -101,6 +101,13 @@ abstract class Graphs extends AbstractWidget
     protected $preloadDummy = false;
 
     /**
+     * Whether to explicitly display that no graphs were found
+     *
+     * @var bool|null
+     */
+    protected $showNoGraphsFound;
+
+    /**
      * Cache for {@link getGraphsList()}
      *
      * @var string
@@ -311,7 +318,7 @@ abstract class Graphs extends AbstractWidget
     {
         $result = $this->getGraphsList();
 
-        if ($result === '' && ! Config::module('graphite')->get('ui', 'disable_no_graphs_found')) {
+        if ($result === '' && $this->getShowNoGraphsFound()) {
             $view = $this->view();
             return "<p>{$view->escape($view->translate('No graphs found'))}</p>";
         }
@@ -531,12 +538,30 @@ abstract class Graphs extends AbstractWidget
     }
 
     /**
-     * Whether there are any graphs to display
+     * Get whether to explicitly display that no graphs were found
      *
      * @return bool
      */
-    public function hasGraphs()
+    public function getShowNoGraphsFound()
     {
-        return $this->getGraphsList() !== '';
+        if ($this->showNoGraphsFound === null) {
+            $this->showNoGraphsFound = ! Config::module('graphite')->get('ui', 'disable_no_graphs_found');
+        }
+
+        return $this->showNoGraphsFound;
+    }
+
+    /**
+     * Set whether to explicitly display that no graphs were found
+     *
+     * @param bool $showNoGraphsFound
+     *
+     * @return $this
+     */
+    public function setShowNoGraphsFound($showNoGraphsFound = true)
+    {
+        $this->showNoGraphsFound = $showNoGraphsFound;
+
+        return $this;
     }
 }
