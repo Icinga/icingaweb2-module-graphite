@@ -41,6 +41,7 @@ Stacktrace ...
 * Module version (System - About):
 * Icinga Web 2 version and modules (System - About):
 * Icinga 2 version (`icinga2 --version`):
+* Graphite (carbon, web, whisper) version:
 * Operating System and version:
 * Webserver, PHP versions:
 
