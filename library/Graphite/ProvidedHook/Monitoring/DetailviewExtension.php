@@ -2,6 +2,8 @@
 
 namespace Icinga\Module\Graphite\ProvidedHook\Monitoring;
 
+use Icinga\Application\Icinga;
+use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
 use Icinga\Module\Monitoring\Hook\DetailviewExtensionHook;
@@ -13,6 +15,10 @@ class DetailviewExtension extends DetailviewExtensionHook
 
     public function getHtmlForObject(MonitoredObject $object)
     {
+        if (Icinga::app()->getRequest()->getUrl()->getParam('graph_debug')) {
+            IPT::enable();
+        }
+
         $graphs = (string) Graphs::forMonitoredObject($object)
             ->setWidth(440)
             ->setHeight(220)

@@ -19,3 +19,4 @@ $this->provideConfigTab('advanced', array(
     'url' => 'config/advanced'
 ));
 
+$this->providePermission('graphite/debug', $this->translate('Allow debugging directly via the web UI'));

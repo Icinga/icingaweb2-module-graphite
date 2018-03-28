@@ -5,6 +5,7 @@ namespace Icinga\Module\Graphite\Graphing;
 use Icinga\Application\Config;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Graphite\Util\MacroTemplate;
+use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
 use InvalidArgumentException;
 
 class Template
@@ -62,6 +63,9 @@ class Template
     public function getCharts(MetricsDataSource $dataSource, array $filter, $checkCommand, array & $excludeMetrics = [])
     {
         $metrics = [];
+        $metricsUsed = 0;
+        $metricsExcluded = 0;
+
         foreach ($this->curves as $curveName => $curve) {
             $query = $dataSource->select()->from($curve[0]->resolve([
                 'host_name_template'    => static::getHostNameTemplate()->resolve([
@@ -82,6 +86,7 @@ class Template
             foreach ($query->fetchColumn() as $metric) {
                 foreach ($excludeMetrics as $excludeMetric) {
                     if ($excludeMetric->reverseResolve($metric) !== false) {
+                        ++$metricsExcluded;
                         continue 2;
                     }
                 }
@@ -89,13 +94,15 @@ class Template
                 $vars = $curve[0]->reverseResolve($metric);
                 if ($vars !== false) {
                     $metrics[$curveName][$metric] = $vars;
+                    ++$metricsUsed;
                 }
             }
         }
 
         switch (count($metrics)) {
             case 0:
-                return [];
+                $metricsCombinations = [];
+                break;
 
             case 1:
                 $metricsCombinations = [];
@@ -143,6 +150,9 @@ class Template
         foreach ($metricsCombinations as $metricsCombination) {
             $charts[] = new Chart($dataSource->getClient(), $this, $metricsCombination);
         }
+
+        IPT::recordf('Excluded %s metric(s)', $metricsExcluded);
+        IPT::recordf('Combined %s metric(s) to %s chart(s)', $metricsUsed, count($charts));
 
         return $charts;
     }
