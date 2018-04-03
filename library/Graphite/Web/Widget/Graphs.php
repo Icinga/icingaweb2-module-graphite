@@ -9,6 +9,7 @@ use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Graphing\Template;
+use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Host as HostGraphs;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Service as ServiceGraphs;
 use Icinga\Module\Monitoring\Object\Host;
@@ -110,13 +111,6 @@ abstract class Graphs extends AbstractWidget
     protected $showNoGraphsFound;
 
     /**
-     * Cache for {@link getGraphsList()}
-     *
-     * @var string
-     */
-    protected $graphsList;
-
-    /**
      * Factory, based on the given object
      *
      * @param   MonitoredObject $object
@@ -201,124 +195,141 @@ abstract class Graphs extends AbstractWidget
      */
     protected function getGraphsList()
     {
-        if ($this->graphsList === null) {
-            $result = []; // kind of string builder
-            $filter = $this->getMonitoredObjectFilter();
-            $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
-            $allTemplates = $this->getAllTemplates();
-            $concreteTemplates = $allTemplates->getTemplates(
-                $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand
-            );
+        $result = []; // kind of string builder
+        $filter = $this->getMonitoredObjectFilter();
+        $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
+        $allTemplates = $this->getAllTemplates();
+        $actualCheckCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
+        $concreteTemplates = $allTemplates->getTemplates($actualCheckCommand);
 
-            $excludedMetrics = [];
+        $excludedMetrics = [];
 
-            foreach ($concreteTemplates as $concreteTemplate) {
-                foreach ($concreteTemplate->getCurves() as $curve) {
-                    $excludedMetrics[] = $curve[0];
-                }
+        foreach ($concreteTemplates as $concreteTemplate) {
+            foreach ($concreteTemplate->getCurves() as $curve) {
+                $excludedMetrics[] = $curve[0];
+            }
+        }
+
+        IPT::recordf("Icinga check command: %s", $this->checkCommand);
+        IPT::recordf("Obscured check command: %s", $this->obscuredCheckCommand);
+
+        foreach ([
+            ['template', $concreteTemplates, []],
+            ['default_template', $allTemplates->getDefaultTemplates(), $excludedMetrics],
+        ] as $templateSet) {
+            list($urlParam, $templates, $excludeMetrics) = $templateSet;
+
+            if (empty($excludeMetrics)) {
+                IPT::recordf('Applying templates for check command %s', $actualCheckCommand);
+            } else {
+                IPT::recordf('Applying default templates, excluding previously used metrics');
             }
 
-            foreach ([
-                ['template', $concreteTemplates, []],
-                ['default_template', $allTemplates->getDefaultTemplates(), $excludedMetrics],
-            ] as $templateSet) {
-                list($urlParam, $templates, $excludeMetrics) = $templateSet;
+            IPT::indent();
 
-                foreach ($templates as $templateName => $template) {
-                    if ($this->designedForMyMonitoredObjectType($template)) {
-                        $charts = $template->getCharts(
-                            static::getMetricsDataSource(), $filter, $this->checkCommand, $excludeMetrics
-                        );
+            foreach ($templates as $templateName => $template) {
+                if ($this->designedForMyMonitoredObjectType($template)) {
+                    IPT::recordf('Applying template %s', $templateName);
+                    IPT::indent();
 
-                        if (! empty($charts)) {
-                            $currentGraphs = [];
+                    $charts = $template->getCharts(
+                        static::getMetricsDataSource(), $filter, $this->checkCommand, $excludeMetrics
+                    );
 
-                            foreach ($charts as $chart) {
-                                $metricVariables = $chart->getMetricVariables();
-                                $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
-                                    ->setParam($urlParam, $templateName)
-                                    ->setParam('start', $this->start)
-                                    ->setParam('end', $this->end)
-                                    ->setParam('width', $this->width)
-                                    ->setParam('height', $this->height)
-                                    ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
-                                if (! $this->compact) {
-                                    $imageUrl->setParam('legend', 1);
-                                }
+                    if (! empty($charts)) {
+                        $currentGraphs = [];
 
-                                $bestIntersect = -1;
-                                $bestPos = count($result);
-
-                                foreach ($result as $graphPos => & $graph) {
-                                    $currentIntersect = count(array_intersect_assoc($graph[1], $metricVariables));
-
-                                    if ($currentIntersect >= $bestIntersect) {
-                                        $bestIntersect = $currentIntersect;
-                                        $bestPos = $graphPos + 1;
-                                    }
-                                }
-                                unset($graph);
-
-                                $currentGraphs[] = [
-                                    '<img id="graphiteImg-'
-                                    . md5((string) $imageUrl->without('cachebuster'))
-                                    . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
-                                    . " width=\"$this->width\" height=\"$this->height\""
-                                    . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">",
-                                    $metricVariables,
-                                    $bestPos
-                                ];
+                        foreach ($charts as $chart) {
+                            $metricVariables = $chart->getMetricVariables();
+                            $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
+                                ->setParam($urlParam, $templateName)
+                                ->setParam('start', $this->start)
+                                ->setParam('end', $this->end)
+                                ->setParam('width', $this->width)
+                                ->setParam('height', $this->height)
+                                ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
+                            if (! $this->compact) {
+                                $imageUrl->setParam('legend', 1);
                             }
 
-                            foreach (array_reverse($currentGraphs) as $graph) {
-                                list($img, $metricVariables, $bestPos) = $graph;
-                                array_splice($result, $bestPos, 0, [[$img, $metricVariables]]);
+                            $bestIntersect = -1;
+                            $bestPos = count($result);
+
+                            foreach ($result as $graphPos => & $graph) {
+                                $currentIntersect = count(array_intersect_assoc($graph[1], $metricVariables));
+
+                                if ($currentIntersect >= $bestIntersect) {
+                                    $bestIntersect = $currentIntersect;
+                                    $bestPos = $graphPos + 1;
+                                }
                             }
+                            unset($graph);
+
+                            $currentGraphs[] = [
+                                '<img id="graphiteImg-'
+                                . md5((string) $imageUrl->without('cachebuster'))
+                                . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
+                                . " width=\"$this->width\" height=\"$this->height\""
+                                . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">",
+                                $metricVariables,
+                                $bestPos
+                            ];
+                        }
+
+                        foreach (array_reverse($currentGraphs) as $graph) {
+                            list($img, $metricVariables, $bestPos) = $graph;
+                            array_splice($result, $bestPos, 0, [[$img, $metricVariables]]);
                         }
                     }
+
+                    IPT::unindent();
+                } else {
+                    IPT::recordf('Not applying template %s', $templateName);
                 }
             }
 
-            if (! empty($result)) {
-                foreach ($result as & $graph) {
-                    $graph = $graph[0];
-                }
-                unset($graph);
+            IPT::unindent();
+        }
 
-                if ($this->maxVisibleGraphs && count($result) > $this->maxVisibleGraphs) {
-                    /** @var View $view */
-                    $view = $this->view();
+        if (! empty($result)) {
+            foreach ($result as & $graph) {
+                $graph = $graph[0];
+            }
+            unset($graph);
 
-                    array_splice($result, $this->maxVisibleGraphs, 0, [sprintf(
-                        '<input type="checkbox" id="toggle-%1$s" class="expandable-toggle">'
-                            . '<label for="toggle-%1$s" class="link-button">'
-                            . '<span class="expandable-expand-label">%2$s</span>'
-                            . '<span class="expandable-collapse-label">%3$s</span>'
-                            . '</label>'
-                            . '<div class="expandable-content">',
-                        $view->protectId($this->getMonitoredObjectIdentifier()),
-                        $view->translate('Show More'),
-                        $view->translate('Show Less')
-                    )]);
+            if ($this->maxVisibleGraphs && count($result) > $this->maxVisibleGraphs) {
+                /** @var View $view */
+                $view = $this->view();
 
-                    $result[] = '</div>';
-                }
+                array_splice($result, $this->maxVisibleGraphs, 0, [sprintf(
+                    '<input type="checkbox" id="toggle-%1$s" class="expandable-toggle">'
+                        . '<label for="toggle-%1$s" class="link-button">'
+                        . '<span class="expandable-expand-label">%2$s</span>'
+                        . '<span class="expandable-collapse-label">%3$s</span>'
+                        . '</label>'
+                        . '<div class="expandable-content">',
+                    $view->protectId($this->getMonitoredObjectIdentifier()),
+                    $view->translate('Show More'),
+                    $view->translate('Show Less')
+                )]);
 
-                $classes = $this->classes;
-                $classes[] = 'images';
-
-                array_unshift($result, '<div class="' . implode(' ', $classes) . '">');
                 $result[] = '</div>';
             }
 
-            $this->graphsList = implode($result);
+            $classes = $this->classes;
+            $classes[] = 'images';
+
+            array_unshift($result, '<div class="' . implode(' ', $classes) . '">');
+            $result[] = '</div>';
         }
 
-        return $this->graphsList;
+        return implode($result);
     }
 
     public function render()
     {
+        IPT::clear();
+
         try {
             $result = $this->getGraphsList();
         } catch (ConfigurationError $e) {
@@ -336,9 +347,15 @@ abstract class Graphs extends AbstractWidget
                 ) . '</p>';
         }
 
+        $view = $this->view();
+
         if ($result === '' && $this->getShowNoGraphsFound()) {
-            $view = $this->view();
-            return "<p>{$view->escape($view->translate('No graphs found'))}</p>";
+            $result = "<p>{$view->escape($view->translate('No graphs found'))}</p>";
+        }
+
+        if (IPT::enabled()) {
+            $result .= "<h3>{$view->escape($view->translate('Graphs assembling process record'))}</h3>"
+                . "<pre>{$view->escape(IPT::dump())}</pre>";
         }
 
         return $result;

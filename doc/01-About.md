@@ -16,3 +16,4 @@ the monitoring module.
 * [Installation](02-Installation.md)
 * [Configuration](03-Configuration.md)
 * [Templates](04-Templates.md)
+* [Troubleshooting](05-Troubleshooting.md)
