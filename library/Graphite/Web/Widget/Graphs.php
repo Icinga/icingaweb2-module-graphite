@@ -219,7 +219,7 @@ abstract class Graphs extends AbstractWidget
         ] as $templateSet) {
             list($urlParam, $templates, $excludeMetrics) = $templateSet;
 
-            if (empty($excludeMetrics)) {
+            if ($urlParam === 'template') {
                 IPT::recordf('Applying templates for check command %s', $actualCheckCommand);
             } else {
                 IPT::recordf('Applying default templates, excluding previously used metrics');
