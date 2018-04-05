@@ -67,17 +67,15 @@ class Template
         $metricsExcluded = 0;
 
         foreach ($this->curves as $curveName => $curve) {
-            $query = $dataSource->select()->from($curve[0]->resolve([
-                'host_name_template'    => static::getHostNameTemplate()->resolve([
-                    'host.check_command'    => $checkCommand,
-                    ''                      => '$$'
-                ]),
-                'service_name_template' => static::getServiceNameTemplate()->resolve([
-                    'service.check_command' => $checkCommand,
-                    ''                      => '$$'
-                ]),
+            $fullMetricTemplate = new MacroTemplate($curve[0]->resolve([
+                'host_name_template'    => static::getHostNameTemplate(),
+                'service_name_template' => static::getServiceNameTemplate(),
                 ''                      => '$$'
             ]));
+
+            $query = $dataSource->select()->from($fullMetricTemplate)
+                ->where('host.check_command', $checkCommand)
+                ->where('service.check_command', $checkCommand);
 
             foreach ($filter as $key => $value) {
                 $query->where($key, $value);
