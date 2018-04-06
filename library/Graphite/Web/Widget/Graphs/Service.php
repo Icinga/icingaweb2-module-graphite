@@ -49,6 +49,11 @@ class Service extends Graphs
         return Url::fromPath('graphite/graph-dummy/service');
     }
 
+    protected function getGraphsListBaseUrl()
+    {
+        return Url::fromPath('graphite/list/services', ['host' => $this->host, 'service' => $this->service]);
+    }
+
     protected function filterImageUrl(Url $url)
     {
         return $url->setParam('host.name', $this->host)->setParam('service.name',  $this->service);

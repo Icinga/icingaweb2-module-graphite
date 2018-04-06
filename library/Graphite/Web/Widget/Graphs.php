@@ -297,6 +297,33 @@ abstract class Graphs extends AbstractWidget
             }
             unset($graph);
 
+            $currentUrl = Icinga::app()->getRequest()->getUrl();
+            $limit = (int) $currentUrl->getParam('graphs_limit', 50);
+            $total = count($result);
+
+            if ($limit < 1) {
+                $limit = -1;
+            }
+
+            if ($limit !== -1 && $total > $limit) {
+                $result = array_slice($result, 0, $limit);
+
+                if (! $this->compact) {
+                    /** @var View $view */
+                    $view = $this->view();
+
+                    $url = $this->getGraphsListBaseUrl();
+                    TimeRangePickerTrait::copyAllRangeParameters($url->getParams(), $currentUrl->getParams());
+
+                    $result[] = "<p class='load-more'>{$view->qlink(
+                        sprintf($view->translate('Load all %d graphs'), $total),
+                        $url->setParam('graphs_limit', '-1'),
+                        null,
+                        ['class' => 'action-link']
+                    )}</p>";
+                }
+            }
+
             if ($this->maxVisibleGraphs && count($result) > $this->maxVisibleGraphs) {
                 /** @var View $view */
                 $view = $this->view();
@@ -411,6 +438,13 @@ abstract class Graphs extends AbstractWidget
      * @return Url
      */
     abstract protected function getDummyImageBaseUrl();
+
+    /**
+     * Get the base URL to the monitored object's graphs list
+     *
+     * @return Url
+     */
+    abstract protected function getGraphsListBaseUrl();
 
     /**
      * Extend the {@link getImageBaseUrl()}'s result's parameters with the concrete monitored object
