@@ -112,7 +112,10 @@ class ListController extends MonitoringAwareController
             $dataView,
             null,
             null,
-            array_merge(['format', 'stateType', 'addColumns', 'problems'], TimeRangePicker::getAllRangeParameters())
+            array_merge(
+                ['format', 'stateType', 'addColumns', 'problems', 'graphs_limit'],
+                TimeRangePicker::getAllRangeParameters()
+            )
         );
         $this->handleFormatRequest($dataView);
     }
