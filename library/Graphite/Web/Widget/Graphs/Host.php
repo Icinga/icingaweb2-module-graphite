@@ -4,31 +4,19 @@ namespace Icinga\Module\Graphite\Web\Widget\Graphs;
 
 use Icinga\Module\Graphite\Graphing\Template;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
+use Icinga\Module\Monitoring\Object\Host as MonitoredHost;
 use Icinga\Web\Url;
 
 class Host extends Graphs
 {
+    protected $monitoredObjectType = 'host';
+
     /**
      * The host to render the graphs of
      *
-     * @var string
+     * @var MonitoredHost
      */
-    protected $host;
-
-    /**
-     * Constructor
-     *
-     * @param   string      $host                   The host to render the graphs of
-     * @param   string      $checkCommand           The check command of the monitored object we display graphs for
-     * @param   string|null $obscuredCheckCommand   The "real" check command (if any) of the monitored object
-     *                                              we display graphs for
-     */
-    public function __construct($host, $checkCommand, $obscuredCheckCommand)
-    {
-        parent::__construct($checkCommand, $obscuredCheckCommand);
-
-        $this->host = $host;
-    }
+    protected $monitoredObject;
 
     protected function getImageBaseUrl()
     {
@@ -42,22 +30,22 @@ class Host extends Graphs
 
     protected function getGraphsListBaseUrl()
     {
-        return Url::fromPath('graphite/list/hosts', ['host' => $this->host]);
+        return Url::fromPath('graphite/list/hosts', ['host' => $this->monitoredObject->getName()]);
     }
 
     protected function filterImageUrl(Url $url)
     {
-        return $url->setParam('host.name', $this->host);
+        return $url->setParam('host.name', $this->monitoredObject->getName());
     }
 
     protected function getMonitoredObjectIdentifier()
     {
-        return $this->host;
+        return $this->monitoredObject->getName();
     }
 
     protected function getMonitoredObjectFilter()
     {
-        return ['host.name' => $this->host];
+        return ['host.name' => $this->monitoredObject->getName()];
     }
 
     protected function designedForMyMonitoredObjectType(Template $template)

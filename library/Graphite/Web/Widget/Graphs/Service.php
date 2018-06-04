@@ -4,40 +4,19 @@ namespace Icinga\Module\Graphite\Web\Widget\Graphs;
 
 use Icinga\Module\Graphite\Graphing\Template;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
+use Icinga\Module\Monitoring\Object\Service as MonitoredService;
 use Icinga\Web\Url;
 
 class Service extends Graphs
 {
-    /**
-     * The host to render the graphs of
-     *
-     * @var string
-     */
-    protected $host;
+    protected $monitoredObjectType = 'service';
 
     /**
      * The service to render the graphs of
      *
-     * @var string
+     * @var MonitoredService
      */
-    protected $service;
-
-    /**
-     * Constructor
-     *
-     * @param   string      $host                   The host to render the graphs of
-     * @param   string      $service                The service to render the graphs of
-     * @param   string      $checkCommand           The check command of the monitored object we display graphs for
-     * @param   string|null $obscuredCheckCommand   The "real" check command (if any) of the monitored object
-     *                                              we display graphs for
-     */
-    public function __construct($host, $service, $checkCommand, $obscuredCheckCommand)
-    {
-        parent::__construct($checkCommand, $obscuredCheckCommand);
-
-        $this->host = $host;
-        $this->service = $service;
-    }
+    protected $monitoredObject;
 
     protected function getImageBaseUrl()
     {
@@ -51,22 +30,30 @@ class Service extends Graphs
 
     protected function getGraphsListBaseUrl()
     {
-        return Url::fromPath('graphite/list/services', ['host' => $this->host, 'service' => $this->service]);
+        return Url::fromPath(
+            'graphite/list/services',
+            ['host' => $this->monitoredObject->getHost()->getName(), 'service' => $this->monitoredObject->getName()]
+        );
     }
 
     protected function filterImageUrl(Url $url)
     {
-        return $url->setParam('host.name', $this->host)->setParam('service.name',  $this->service);
+        return $url
+            ->setParam('host.name', $this->monitoredObject->getHost()->getName())
+            ->setParam('service.name',  $this->monitoredObject->getName());
     }
 
     protected function getMonitoredObjectIdentifier()
     {
-        return $this->host . ':' . $this->service;
+        return $this->monitoredObject->getHost()->getName() . ':' . $this->monitoredObject->getName();
     }
 
     protected function getMonitoredObjectFilter()
     {
-        return ['host.name' => $this->host, 'service.name' =>  $this->service];
+        return [
+            'host.name' => $this->monitoredObject->getHost()->getName(),
+            'service.name' =>  $this->monitoredObject->getName()
+        ];
     }
 
     protected function designedForMyMonitoredObjectType(Template $template)

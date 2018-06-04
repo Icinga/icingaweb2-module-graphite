@@ -5,7 +5,8 @@ use Icinga\Web\Url;
 
 /** @var \Icinga\Web\View $this */
 /** @var \Icinga\Web\Widget\FilterEditor $filterEditor */
-/** @var \Icinga\Module\Monitoring\DataView\DataView $services */
+/** @var \Icinga\Module\Monitoring\Object\Service[] $services */
+/** @var bool $hasMoreServices */
 /** @var \Icinga\Web\Url $hostBaseUrl */
 /** @var \Icinga\Web\Url $serviceBaseUrl */
 
@@ -23,8 +24,8 @@ if (! $compact): ?>
 <?php endif ?>
 <div class="content">
 <?php
-if ($services->hasResult()) {
-    foreach ($services->peekAhead($compact) as $service) {
+if (! empty($services)) {
+    foreach ($services as $service) {
         echo '<div class="grid-item">'
             . '<h2>'
             . $this->qlink(
@@ -49,16 +50,11 @@ if ($services->hasResult()) {
             )
             . '</h2>';
 
-        echo (new Service(
-            $service->host_name,
-            $service->service_description,
-            $service->service_check_command,
-            $service->_service_check_command
-        ))->handleRequest();
+        echo (new Service($service))->handleRequest();
         echo '</div>';
     }
 
-    if (! $compact && $services->hasMore()) {
+    if ($hasMoreServices) {
         echo '<div class="action-links">'
             . $this->qlink(
                 mt('monitoring', 'Show More'),
