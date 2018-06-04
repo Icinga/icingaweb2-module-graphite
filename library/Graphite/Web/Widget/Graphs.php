@@ -202,7 +202,6 @@ abstract class Graphs extends AbstractWidget
     protected function getGraphsList()
     {
         $result = []; // kind of string builder
-        $filter = $this->getMonitoredObjectFilter();
         $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
         $allTemplates = $this->getAllTemplates();
         $actualCheckCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
@@ -239,7 +238,7 @@ abstract class Graphs extends AbstractWidget
                     IPT::indent();
 
                     $charts = $template->getCharts(
-                        static::getMetricsDataSource(), $filter, $this->checkCommand, $excludeMetrics
+                        static::getMetricsDataSource(), $this->monitoredObject, [], $excludeMetrics
                     );
 
                     if (! empty($charts)) {
@@ -423,13 +422,6 @@ abstract class Graphs extends AbstractWidget
      * @return  string
      */
     abstract protected function getMonitoredObjectIdentifier();
-
-    /**
-     * Return a filter specifying the monitored object we display graphs for
-     *
-     * @return string[]
-     */
-    abstract protected function getMonitoredObjectFilter();
 
     /**
      * Get the base URL to a graph specifying just the monitored object kind

@@ -48,14 +48,6 @@ class Service extends Graphs
         return $this->monitoredObject->getHost()->getName() . ':' . $this->monitoredObject->getName();
     }
 
-    protected function getMonitoredObjectFilter()
-    {
-        return [
-            'host.name' => $this->monitoredObject->getHost()->getName(),
-            'service.name' =>  $this->monitoredObject->getName()
-        ];
-    }
-
     protected function designedForMyMonitoredObjectType(Template $template)
     {
         foreach ($template->getCurves() as $curve) {

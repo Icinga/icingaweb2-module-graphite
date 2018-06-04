@@ -55,7 +55,6 @@ class ListController extends MonitoringAwareController
         foreach ($hostsQuery->peekAhead($this->view->compact) as $host) {
             $host = new Host($this->backend, $host->host_name);
             $host->fetch();
-            $host->fetchCustomvars();
             $hosts[] = $host;
         }
 
@@ -101,7 +100,6 @@ class ListController extends MonitoringAwareController
         foreach ($servicesQuery->peekAhead($this->view->compact) as $service) {
             $service = new Service($this->backend, $service->host_name, $service->service_description);
             $service->fetch();
-            $service->fetchCustomvars();
             $services[] = $service;
         }
 

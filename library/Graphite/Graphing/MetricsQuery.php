@@ -10,6 +10,8 @@ use Icinga\Exception\NotImplementedError;
 use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
+use Icinga\Module\Monitoring\Object\Macro;
+use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Util\Json;
 use Icinga\Web\Url;
 use InvalidArgumentException;
@@ -37,6 +39,13 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
      * @var string[]
      */
     protected $filter = [];
+
+    /**
+     * The monitored object to render the graphs of
+     *
+     * @var MonitoredObject
+     */
+    protected $monitoredObject;
 
     /**
      * Constructor
@@ -85,7 +94,7 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
 
     public function where($condition, $value = null)
     {
-        $this->filter[$condition] = preg_replace('/[^a-zA-Z0-9\*\-:[\]$]/', '_', $value);
+        $this->filter[$condition] = $this->escapeMetricStep($value);
 
         return $this;
     }
@@ -108,9 +117,32 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
 
     public function fetchColumn()
     {
+        $filter = [];
+        foreach ($this->base->getMacros() as $macro) {
+            if (isset($this->filter[$macro])) {
+                $filter[$macro] = $this->filter[$macro];
+                continue;
+            }
+
+            if (strpos($macro, '.') === false) {
+                continue;
+            }
+
+            $workaroundMacro = str_replace('.', '_', $macro);
+            if ($workaroundMacro === 'service_name') {
+                $workaroundMacro = 'service_description';
+            }
+
+            $result = Macro::resolveMacro($workaroundMacro, $this->monitoredObject);
+
+            if ($result !== $workaroundMacro) {
+                $filter[$macro] = $this->escapeMetricStep($result);
+            }
+        }
+
         $client = $this->dataSource->getClient();
         $url = Url::fromPath('metrics/expand', [
-            'query' => $client->escapeMetricPath($this->base->resolve($this->filter, '*'))
+            'query' => $client->escapeMetricPath($this->base->resolve($filter, '*'))
         ]);
         $res = Json::decode($client->request($url));
         natsort($res->results);
@@ -129,5 +161,31 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
     public function fetchPairs()
     {
         throw new NotImplementedError(__METHOD__);
+    }
+
+    /**
+     * Set the monitored object to render the graphs of
+     *
+     * @param MonitoredObject $monitoredObject
+     *
+     * @return $this
+     */
+    public function setMonitoredObject($monitoredObject)
+    {
+        $this->monitoredObject = $monitoredObject;
+
+        return $this;
+    }
+
+    /**
+     * Escapes a string for usage in a Graphite metric path between two dots
+     *
+     * @param   string  $step
+     *
+     * @return  string
+     */
+    protected function escapeMetricStep($step)
+    {
+        return preg_replace('/[^a-zA-Z0-9\*\-:[\]$]/', '_', $step);
     }
 }

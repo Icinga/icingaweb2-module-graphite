@@ -184,7 +184,7 @@ class Chart
     public function getMetricVariables()
     {
         /** @var MacroTemplate[][] $curves */
-        $curves = $this->template->getCurves();
+        $curves = $this->template->getFullCurves();
         $variables = [];
 
         foreach ($this->metrics as $curveName => $metric) {

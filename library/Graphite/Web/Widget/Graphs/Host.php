@@ -43,11 +43,6 @@ class Host extends Graphs
         return $this->monitoredObject->getName();
     }
 
-    protected function getMonitoredObjectFilter()
-    {
-        return ['host.name' => $this->monitoredObject->getName()];
-    }
-
     protected function designedForMyMonitoredObjectType(Template $template)
     {
         foreach ($template->getCurves() as $curve) {
