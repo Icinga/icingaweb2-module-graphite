@@ -30,7 +30,7 @@ class Client implements ClientInterface
      *
      * @var array
      */
-    protected $handles;
+    protected $handles = [];
 
     /**
      * Return user agent
@@ -145,7 +145,7 @@ class Client implements ClientInterface
             return $handle->responseBody->write($string);
         };
 
-        $ch = $this->handles ? array_pop($this->handles) : curl_init();
+        $ch = ! empty($this->handles) ? array_pop($this->handles) : curl_init();
 
         curl_setopt_array($ch, $curlOptions);
 
