@@ -7,6 +7,9 @@ use Icinga\Exception\Http\HttpNotFoundException;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
+use Icinga\Module\Monitoring\Object\Host;
+use Icinga\Module\Monitoring\Object\MonitoredObject;
+use Icinga\Module\Monitoring\Object\Service;
 use Icinga\Web\UrlParams;
 
 class GraphController extends MonitoringAwareController
@@ -53,11 +56,12 @@ class GraphController extends MonitoringAwareController
 
     public function hostAction()
     {
+        $hostName = $this->filterParams->getRequired('host.name');
         $checkCommandColumn = '_host_' . Graphs::getObscuredCheckCommandCustomVar();
         $host = $this->applyMonitoringRestriction(
             $this->backend->select()->from('hoststatus', ['host_check_command', $checkCommandColumn])
         )
-            ->where('host_name', $this->filterParams->getRequired('host.name'))
+            ->where('host_name', $hostName)
             ->limit(1) // just to be sure to save a few CPU cycles
             ->fetchRow();
 
@@ -65,17 +69,19 @@ class GraphController extends MonitoringAwareController
             throw new HttpNotFoundException('%s', $this->translate('No such host'));
         }
 
-        $this->supplyImage($host->host_check_command, $host->$checkCommandColumn);
+        $this->supplyImage(new Host($this->backend, $hostName), $host->host_check_command, $host->$checkCommandColumn);
     }
 
     public function serviceAction()
     {
+        $hostName = $this->filterParams->getRequired('host.name');
+        $serviceName = $this->filterParams->getRequired('service.name');
         $checkCommandColumn = '_service_' . Graphs::getObscuredCheckCommandCustomVar();
         $service = $this->applyMonitoringRestriction(
             $this->backend->select()->from('servicestatus', ['service_check_command', $checkCommandColumn])
         )
-            ->where('host_name', $this->filterParams->getRequired('host.name'))
-            ->where('service_description', $this->filterParams->getRequired('service.name'))
+            ->where('host_name', $hostName)
+            ->where('service_description', $serviceName)
             ->limit(1) // just to be sure to save a few CPU cycles
             ->fetchRow();
 
@@ -83,17 +89,22 @@ class GraphController extends MonitoringAwareController
             throw new HttpNotFoundException('%s', $this->translate('No such service'));
         }
 
-        $this->supplyImage($service->service_check_command, $service->$checkCommandColumn);
+        $this->supplyImage(
+            new Service($this->backend, $hostName, $serviceName),
+            $service->service_check_command,
+            $service->$checkCommandColumn
+        );
     }
 
     /**
      * Do all monitored object type independend actions
      *
-     * @param   string      $checkCommand           The check command of the monitored object we supply an image for
-     * @param   string|null $obscuredCheckCommand   The "real" check command (if any) of the monitored object
-     *                                              we display graphs for
+     * @param   MonitoredObject     $monitoredObject        The monitored object to render the graphs of
+     * @param   string              $checkCommand           The check command of the monitored object we supply an image for
+     * @param   string|null         $obscuredCheckCommand   The "real" check command (if any) of the monitored object
+     *                                                      we display graphs for
      */
-    protected function supplyImage($checkCommand, $obscuredCheckCommand)
+    protected function supplyImage(MonitoredObject $monitoredObject, $checkCommand, $obscuredCheckCommand)
     {
         if (isset($this->graphParams['default_template'])) {
             $urlParam = 'default_template';
@@ -111,8 +122,8 @@ class GraphController extends MonitoringAwareController
 
         $charts = $templates[$this->graphParams[$urlParam]]->getCharts(
             static::getMetricsDataSource(),
-            array_map('rawurldecode', $this->filterParams->toArray(false)),
-            $checkCommand
+            $monitoredObject,
+            array_map('rawurldecode', $this->filterParams->toArray(false))
         );
 
         switch (count($charts)) {

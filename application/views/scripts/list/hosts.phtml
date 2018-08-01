@@ -5,7 +5,8 @@ use Icinga\Web\Url;
 
 /** @var \Icinga\Web\View $this */
 /** @var \Icinga\Web\Widget\FilterEditor $filterEditor */
-/** @var \Icinga\Module\Monitoring\DataView\DataView $hosts */
+/** @var \Icinga\Module\Monitoring\Object\Host[] $hosts */
+/** @var bool $hasMoreHosts */
 /** @var \Icinga\Web\Url $baseUrl */
 
 if (! $compact): ?>
@@ -22,13 +23,9 @@ if (! $compact): ?>
 <?php endif ?>
 <div class="content">
 <?php
-if ($hosts->hasResult()) {
-    foreach ($hosts->peekAhead($compact) as $host) {
-        $hostGraphs = (string) (new Host(
-            $host->host_name,
-            $host->host_check_command,
-            $host->_host_check_command
-        ))->handleRequest();
+if (! empty($hosts)) {
+    foreach ($hosts as $host) {
+        $hostGraphs = (string) (new Host($host))->handleRequest();
 
         if ($hostGraphs !== '') {
             echo '<div class="grid-item">'
@@ -47,7 +44,7 @@ if ($hosts->hasResult()) {
         }
     }
 
-    if (! $compact && $hosts->hasMore()) {
+    if ($hasMoreHosts) {
         echo '<div class="action-links">'
             . $this->qlink(
                 mt('monitoring', 'Show More'),

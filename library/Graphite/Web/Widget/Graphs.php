@@ -32,6 +32,20 @@ abstract class Graphs extends AbstractWidget
     protected static $obscuredCheckCommandCustomVar;
 
     /**
+     * The type of the monitored object to render the graphs of
+     *
+     * @var string
+     */
+    protected $monitoredObjectType;
+
+    /**
+     * The monitored object to render the graphs of
+     *
+     * @var MonitoredObject
+     */
+    protected $monitoredObject;
+
+    /**
      * Graph image width
      *
      * @var string
@@ -122,20 +136,11 @@ abstract class Graphs extends AbstractWidget
         switch ($object->getType()) {
             case 'host':
                 /** @var Host $object */
-                return new HostGraphs(
-                    $object->getName(),
-                    $object->host_check_command,
-                    $object->{'_host_' . Graphs::getObscuredCheckCommandCustomVar()}
-                );
+                return new HostGraphs($object);
 
             case 'service':
                 /** @var Service $object */
-                return new ServiceGraphs(
-                    $object->getHost()->getName(),
-                    $object->getName(),
-                    $object->service_check_command,
-                    $object->{'_service_' . Graphs::getObscuredCheckCommandCustomVar()}
-                );
+                return new ServiceGraphs($object);
         }
     }
 
@@ -157,14 +162,15 @@ abstract class Graphs extends AbstractWidget
     /**
      * Constructor
      *
-     * @param   string      $checkCommand           The check command of the monitored object we display graphs for
-     * @param   string|null $obscuredCheckCommand   The "real" check command (if any) of the monitored object
-     *                                              we display graphs for
+     * @param   MonitoredObject $monitoredObject    The monitored object to render the graphs of
      */
-    public function __construct($checkCommand, $obscuredCheckCommand)
+    public function __construct(MonitoredObject $monitoredObject)
     {
-        $this->checkCommand = $checkCommand;
-        $this->obscuredCheckCommand = $obscuredCheckCommand;
+        $this->monitoredObject = $monitoredObject;
+        $this->checkCommand = $monitoredObject->{"{$this->monitoredObjectType}_check_command"};
+        $this->obscuredCheckCommand = $monitoredObject->{
+            "_{$this->monitoredObjectType}_" . Graphs::getObscuredCheckCommandCustomVar()
+        };
     }
 
     /**
@@ -196,7 +202,6 @@ abstract class Graphs extends AbstractWidget
     protected function getGraphsList()
     {
         $result = []; // kind of string builder
-        $filter = $this->getMonitoredObjectFilter();
         $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
         $allTemplates = $this->getAllTemplates();
         $actualCheckCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
@@ -233,7 +238,7 @@ abstract class Graphs extends AbstractWidget
                     IPT::indent();
 
                     $charts = $template->getCharts(
-                        static::getMetricsDataSource(), $filter, $this->checkCommand, $excludeMetrics
+                        static::getMetricsDataSource(), $this->monitoredObject, [], $excludeMetrics
                     );
 
                     if (! empty($charts)) {
@@ -417,13 +422,6 @@ abstract class Graphs extends AbstractWidget
      * @return  string
      */
     abstract protected function getMonitoredObjectIdentifier();
-
-    /**
-     * Return a filter specifying the monitored object we display graphs for
-     *
-     * @return string[]
-     */
-    abstract protected function getMonitoredObjectFilter();
 
     /**
      * Get the base URL to a graph specifying just the monitored object kind

@@ -8,6 +8,8 @@ use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
 use Icinga\Module\Monitoring\DataView\DataView;
+use Icinga\Module\Monitoring\Object\Host;
+use Icinga\Module\Monitoring\Object\Service;
 use Icinga\Web\Url;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
 use Icinga\Web\Widget\Tabextension\MenuAction;
@@ -34,13 +36,8 @@ class ListController extends MonitoringAwareController
             mt('monitoring', 'List hosts')
         );
 
-        $this->view->hosts = $hosts = $this->applyMonitoringRestriction(
-            $this->backend->select()->from('hoststatus', [
-                'host_name',
-                'host_display_name',
-                'host_check_command',
-                '_host_check_command' => '_host_' . Graphs::getObscuredCheckCommandCustomVar()
-            ])
+        $hostsQuery = $this->applyMonitoringRestriction(
+            $this->backend->select()->from('hoststatus', ['host_name'])
         );
 
         $this->view->baseUrl = $baseUrl = Url::fromPath('monitoring/host/show');
@@ -49,13 +46,22 @@ class ListController extends MonitoringAwareController
             $this->getRequest()->getUrl()->getParams()
         );
 
-        $this->filterQuery($hosts);
-        $this->setupPaginationControl($hosts);
+        $this->filterQuery($hostsQuery);
+        $this->setupPaginationControl($hostsQuery);
         $this->setupLimitControl();
-        $this->setupSortControl(['host_display_name' => mt('monitoring', 'Hostname')], $hosts);
+        $this->setupSortControl(['host_display_name' => mt('monitoring', 'Hostname')], $hostsQuery);
+
+        $hosts = [];
+        foreach ($hostsQuery->peekAhead($this->view->compact) as $host) {
+            $host = new Host($this->backend, $host->host_name);
+            $host->fetch();
+            $hosts[] = $host;
+        }
 
         $this->handleTimeRangePickerRequest();
         $this->view->timeRangePicker = $this->renderTimeRangePicker($this->view);
+        $this->view->hosts = $hosts;
+        $this->view->hasMoreHosts = ! $this->view->compact && $hostsQuery->hasMore();
     }
 
     public function servicesAction()
@@ -66,15 +72,8 @@ class ListController extends MonitoringAwareController
             mt('monitoring', 'List services')
         );
 
-        $this->view->services = $services = $this->applyMonitoringRestriction(
-            $this->backend->select()->from('servicestatus', [
-                'host_name',
-                'host_display_name',
-                'service_description',
-                'service_display_name',
-                'service_check_command',
-                '_service_check_command' => '_service_' . Graphs::getObscuredCheckCommandCustomVar()
-            ])
+        $servicesQuery = $this->applyMonitoringRestriction(
+            $this->backend->select()->from('servicestatus', ['host_name', 'service_description'])
         );
 
         $this->view->hostBaseUrl = $hostBaseUrl = Url::fromPath('monitoring/host/show');
@@ -89,16 +88,25 @@ class ListController extends MonitoringAwareController
             $this->getRequest()->getUrl()->getParams()
         );
 
-        $this->filterQuery($services);
-        $this->setupPaginationControl($services);
+        $this->filterQuery($servicesQuery);
+        $this->setupPaginationControl($servicesQuery);
         $this->setupLimitControl();
         $this->setupSortControl([
             'service_display_name'  => mt('monitoring', 'Service Name'),
             'host_display_name'     => mt('monitoring', 'Hostname')
-        ], $services);
+        ], $servicesQuery);
+
+        $services = [];
+        foreach ($servicesQuery->peekAhead($this->view->compact) as $service) {
+            $service = new Service($this->backend, $service->host_name, $service->service_description);
+            $service->fetch();
+            $services[] = $service;
+        }
 
         $this->handleTimeRangePickerRequest();
         $this->view->timeRangePicker = $this->renderTimeRangePicker($this->view);
+        $this->view->services = $services;
+        $this->view->hasMoreServices = ! $this->view->compact && $servicesQuery->hasMore();
     }
 
     /**

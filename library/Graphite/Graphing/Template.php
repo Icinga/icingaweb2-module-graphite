@@ -6,6 +6,7 @@ use Icinga\Application\Config;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
+use Icinga\Module\Monitoring\Object\MonitoredObject;
 use InvalidArgumentException;
 
 class Template
@@ -34,6 +35,15 @@ class Template
     protected $curves = [];
 
     /**
+     * All curves to show in a chart by name with full Graphite Web metric filters and Graphite functions
+     *
+     * [$curve => [$metricFilter, $function], ...]
+     *
+     * @var MacroTemplate[][]
+     */
+    protected $fullCurves;
+
+    /**
      * Additional URL parameters for rendering via Graphite Web
      *
      * [$key => $value, ...]
@@ -54,28 +64,22 @@ class Template
      * from the given data source restricted by the given filter
      *
      * @param   MetricsDataSource   $dataSource
+     * @param   MonitoredObject     $monitoredObject    The monitored object to render the graphs of
      * @param   string[]            $filter
-     * @param   string              $checkCommand   The check command of the monitored object we fetch charts for
      * @param   MacroTemplate[]     $excludeMetrics
      *
      * @return  Chart[]
      */
-    public function getCharts(MetricsDataSource $dataSource, array $filter, $checkCommand, array & $excludeMetrics = [])
+    public function getCharts(MetricsDataSource $dataSource, MonitoredObject $monitoredObject, array $filter, array & $excludeMetrics = [])
     {
         $metrics = [];
         $metricsUsed = 0;
         $metricsExcluded = 0;
 
-        foreach ($this->curves as $curveName => $curve) {
-            $fullMetricTemplate = new MacroTemplate($curve[0]->resolve([
-                'host_name_template'    => static::getHostNameTemplate(),
-                'service_name_template' => static::getServiceNameTemplate(),
-                ''                      => '$$'
-            ]));
+        foreach ($this->getFullCurves() as $curveName => $curve) {
+            $fullMetricTemplate = $curve[0];
 
-            $query = $dataSource->select()->from($fullMetricTemplate)
-                ->where('host.check_command', $checkCommand)
-                ->where('service.check_command', $checkCommand);
+            $query = $dataSource->select()->setMonitoredObject($monitoredObject)->from($fullMetricTemplate);
 
             foreach ($filter as $key => $value) {
                 $query->where($key, $value);
@@ -221,6 +225,31 @@ class Template
     public function getCurves()
     {
         return $this->curves;
+    }
+
+    /**
+     * Get curves to show in a chart by name with full Graphite Web metric filters and Graphite functions
+     *
+     * @return MacroTemplate[][]
+     */
+    public function getFullCurves()
+    {
+        if ($this->fullCurves === null) {
+            $curves = $this->curves;
+
+            foreach ($curves as &$curve) {
+                $curve[0] = new MacroTemplate($curve[0]->resolve([
+                    'host_name_template'    => static::getHostNameTemplate(),
+                    'service_name_template' => static::getServiceNameTemplate(),
+                    ''                      => '$$'
+                ]));
+            }
+            unset($curve);
+
+            $this->fullCurves = $curves;
+        }
+
+        return $this->fullCurves;
     }
 
     /**
