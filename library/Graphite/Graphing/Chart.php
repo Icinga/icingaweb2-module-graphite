@@ -3,10 +3,8 @@
 namespace Icinga\Module\Graphite\Graphing;
 
 use Icinga\Module\Graphite\Util\MacroTemplate;
+use Icinga\Module\Graphite\Web\Widget\GraphImage;
 use Icinga\Web\Response;
-use Icinga\Web\Url;
-use Icinga\Web\UrlParams;
-use RuntimeException;
 
 class Chart
 {
@@ -89,80 +87,10 @@ class Chart
      */
     public function serveImage(Response $response)
     {
-        $now = time();
+        $image = new GraphImage($this);
 
-        $from = (int) $this->from;
-        if ($from < 0) {
-            $from += $now;
-        }
-
-        if ((string) $this->until === '') {
-            $until = $now;
-        } else {
-            $until = (int) $this->until;
-            if ($until < 0) {
-                $until += $now;
-            }
-        }
-
-        $params = (new UrlParams())->addValues([
-            'from'                  => $from,
-            'until'                 => $until,
-            'width'                 => $this->width,
-            'height'                => $this->height,
-            'hideLegend'            => (string) ! $this->showLegend,
-            'tz'                    => date_default_timezone_get(),
-            '_salt'                 => time() . '.000',
-            'vTitle'                => 'Percent',
-            'lineMode'              => 'connected',
-            'drawNullAsZero'        => 'false',
-            'graphType'             => 'line',
-            'majorGridLineColor'    => '#0000003F',
-            'minorGridLineColor'    => '#00000000',
-            '_ext'                  => 'whatever.svg'
-        ]);
-
-        $variables = $this->getMetricVariables();
-        foreach ($this->template->getUrlParams() as $key => $value) {
-            $params->set($key, $value->resolve($variables));
-        }
-
-        foreach ($this->metrics as $curveName => $metric) {
-            $params->add('target', $this->template->getCurves()[$curveName][1]->resolve([
-                'metric' => $this->graphiteWebClient->escapeMetricPath($metric)
-            ]));
-        }
-
-        $url = Url::fromPath('/render')->setParams($params);
-        $headers = [
-            'Accept-language'   => 'en',
-            'Content-type'      => 'application/x-www-form-urlencoded'
-        ];
-
-        for (;;) {
-            try {
-                $image = $this->graphiteWebClient->request($url, 'POST', $headers);
-            } catch (RuntimeException $e) {
-                if (preg_match('/\b500\b/', $e->getMessage())) {
-                    // A 500 Internal Server Error, probably because of
-                    // a division by zero because of a too low time range to render.
-
-                    $until = (int) $url->getParam('until');
-                    $diff = $until - (int) $url->getParam('from');
-
-                    // Try to render a higher time range, but give up
-                    // once our default (1h) has been reached (non successfully).
-                    if ($diff < 3600) {
-                        $url->setParam('from', $until - $diff * 2);
-                        continue;
-                    }
-                }
-
-                throw $e;
-            }
-
-            break;
-        }
+        // Errors should occur now or not at all
+        $image->render();
 
         $response
             ->setHeader('Content-Type', 'image/png', true)
@@ -195,6 +123,36 @@ class Chart
         }
 
         return $variables;
+    }
+
+    /**
+     * Get Graphite Web client
+     *
+     * @return GraphiteWebClient
+     */
+    public function getGraphiteWebClient()
+    {
+        return $this->graphiteWebClient;
+    }
+
+    /**
+     * Get template
+     *
+     * @return Template
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * Get metrics
+     *
+     * @return string[]
+     */
+    public function getMetrics()
+    {
+        return $this->metrics;
     }
 
     /**
