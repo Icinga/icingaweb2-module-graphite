@@ -12,6 +12,7 @@ use Icinga\Module\Graphite\Graphing\Template;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Host as HostGraphs;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Service as ServiceGraphs;
+use Icinga\Module\Graphite\Web\Widget\InlineGraphImage;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Module\Monitoring\Object\Service;
@@ -118,6 +119,13 @@ abstract class Graphs extends AbstractWidget
     protected $preloadDummy = false;
 
     /**
+     * Whether to render the graphs inline
+     *
+     * @var bool
+     */
+    protected $renderInline;
+
+    /**
      * Whether to explicitly display that no graphs were found
      *
      * @var bool|null
@@ -168,6 +176,7 @@ abstract class Graphs extends AbstractWidget
     {
         $this->monitoredObject = $monitoredObject;
         $this->checkCommand = $monitoredObject->{"{$this->monitoredObjectType}_check_command"};
+        $this->renderInline = Url::fromRequest()->getParam('format') === 'pdf';
         $this->obscuredCheckCommand = $monitoredObject->{
             "_{$this->monitoredObjectType}_" . Graphs::getObscuredCheckCommandCustomVar()
         };
@@ -246,17 +255,6 @@ abstract class Graphs extends AbstractWidget
 
                         foreach ($charts as $chart) {
                             $metricVariables = $chart->getMetricVariables();
-                            $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
-                                ->setParam($urlParam, $templateName)
-                                ->setParam('start', $this->start)
-                                ->setParam('end', $this->end)
-                                ->setParam('width', $this->width)
-                                ->setParam('height', $this->height)
-                                ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
-                            if (! $this->compact) {
-                                $imageUrl->setParam('legend', 1);
-                            }
-
                             $bestIntersect = -1;
                             $bestPos = count($result);
 
@@ -270,15 +268,29 @@ abstract class Graphs extends AbstractWidget
                             }
                             unset($graph);
 
-                            $currentGraphs[] = [
-                                '<img id="graphiteImg-'
-                                . md5((string) $imageUrl->without('cachebuster'))
-                                . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
-                                . " width=\"$this->width\" height=\"$this->height\""
-                                . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">",
-                                $metricVariables,
-                                $bestPos
-                            ];
+                            if ($this->renderInline) {
+                                $img = new InlineGraphImage($chart);
+                            } else {
+                                $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
+                                    ->setParam($urlParam, $templateName)
+                                    ->setParam('start', $this->start)
+                                    ->setParam('end', $this->end)
+                                    ->setParam('width', $this->width)
+                                    ->setParam('height', $this->height)
+                                    ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
+
+                                if (! $this->compact) {
+                                    $imageUrl->setParam('legend', 1);
+                                }
+
+                                $img = '<img id="graphiteImg-'
+                                    . md5((string) $imageUrl->without('cachebuster'))
+                                    . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
+                                    . " width=\"$this->width\" height=\"$this->height\""
+                                    . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">";
+                            }
+
+                            $currentGraphs[] = [$img, $metricVariables, $bestPos];
                         }
 
                         foreach (array_reverse($currentGraphs) as $graph) {
@@ -353,6 +365,15 @@ abstract class Graphs extends AbstractWidget
 
             array_unshift($result, '<div class="' . implode(' ', $classes) . '">');
             $result[] = '</div>';
+        }
+
+        if ($this->renderInline) {
+            foreach ($result as $html) {
+                if ($html instanceof InlineGraphImage) {
+                    // Errors should occur now or not at all
+                    $html->render();
+                }
+            }
         }
 
         return implode($result);
@@ -600,6 +621,30 @@ abstract class Graphs extends AbstractWidget
     public function setPreloadDummy($preloadDummy = true)
     {
         $this->preloadDummy = $preloadDummy;
+
+        return $this;
+    }
+
+    /**
+     * Get whether to render the graphs inline
+     *
+     * @return bool
+     */
+    public function getRenderInline()
+    {
+        return $this->renderInline;
+    }
+
+    /**
+     * Set whether to render the graphs inline
+     *
+     * @param bool $renderInline
+     *
+     * @return $this
+     */
+    public function setRenderInline($renderInline = true)
+    {
+        $this->renderInline = $renderInline;
 
         return $this;
     }
