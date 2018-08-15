@@ -58,3 +58,8 @@ apply Service "by_ssh-disk" {
   assign where host.name == NodeName
 }
 ```
+
+## Further reading
+
+* [Templates](04-Templates.md)
+* [Troubleshooting](05-Troubleshooting.md)
