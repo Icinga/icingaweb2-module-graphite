@@ -98,7 +98,7 @@ class GraphImage extends AbstractWidget
 
             for (;;) {
                 try {
-                    $this->rendered = $graphiteWebClient->request($url, 'POST', $headers);
+                    $this->rendered = $graphiteWebClient->request($url, 'GET', $headers);
                 } catch (RuntimeException $e) {
                     if (preg_match('/\b500\b/', $e->getMessage())) {
                         // A 500 Internal Server Error, probably because of
