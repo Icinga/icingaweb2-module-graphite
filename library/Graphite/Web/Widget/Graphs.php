@@ -7,6 +7,7 @@ use Icinga\Application\Icinga;
 use Icinga\Authentication\Auth;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
+use Icinga\Module\Graphite\Graphing\Chart;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Graphing\Template;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
@@ -254,6 +255,8 @@ abstract class Graphs extends AbstractWidget
                         $currentGraphs = [];
 
                         foreach ($charts as $chart) {
+                            /** @var Chart $chart */
+
                             $metricVariables = $chart->getMetricVariables();
                             $bestIntersect = -1;
                             $bestPos = count($result);
@@ -269,6 +272,12 @@ abstract class Graphs extends AbstractWidget
                             unset($graph);
 
                             if ($this->renderInline) {
+                                $chart->setFrom($this->start)
+                                    ->setUntil($this->end)
+                                    ->setWidth($this->width)
+                                    ->setHeight($this->height)
+                                    ->setShowLegend(! $this->compact);
+
                                 $img = new InlineGraphImage($chart);
                             } else {
                                 $imageUrl = $this->filterImageUrl($imageBaseUrl->with($metricVariables))
