@@ -32,8 +32,19 @@ value or similar.
 
 Just extract/clone this module to a `graphite` subfolder in your Icinga Web 2
 module path and enable it in the frontend.
+
+
+
+    ICINGAWEB_MODULEPATH="/usr/share/icingaweb2/modules"
+    REPO_URL="https://github.com/Icinga/icingaweb2-module-graphite"
+    TARGET_DIR="${ICINGAWEB_MODULEPATH}/graphite"
+    git clone "${REPO_URL}" "${TARGET_DIR}"
+
+
+ Enable
 (*Configuration* > *Modules* > *graphite* > *enable*)
 
+    
 > **Note:**
 >
 > It is best practice to install 3rd party modules into a distinct module
