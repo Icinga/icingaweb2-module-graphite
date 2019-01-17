@@ -15,12 +15,19 @@ ADD .docker/apt-ext.list /etc/apt/sources.list.d/ext.list
 RUN apt-get update ;\
 	DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --no-install-suggests -y \
 	icinga2-{bin,ido-mysql} dbconfig-no-thanks mariadb-server \
-	apache2 icingaweb2{,-module-monitoring} php7.0-{intl,imagick,mysql} locales ;\
+	apache2 icingaweb2{,-module-monitoring} php7.0-{intl,imagick,mysql} locales \
+	gcc libapache2-mod-wsgi libcairo2 libffi-dev python{,-dev} virtualenv ;\
 	apt-get clean ;\
 	rm -vrf /var/lib/apt/lists/* /etc/icinga2/conf.d/* /etc/icingaweb2/* ;\
 	a2dissite 000-default ;\
 	perl -pi -e 's~//~~ if /const NodeName/' /etc/icinga2/constants.conf ;\
 	perl -pi -e 'if (!%locales) { %locales = (); for my $d ("", "/modules/monitoring") { for my $f (glob "/usr/share/icingaweb2${d}/application/locale/*_*") { if ($f =~ m~/(\w+)$~) { $locales{$1} = undef } } } } s/^# ?// if (/ UTF-8$/ && /^# (\w+)/ && exists $locales{$1})' /etc/locale.gen
+
+RUN adduser --system --group --home /opt/graphite/home graphite ;\
+	chown graphite:graphite /opt/graphite ;\
+	su -ls /bin/bash -c 'set -exo pipefail; /usr/bin/virtualenv /opt/graphite; . /opt/graphite/bin/activate; export PYTHONPATH=/opt/graphite/lib/:/opt/graphite/webapp/; /opt/graphite/bin/pip install --no-binary=:all: https://github.com/graphite-project/whisper/tarball/87ae6def1bece7e079d49a61ac8d09c6ebfe4e96; /opt/graphite/bin/pip install --no-binary=:all: https://github.com/graphite-project/carbon/tarball/f36da0f77aaf83a61f9880dec7abbf5c14a7d2bb; /opt/graphite/bin/pip install --no-binary=:all: https://github.com/graphite-project/graphite-web/tarball/53d96432b6ba1c30797405dff97ba01af009cb25; for f in /opt/graphite/conf/*.example; do ln -vs "$f" "/opt/graphite/conf/$(basename "$f" .example)"; done; /opt/graphite/bin/django-admin migrate --settings=graphite.settings' graphite
+
+COPY --from=grandmaster/nosu:latest /usr/local/bin/nosu /usr/local/bin/nosu
 
 RUN set -a; . /etc/default/icinga2; set +a ;\
 	/usr/lib/icinga2/prepare-dirs /etc/default/icinga2
@@ -37,7 +44,7 @@ RUN mysqld -u mysql & \
 COPY .docker/icinga2-ido.conf /etc/icinga2/features-available/ido-mysql.conf
 
 RUN set -a; . /etc/default/icinga2; set +a ;\
-	for f in command ido-mysql; do icinga2 feature enable $f; done
+	for f in command graphite ido-mysql; do icinga2 feature enable $f; done
 
 COPY .docker/php-icingaweb2.ini /etc/php/7.0/apache2/conf.d/99-icingaweb2.ini
 ADD --chown=www-data:icingaweb2 .docker/icingaweb2 /etc/icingaweb2
