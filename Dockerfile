@@ -23,7 +23,7 @@ ADD .docker/apt-ext.list /etc/apt/sources.list.d/ext.list
 RUN apt-get update ;\
 	DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --no-install-suggests -y \
 	icinga2-{bin,ido-mysql} dbconfig-no-thanks mariadb-server \
-	apache2 icingaweb2{,-module-monitoring} php7.0-{intl,imagick,mysql,curl} locales \
+	apache2 icingaweb2{,-module-monitoring} icingacli php7.0-{intl,imagick,mysql,curl} locales \
 	gcc libapache2-mod-wsgi libcairo2 libffi-dev python{,-dev} virtualenv ;\
 	apt-get clean ;\
 	rm -vrf /var/lib/apt/lists/* /etc/icinga2/conf.d/* /etc/icingaweb2/* ;\
@@ -66,6 +66,8 @@ RUN install -o www-data -g icingaweb2 -m 02770 -d /etc/icingaweb2/enabledModules
 
 COPY .docker/apache2-site.conf /etc/apache2/sites-available/icingaweb2.conf
 RUN a2enmod proxy; a2enmod proxy_http; a2ensite icingaweb2
+
+RUN icingacli graphite icinga2 config >/etc/icinga2/conf.d/graphite.conf
 
 COPY --from=ochinchina/supervisord:latest /usr/local/bin/supervisord /usr/local/bin/supervisord
 COPY .docker/supervisord.conf /etc/
