@@ -169,7 +169,7 @@
     function updateGraphSizes() {
         $("div.images.monitored-object-detail-view img.graphiteImg").each(function() {
             var e = $(this);
-            var src = e.attr("src");
+            var src = e.attr("data-actualimageurl");
 
             if (typeof(src) !== "undefined") {
                 var matchParams = extractUrlParams.exec(src);
@@ -196,7 +196,10 @@
                                 renderedUrlParams.push(urlParam + "=" + urlParams[urlParam]);
                             }
 
-                            e.attr("src", matchParams[1].replace("-dummy", "") + "?" + renderedUrlParams.join("&"));
+                            src = matchParams[1] + "?" + renderedUrlParams.join("&");
+
+                            e.attr("data-actualimageurl", src);
+                            e.attr("src", src);
                         }
                     }
                 }

@@ -23,11 +23,6 @@ class Service extends Graphs
         return Url::fromPath('graphite/graph/service');
     }
 
-    protected function getDummyImageBaseUrl()
-    {
-        return Url::fromPath('graphite/graph-dummy/service');
-    }
-
     protected function getGraphsListBaseUrl()
     {
         return Url::fromPath(
