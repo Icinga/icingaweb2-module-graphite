@@ -29,7 +29,8 @@ RUN apt-get update ;\
 	rm -vrf /var/lib/apt/lists/* /etc/icinga2/conf.d/* /etc/icingaweb2/* ;\
 	a2dissite 000-default ;\
 	perl -pi -e 's~//~~ if /const NodeName/' /etc/icinga2/constants.conf ;\
-	perl -pi -e 'if (!%locales) { %locales = (); for my $d ("", "/modules/monitoring") { for my $f (glob "/usr/share/icingaweb2${d}/application/locale/*_*") { if ($f =~ m~/(\w+)$~) { $locales{$1} = undef } } } } s/^# ?// if (/ UTF-8$/ && /^# (\w+)/ && exists $locales{$1})' /etc/locale.gen
+	perl -pi -e 'if (!%locales) { %locales = (); for my $d ("", "/modules/monitoring") { for my $f (glob "/usr/share/icingaweb2${d}/application/locale/*_*") { if ($f =~ m~/(\w+)$~) { $locales{$1} = undef } } } } s/^# ?// if (/ UTF-8$/ && /^# (\w+)/ && exists $locales{$1})' /etc/locale.gen ;\
+	perl -e 'print "object GraphiteWriter \"graphite\" {\n  enable_send_thresholds = true\n  enable_send_metadata = true\n}\n"' > /etc/icinga2/features-available/graphite.conf
 
 RUN adduser --system --group --home /opt/graphite/home graphite ;\
 	chown graphite:graphite /opt/graphite ;\
