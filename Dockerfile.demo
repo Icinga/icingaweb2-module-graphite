@@ -68,8 +68,8 @@ RUN install -o www-data -g icingaweb2 -m 02770 -d /etc/icingaweb2/enabledModules
 COPY .docker/apache2-site.conf /etc/apache2/sites-available/icingaweb2.conf
 RUN a2enmod proxy; a2enmod proxy_http; a2ensite icingaweb2
 
-RUN icingacli graphite icinga2 config >/etc/icinga2/conf.d/graphite.conf
-
 COPY --from=ochinchina/supervisord:latest /usr/local/bin/supervisord /usr/local/bin/supervisord
 COPY .docker/supervisord.conf /etc/
-CMD ["/usr/local/bin/supervisord", "-c", "/etc/supervisord.conf"]
+
+CMD icingacli graphite icinga2 config >/etc/icinga2/conf.d/graphite.conf ;\
+	exec supervisord -c /etc/supervisord.conf

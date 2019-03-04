@@ -27,6 +27,9 @@ Use the container for development without re-building:
 docker run -itp 8080:80 -v "$(pwd):/usr/share/icingaweb2/modules/graphite" icingaweb2-module-graphite-demo
 ```
 
+Code changes are visible immediately, but graph template changes
+require a container restart.
+
 Preserve graphs:
 
 ```bash
