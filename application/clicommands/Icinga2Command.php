@@ -3,7 +3,6 @@
 
 namespace Icinga\Module\Graphite\Clicommands;
 
-use DateTime;
 use Icinga\Cli\Command;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Graphing\Template;
@@ -26,7 +25,7 @@ class Icinga2Command extends Command
      */
     public function configAction()
     {
-        $icinga2CfgObjPrefix = 'IW2_graphite_simulator_' . (new DateTime())->format('YmdHis');
+        $icinga2CfgObjPrefix = 'IW2_graphite_demo';
         $obscuredCheckCommandCustomVar = Graphs::getObscuredCheckCommandCustomVar();
 
         $result = [
