@@ -212,7 +212,7 @@ abstract class Graphs extends AbstractWidget
     protected function getGraphsList()
     {
         $result = []; // kind of string builder
-        $imageBaseUrl = $this->preloadDummy ? $this->getDummyImageBaseUrl() : $this->getImageBaseUrl();
+        $imageBaseUrl = $this->getImageBaseUrl();
         $allTemplates = $this->getAllTemplates();
         $actualCheckCommand = $this->obscuredCheckCommand === null ? $this->checkCommand : $this->obscuredCheckCommand;
         $concreteTemplates = $allTemplates->getTemplates($actualCheckCommand);
@@ -292,9 +292,17 @@ abstract class Graphs extends AbstractWidget
                                     $imageUrl->setParam('legend', 1);
                                 }
 
+                                if ($this->preloadDummy) {
+                                    $src = 'data:image/png;base64,' // 1x1 dummy
+                                        . 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRS'
+                                        . 'TlMAQObYZgAAAApJREFUeAFjZAAAAAQAAhq+CAMAAAAASUVORK5CYII=';
+                                } else {
+                                    $src = $imageUrl;
+                                }
+
                                 $img = '<img id="graphiteImg-'
                                     . md5((string) $imageUrl->without('cachebuster'))
-                                    . "\" src=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
+                                    . "\" src=\"$src\" data-actualimageurl=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
                                     . " width=\"$this->width\" height=\"$this->height\""
                                     . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">";
                             }
@@ -459,13 +467,6 @@ abstract class Graphs extends AbstractWidget
      * @return Url
      */
     abstract protected function getImageBaseUrl();
-
-    /**
-     * Get the base URL to a dummy image specifying just the monitored object kind
-     *
-     * @return Url
-     */
-    abstract protected function getDummyImageBaseUrl();
 
     /**
      * Get the base URL to the monitored object's graphs list
