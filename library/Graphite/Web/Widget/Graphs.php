@@ -106,13 +106,6 @@ abstract class Graphs extends AbstractWidget
     protected $classes = [];
 
     /**
-     * The amount of graphs to show
-     *
-     * @var int
-     */
-    protected $maxVisibleGraphs;
-
-    /**
      * Whether to serve a transparent dummy image first and let the JS code load the actual graph
      *
      * @var bool
@@ -332,7 +325,7 @@ abstract class Graphs extends AbstractWidget
             unset($graph);
 
             $currentUrl = Icinga::app()->getRequest()->getUrl();
-            $limit = (int) $currentUrl->getParam('graphs_limit', 50);
+            $limit = (int) $currentUrl->getParam('graphs_limit', 2);
             $total = count($result);
 
             if ($limit < 1) {
@@ -356,25 +349,6 @@ abstract class Graphs extends AbstractWidget
                         ['class' => 'action-link']
                     )}</p>";
                 }
-            }
-
-            if ($this->maxVisibleGraphs && count($result) > $this->maxVisibleGraphs) {
-                /** @var View $view */
-                $view = $this->view();
-
-                array_splice($result, $this->maxVisibleGraphs, 0, [sprintf(
-                    '<input type="checkbox" id="toggle-%1$s" class="expandable-toggle">'
-                        . '<label for="toggle-%1$s" class="link-button">'
-                        . '<span class="expandable-expand-label">%2$s</span>'
-                        . '<span class="expandable-collapse-label">%3$s</span>'
-                        . '</label>'
-                        . '<div class="expandable-content">',
-                    $view->protectId($this->getMonitoredObjectIdentifier()),
-                    $view->translate('Show More'),
-                    $view->translate('Show Less')
-                )]);
-
-                $result[] = '</div>';
             }
 
             $classes = $this->classes;
@@ -585,29 +559,6 @@ abstract class Graphs extends AbstractWidget
     {
         $this->classes = $classes;
 
-        return $this;
-    }
-
-    /**
-     * Get the amount of graphs to show
-     *
-     * @return  int
-     */
-    public function getMaxVisbileGraphs()
-    {
-        return $this->maxVisibleGraphs;
-    }
-
-    /**
-     * Set the amount of graphs to show
-     *
-     * @param   int     $count
-     *
-     * @return  $this
-     */
-    public function setMaxVisibleGraphs($count)
-    {
-        $this->maxVisibleGraphs = (int) $count;
         return $this;
     }
 
