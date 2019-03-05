@@ -18,3 +18,4 @@ the monitoring module.
 * [Installation](doc/02-Installation.md)
 * [Configuration](doc/03-Configuration.md)
 * [Templates](doc/04-Templates.md)
+* [Demonstration](doc/06-Demonstration.md)
