@@ -23,7 +23,6 @@ class DetailviewExtension extends DetailviewExtensionHook
             ->setWidth(440)
             ->setHeight(220)
             ->setClasses(['monitored-object-detail-view'])
-            ->setMaxVisibleGraphs(2)
             ->setPreloadDummy()
             ->setShowNoGraphsFound(false)
             ->handleRequest();
