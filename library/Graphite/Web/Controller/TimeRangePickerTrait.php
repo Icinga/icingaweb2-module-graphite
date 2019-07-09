@@ -55,7 +55,7 @@ trait TimeRangePickerTrait
                 'class' => 'button-link flyover-toggle',
                 'icon'  => 'calendar'
             ])
-            . $this->getTimeRangePickerCustomForm()->setAttrib('class', 'flyover-content')
+            . '<div class="flyover-content">' . $this->getTimeRangePickerCustomForm() . '</div>'
             . '</div>'
             . '</div>';
     }
