@@ -186,6 +186,6 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
      */
     protected function escapeMetricStep($step)
     {
-        return preg_replace('/[^a-zA-Z0-9\*\-:^[\]$%\']/', '_', $step);
+        return preg_replace('/[^a-zA-Z0-9\*\-:^[\]$#%\']/', '_', $step);
     }
 }
