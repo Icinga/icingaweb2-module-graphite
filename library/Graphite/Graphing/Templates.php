@@ -199,17 +199,6 @@ class Templates
                             );
                         }
 
-                        if ($curves[$curve][1]->getMacros() !== ['metric']) {
-                            throw new ConfigurationError(
-                                'Bad function "%s" for curve "%s" of template "%s" in file "%s":'
-                                . ' function definitions of templates must include the macro $metric$ and no other ones',
-                                $template['functions'][$curve],
-                                $curve,
-                                $templateName,
-                                $path
-                            );
-                        }
-
                         unset($template['functions'][$curve]);
                     } else {
                         $curves[$curve][1] = new MacroTemplate('$metric$');

@@ -84,10 +84,26 @@ class GraphImage extends AbstractWidget
                 $params->set($key, $value->resolve($variables));
             }
 
-            foreach ($this->chart->getMetrics() as $curveName => $metric) {
-                $params->add('target', $template->getCurves()[$curveName][1]->resolve([
-                    'metric' => $graphiteWebClient->escapeMetricPath($metric)
-                ]));
+            $metrics = $this->chart->getMetrics();
+
+            foreach ($metrics as &$metric) {
+                $metric = $graphiteWebClient->escapeMetricPath($metric);
+            }
+            unset($metric);
+
+            $allVars = [];
+
+            foreach ($template->getCurves() as $curveName => $curve) {
+                $vars = $curve[0]->reverseResolve($metrics[$curveName]);
+
+                if ($vars !== false) {
+                    $allVars = array_merge($allVars, $vars);
+                }
+            }
+
+            foreach ($metrics as $curveName => $metric) {
+                $allVars['metric'] = $metric;
+                $params->add('target', $template->getCurves()[$curveName][1]->resolve($allVars));
             }
 
             $url = Url::fromPath('/render')->setParams($params);

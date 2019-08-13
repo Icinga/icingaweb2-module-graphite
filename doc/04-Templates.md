@@ -125,6 +125,10 @@ The metric in question can be referenced in the function call using the macro
 
     alias(color(scale($metric$, 1000), '#1a7dd7'), 'Round trip time (ms)')
 
+In addition you may utilize all other macros here as well:
+
+    alias(color(scale(divideSeries($metric$, $service_name_template$.perfdata.$disk$.max), 100), '#1a7dd7'), 'Used (%)')
+
 ## Template Example <a id="templates-example"></a>
 
 The configuration examples used in this document are borrowed from the template
