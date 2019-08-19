@@ -45,7 +45,7 @@ trait TimeRangePickerTrait
     {
         $url = Url::fromRequest()->getAbsoluteUrl();
 
-        return '<div>'
+        return '<div class="timerangepicker-container">'
             . $this->getTimeRangePickerCommonForm()
             . '<div class="flyover flyover-arrow-top" id="'
             . $view->protectId('graphite-customrange')
