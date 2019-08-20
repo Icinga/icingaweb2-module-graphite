@@ -37,6 +37,7 @@ class CommonForm extends Form
     {
         $this->setName('form_timerangepickercommon_graphite');
         $this->setAttrib('data-base-target', '_self');
+        $this->setAttrib('class', 'icinga-form icinga-controls inline');
     }
 
     public function createElements(array $formData)
@@ -126,16 +127,13 @@ class CommonForm extends Form
             'label'         => $label,
             'description'   => $description,
             'multiOptions'  => $multiOptions,
+            'title'         => $description,
             'autosubmit'    => true
         ]);
 
         $decorators = $element->getDecorators();
         $element->setDecorators([
-            'Zend_Form_Decorator_ViewHelper'    => $decorators['Zend_Form_Decorator_ViewHelper'],
-            'Zend_Form_Decorator_HtmlTag'       => new Zend_Form_Decorator_HtmlTag([
-                'tag'   => 'span',
-                'title' => $description
-            ])
+            'Zend_Form_Decorator_ViewHelper'    => $decorators['Zend_Form_Decorator_ViewHelper']
         ]);
 
         return $element;
