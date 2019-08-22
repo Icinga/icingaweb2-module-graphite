@@ -62,8 +62,11 @@ ul.legend {
 
   .button-link {
     line-height: 1.75;
+    width: 2.25em;
 
     i {
+      display: inline-block;
+      width: 100%;
       text-align: center;
     }
 
@@ -74,19 +77,36 @@ ul.legend {
 }
 
 form[name=form_timerangepickercommon_graphite] {
-  display: inline;
+  display: inline-flex;
+  flex: 1 1 auto;
+  width: 0;
+  max-width: 43.25em;
+
+  &:not(:last-child) {
+    margin-right: .25em;
+  }
 
   select {
-    width: 7.5em;
-    margin-right: 0.25em;
+    min-width: 3.5em;
+    max-width: 7em;
+    flex: 1 1 auto;
+    width: auto;
+
+    &:not(:last-of-type) {
+      margin-right: .25em;
+    }
   }
 }
 
 form[name=form_timerangepickercustom_graphite] {
-  min-width: 17em;
+  min-width: 21em;
+
+  .control-label-group {
+    text-align: left;
+  }
 
   input[type=date] {
-    min-width: 8em;
+    min-width: 11em;
   }
 
   input[type=time] {
@@ -96,7 +116,6 @@ form[name=form_timerangepickercustom_graphite] {
 
 .flyover[id^="graphite-customrange-"] {
   display: inline-block;
-  margin-left: 0.5em;
 }
 
 .grid-item {
