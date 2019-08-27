@@ -24,6 +24,7 @@ if (! $compact): ?>
 <div class="content">
 <?php
 if (! empty($hosts)) {
+    echo '<div class="grid">';
     foreach ($hosts as $host) {
         $hostGraphs = (string) (new Host($host))->handleRequest();
 
@@ -57,6 +58,7 @@ if (! empty($hosts)) {
             )
             . '</div>';
     }
+    echo '</div>';
 } else {
     echo '<p>' . $this->escape(mt('monitoring', 'No hosts found matching the filter.')) . '</p>';
 }
