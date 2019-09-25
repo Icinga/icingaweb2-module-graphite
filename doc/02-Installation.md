@@ -31,7 +31,16 @@ value or similar.
 ## Setup the Graphite Module
 
 Just extract/clone [this module](https://github.com/Icinga/icingaweb2-module-graphite) to a `graphite` subfolder in your Icinga Web 2
-module path and enable it in the frontend.
+module path (for example like running this command in your module path to install the latest release of the graphite module):
+
+    # mkdir graphite && cd graphite && \
+	curl -L $(curl -s https://api.github.com/repos/Icinga/icingaweb2-module-graphite/releases/latest | jq -r ".tarball_url") | tar xz --strip=1
+
+> **Note:**
+>
+> This requires the binaries `curl`, `jq` and `tar`.
+
+Enable the graphite module in the frontend.
 (*Configuration* > *Modules* > *graphite* > *enable*)
 
 > **Note:**
