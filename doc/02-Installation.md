@@ -30,7 +30,7 @@ value or similar.
 
 ## Setup the Graphite Module
 
-Just extract/clone this module to a `graphite` subfolder in your Icinga Web 2
+Just extract/clone [this module](https://github.com/Icinga/icingaweb2-module-graphite) to a `graphite` subfolder in your Icinga Web 2
 module path and enable it in the frontend.
 (*Configuration* > *Modules* > *graphite* > *enable*)
 
