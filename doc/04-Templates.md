@@ -43,7 +43,7 @@ of the following configuration topics:
 ### Template Structure: graph <a id="templates-structure-graph"></a>
 
 Supports a single option called `check_command` and should be set to the name
-of a Icinga 2 [check-command](https://www.icinga.com/docs/icinga2/latest/doc/03-monitoring-basics/#check-commands).  
+of a Icinga 2 [check-command](https://www.icinga.com/docs/icinga2/latest/doc/03-monitoring-basics/#check-commands).
 To get multiple graphs for hosts and services with this check-command, multiple
 templates can reference the same check-command.
 
@@ -57,7 +57,7 @@ check_command = "ping, ping4, ping6"
 
 ### Template Structure: metric_filters <a id="templates-structure-metric-filters"></a>
 
-Define what metric to use and how many curves to display in the resulting graph.  
+Define what metric to use and how many curves to display in the resulting graph.
 Each option's key represents the name of a curve. Its value the path to the
 metric in Icinga 2's [graphite naming schema](https://www.icinga.com/docs/icinga2/latest/doc/14-features/#current-graphite-schema).
 If no metrics are given, no graphs are rendered.
@@ -203,3 +203,6 @@ parameters to the render API.
 > [this community topic](https://community.icinga.com/t/how-to-adjust-the-graphite-background-color/3172/3).
 
 
+## Further reading
+
+* [Troubleshooting](06-Troubleshooting.md)

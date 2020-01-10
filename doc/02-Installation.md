@@ -82,3 +82,10 @@ Enable the `graphite` module either on the CLI by running
 
 Or go to your Icinga Web 2 frontend, choose `Configuration / Modules`,
 select the `graphite` module and choose `State: enable`.
+
+
+## Further reading
+
+* [Configuration](03-Configuration.md)
+* [Templates](04-Templates.md)
+* [Troubleshooting](05-Troubleshooting.md)
