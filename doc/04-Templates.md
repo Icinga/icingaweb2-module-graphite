@@ -1,10 +1,19 @@
-# <a id="Templates"></a>Templates
+# Templates <a id="templates"></a>
 
 A template defines what kind of data a graph visualizes, which kind of graph to
 use and its style. Essentially this module is using templates to tell Graphite
 how to render which graphs.
 
-## Template Location
+* [Location](04-Templates.md#templates-location)
+* [Structure](04-Templates.md#templates-structure)
+    * [graph](04-Templates.md#templates-structure-graph)
+    * [metric_filters](04-Templates.md#templates-structure-metric-filters)
+    * [urlparams](04-Templates.md#templates-structure-urlparams)
+    * [functions](04-Templates.md#templates-structure-functions)
+* [Example](04-Templates.md#templates-example)
+* [Default Template Settings](04-Templates.md#templates-default-settings)
+
+## Template Location <a id="templates-location"></a>
 
 There are a bunch of templates already shipped with this module, located in
 its installation path. (e.g. `/usr/share/icingaweb2/modules/graphite`)
@@ -19,7 +28,7 @@ templates of its parent folders.
 >
 > Hidden files and directories (with a leading dot) are ignored by this module.
 
-## Template Structure
+## Template Structure <a id="templates-structure"></a>
 
 Templates are organized within simple INI files. However, it is perfectly valid
 to define multiple templates in a single file.
@@ -31,7 +40,7 @@ The name of a section consists of two parts separated by a dot:
 The first part is the name of the template and the second part the name of one
 of the following configuration topics:
 
-**graph**
+### Template Structure: graph <a id="templates-structure-graph"></a>
 
 Supports a single option called `check_command` and should be set to the name
 of a Icinga 2 [check-command](https://www.icinga.com/docs/icinga2/latest/doc/03-monitoring-basics/#check-commands).  
@@ -46,7 +55,7 @@ perfdata, all of them may be specified separated by comma. E.g.:
 check_command = "ping, ping4, ping6"
 ```
 
-**metrics_filters**
+### Template Structure: metric_filters <a id="templates-structure-metric-filters"></a>
 
 Define what metric to use and how many curves to display in the resulting graph.  
 Each option's key represents the name of a curve. Its value the path to the
@@ -79,7 +88,7 @@ macro in place for the actual perfdata-label:
 > The name of the macro for the perfdata-label is also arbitrary. You may as
 > well use a more descriptive name such as `$disk$` for the disk check.
 
-**urlparams**
+### Template Structure: urlparams <a id="templates-structure-urlparams"></a>
 
 Allows to define additional URL parameters to be passed to Graphite's render
 API.
@@ -103,7 +112,7 @@ These may be overridden in the template itself:
 
     yUnitSystem = "binary"
 
-**functions**
+### Template Structure: functions <a id="templates-structure-functions"></a>
 
 Allows to define Graphite functions which are applied to the metric of a
 specific curve on the graph.
@@ -116,7 +125,7 @@ The metric in question can be referenced in the function call using the macro
 
     alias(color(scale($metric$, 1000), '#1a7dd7'), 'Round trip time (ms)')
 
-## Template Example
+## Template Example <a id="templates-example"></a>
 
 The configuration examples used in this document are borrowed from the template
 for the `hostalive` check-command:
@@ -153,3 +162,44 @@ yUnitSystem = "none"
 [hostalive-pl.functions]
 pl.value = "alias(color($metric$, '#1a7dd7'), 'Packet loss (%)')"
 ```
+
+## Default Template Settings <a id="templates-default-settings"></a>
+
+Next to maintaining templates for specific commands, you can
+specify the default template settings in the [default.ini](https://github.com/Icinga/icingaweb2-module-graphite/blob/master/templates/default.ini)
+configuration file.
+
+The following example adjusts the background and foreground colors
+to setup the "dark mode" for graphs.
+
+First, copy the package provided configuration into the configuration
+path. Then add the `bgcolor` and `fgcolor` settings into the [urlparams](04-Templates.md#templates-structure-urlparams)
+sections for `default-host` and `default-service`.
+
+```
+cp /usr/share/icingaweb2/modules/graphite/templates/default.ini /etc/icingaweb2/modules/graphite/templates/default.ini
+
+vim /etc/icingaweb2/modules/graphite/templates/default.ini
+
+[default-host.urlparams]
+
+bgcolor = "black"
+fgcolor = "white"
+
+[default-service.urlparams]
+
+bgcolor = "black"
+fgcolor = "white"
+```
+
+The settings make use the `urlparams` section which adds the
+parameters to the render API.
+
+
+> **Note**
+>
+> Instead of modifying the color settings in the default template,
+> you can also change the Graphite configuration explained in
+> [this community topic](https://community.icinga.com/t/how-to-adjust-the-graphite-background-color/3172/3).
+
+
