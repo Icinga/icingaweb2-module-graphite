@@ -4,7 +4,7 @@
 
 Open up the Icinga Web 2 frontend and navigate to:
 
-    Configuration > Modules > graphite > Backend
+`Configuration > Modules > graphite > Backend`
 
 Enter the Graphite Web URL. (e.g. `https://192.0.2.42:8003/`)
 
@@ -15,7 +15,7 @@ if your Graphite Web is protected by such a mechanism.
 
 Open up the Icinga Web 2 frontend and navigate to:
 
-    Configuration > Modules > graphite > Advanced
+`Configuration > Modules > graphite > Advanced`
 
 ### UI
 
