@@ -82,7 +82,6 @@
                     $img.clone()
                         .addClass('graphiteClone')
                         .attr('id', $img.attr('id') + '_clone')
-                        .load(self.imageLoaded)
                         // .data('
                         .attr(
                             'src',
@@ -92,10 +91,6 @@
                 )
               );
             });
-        },
-
-        imageLoaded: function (event) {
-            // console.log('LOADED', event);
         }
     };
 
