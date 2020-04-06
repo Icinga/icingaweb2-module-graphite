@@ -1,1 +1,1 @@
-deb https://packages.icinga.com/debian icinga-stretch main
+deb https://packages.icinga.com/debian icinga-buster main

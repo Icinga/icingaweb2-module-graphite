@@ -1,4 +1,4 @@
-FROM debian:9 as icingaweb2-module-graphite
+FROM debian:10 as icingaweb2-module-graphite
 SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
 
 ADD . /icingaweb2-module-graphite
@@ -6,7 +6,7 @@ ADD . /icingaweb2-module-graphite
 RUN rm -rf /icingaweb2-module-graphite/.* || true
 
 
-FROM debian:9
+FROM debian:10
 SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
 
 RUN apt-get update ;\
@@ -23,7 +23,7 @@ ADD .docker/apt-ext.list /etc/apt/sources.list.d/ext.list
 RUN apt-get update ;\
 	DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --no-install-suggests -y \
 	icinga2-{bin,ido-mysql} dbconfig-no-thanks mariadb-server \
-	apache2 icingaweb2{,-module-monitoring} icingacli php7.0-{intl,imagick,mysql,curl} locales \
+	apache2 icingaweb2{,-module-monitoring} icingacli php7.3-{intl,imagick,mysql,curl} locales \
 	gcc libapache2-mod-wsgi libcairo2 libffi-dev python{,-dev} virtualenv ;\
 	apt-get clean ;\
 	rm -vrf /var/lib/apt/lists/* /etc/icinga2/conf.d/* /etc/icingaweb2/* ;\
@@ -57,7 +57,7 @@ COPY .docker/icinga2-ido.conf /etc/icinga2/features-available/ido-mysql.conf
 RUN set -a; . /etc/default/icinga2; set +a ;\
 	for f in command graphite ido-mysql; do icinga2 feature enable $f; done
 
-COPY .docker/php-icingaweb2.ini /etc/php/7.0/apache2/conf.d/99-icingaweb2.ini
+COPY .docker/php-icingaweb2.ini /etc/php/7.3/apache2/conf.d/99-icingaweb2.ini
 ADD --chown=www-data:icingaweb2 .docker/icingaweb2 /etc/icingaweb2
 
 RUN install -o www-data -g icingaweb2 -m 02770 -d /etc/icingaweb2/enabledModules ;\
