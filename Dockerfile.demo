@@ -23,7 +23,7 @@ ADD .docker/apt-ext.list /etc/apt/sources.list.d/ext.list
 RUN apt-get update ;\
 	DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --no-install-suggests -y \
 	icinga2-{bin,ido-mysql} dbconfig-no-thanks mariadb-server \
-	apache2 icingaweb2{,-module-monitoring} icingacli php7.3-{intl,imagick,mysql,curl} locales \
+	apache2 icingaweb2{,-module-monitoring} icingacli php7.3-{gd,intl,imagick,mbstring,mysql,curl} locales \
 	gcc libapache2-mod-wsgi libcairo2 libffi-dev python{,-dev} virtualenv ;\
 	apt-get clean ;\
 	rm -vrf /var/lib/apt/lists/* /etc/icinga2/conf.d/* /etc/icingaweb2/* ;\
