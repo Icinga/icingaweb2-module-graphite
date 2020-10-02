@@ -94,6 +94,10 @@ class GraphImage extends AbstractWidget
             $allVars = [];
 
             foreach ($template->getCurves() as $curveName => $curve) {
+                if (!isset($metrics[$curveName])) {
+                    continue;
+                }
+
                 $vars = $curve[0]->reverseResolve($metrics[$curveName]);
 
                 if ($vars !== false) {
