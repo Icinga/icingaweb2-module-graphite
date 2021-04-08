@@ -144,7 +144,7 @@ class Templates
                             $templateName,
                             $path,
                             implode(', ', array_map(
-                                function($option) {
+                                function ($option) {
                                     return "\"graph.$option\"";
                                 },
                                 $standalone

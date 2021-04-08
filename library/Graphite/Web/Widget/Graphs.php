@@ -241,7 +241,10 @@ abstract class Graphs extends AbstractWidget
                     IPT::indent();
 
                     $charts = $template->getCharts(
-                        static::getMetricsDataSource(), $this->monitoredObject, [], $excludeMetrics
+                        static::getMetricsDataSource(),
+                        $this->monitoredObject,
+                        [],
+                        $excludeMetrics
                     );
 
                     if (! empty($charts)) {
@@ -295,8 +298,8 @@ abstract class Graphs extends AbstractWidget
 
                                 $img = '<img id="graphiteImg-'
                                     . md5((string) $imageUrl->without('cachebuster'))
-                                    . "\" src=\"$src\" data-actualimageurl=\"$imageUrl\" class=\"detach graphiteImg\" alt=\"\""
-                                    . " width=\"$this->width\" height=\"$this->height\""
+                                    . "\" src=\"$src\" data-actualimageurl=\"$imageUrl\" class=\"detach graphiteImg\""
+                                    . " alt=\"\" width=\"$this->width\" height=\"$this->height\""
                                     . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">";
                             }
 

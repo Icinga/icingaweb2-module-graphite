@@ -35,7 +35,7 @@ class Service extends Graphs
     {
         return $url
             ->setParam('host.name', $this->monitoredObject->getHost()->getName())
-            ->setParam('service.name',  $this->monitoredObject->getName());
+            ->setParam('service.name', $this->monitoredObject->getName());
     }
 
     protected function getMonitoredObjectIdentifier()

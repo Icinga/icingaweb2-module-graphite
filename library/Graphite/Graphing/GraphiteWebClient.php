@@ -92,7 +92,8 @@ class GraphiteWebClient
      *
      * @return  string
      */
-    public function escapeMetricPath($metricPath) {
+    public function escapeMetricPath($metricPath)
+    {
         return preg_replace_callback(
             '/[[\]]/',
             function (array $matches) {
