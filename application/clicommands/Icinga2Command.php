@@ -179,7 +179,7 @@ EOT
      *
      * @return  array[]
      */
-    protected function cartesianProduct(array & $input)
+    protected function cartesianProduct(array &$input)
     {
         $results = [[]];
 

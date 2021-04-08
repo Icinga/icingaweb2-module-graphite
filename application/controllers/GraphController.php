@@ -99,10 +99,10 @@ class GraphController extends MonitoringAwareController
     /**
      * Do all monitored object type independend actions
      *
-     * @param   MonitoredObject     $monitoredObject        The monitored object to render the graphs of
-     * @param   string              $checkCommand           The check command of the monitored object we supply an image for
-     * @param   string|null         $obscuredCheckCommand   The "real" check command (if any) of the monitored object
-     *                                                      we display graphs for
+     * @param MonitoredObject $monitoredObject      The monitored object to render the graphs of
+     * @param string          $checkCommand         The check command of the monitored object we supply an image for
+     * @param string|null     $obscuredCheckCommand The "real" check command (if any) of the monitored object
+     *                                              we display graphs for
      */
     protected function supplyImage(MonitoredObject $monitoredObject, $checkCommand, $obscuredCheckCommand)
     {
@@ -139,6 +139,7 @@ class GraphController extends MonitoringAwareController
                     ->setShowLegend((bool) $this->graphParams['legend'])
                     ->serveImage($this->getResponse());
 
+                // not falling through, serveImage exits
             default:
                 throw new HttpBadRequestException('%s', $this->translate(
                     'Graphite Web yields more than one metric for the given filter.'

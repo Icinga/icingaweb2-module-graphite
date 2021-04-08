@@ -70,8 +70,12 @@ class Template
      *
      * @return  Chart[]
      */
-    public function getCharts(MetricsDataSource $dataSource, MonitoredObject $monitoredObject, array $filter, array & $excludeMetrics = [])
-    {
+    public function getCharts(
+        MetricsDataSource $dataSource,
+        MonitoredObject $monitoredObject,
+        array $filter,
+        array &$excludeMetrics = []
+    ) {
         $metrics = [];
         $metricsUsed = 0;
         $metricsExcluded = 0;
@@ -167,8 +171,12 @@ class Template
      * @param   string[][]      $metricsCombinations
      * @param   string[]        $currentCombination
      */
-    protected function combineMetrics(array & $metrics, array & $possibleCombinations, array & $metricsCombinations, array $currentCombination = [])
-    {
+    protected function combineMetrics(
+        array &$metrics,
+        array &$possibleCombinations,
+        array &$metricsCombinations,
+        array $currentCombination = []
+    ) {
         if (empty($currentCombination)) {
             foreach ($metrics as $curveName => & $curveMetrics) {
                 foreach ($curveMetrics as $metric => & $_) {

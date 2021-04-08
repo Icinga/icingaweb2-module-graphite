@@ -130,7 +130,8 @@ class CustomForm extends Form
         $decorators = [];
         foreach ($elementDecorators as $key => $decorator) {
             if ($key === 'Zend_Form_Decorator_ViewHelper') {
-                $decorators['Zend_Form_Decorator_FormElements'] = $group->getDecorators()['Zend_Form_Decorator_FormElements'];
+                $decorators['Zend_Form_Decorator_FormElements'] =
+                    $group->getDecorators()['Zend_Form_Decorator_FormElements'];
             } else {
                 $decorators[$key] = (new Proxy())->setActualDecorator($decorator->setElement($element));
             }

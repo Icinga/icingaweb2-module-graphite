@@ -1,6 +1,7 @@
 <?php
 
 namespace Icinga\Module\Graphite\Util;
+
 use Icinga\Authentication\Auth;
 use Icinga\Security\SecurityException;
 
