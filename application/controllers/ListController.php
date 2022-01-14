@@ -3,11 +3,9 @@
 namespace Icinga\Module\Graphite\Controllers;
 
 use Icinga\Data\Filter\Filter;
-use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePicker;
-use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePickerFormTrait;
+use Icinga\Module\Graphite\Util\TimeRangePickerTools;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
-use Icinga\Module\Graphite\Web\Widget\Graphs;
 use Icinga\Module\Monitoring\DataView\DataView;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\Service;
@@ -44,7 +42,7 @@ class ListController extends MonitoringAwareController
         $hostsQuery->applyFilter(Filter::expression('host_perfdata', '!=', ''));
 
         $this->view->baseUrl = $baseUrl = Url::fromPath('monitoring/host/show');
-        TimeRangePickerFormTrait::copyAllRangeParameters(
+        TimeRangePickerTools::copyAllRangeParameters(
             $baseUrl->getParams(),
             $this->getRequest()->getUrl()->getParams()
         );
@@ -82,13 +80,13 @@ class ListController extends MonitoringAwareController
         $servicesQuery->applyFilter(Filter::expression('service_perfdata', '!=', ''));
 
         $this->view->hostBaseUrl = $hostBaseUrl = Url::fromPath('monitoring/host/show');
-        TimeRangePickerFormTrait::copyAllRangeParameters(
+        TimeRangePickerTools::copyAllRangeParameters(
             $hostBaseUrl->getParams(),
             $this->getRequest()->getUrl()->getParams()
         );
 
         $this->view->serviceBaseUrl = $serviceBaseUrl = Url::fromPath('monitoring/service/show');
-        TimeRangePickerFormTrait::copyAllRangeParameters(
+        TimeRangePickerTools::copyAllRangeParameters(
             $serviceBaseUrl->getParams(),
             $this->getRequest()->getUrl()->getParams()
         );
@@ -127,7 +125,7 @@ class ListController extends MonitoringAwareController
             null,
             array_merge(
                 ['format', 'stateType', 'addColumns', 'problems', 'graphs_limit'],
-                TimeRangePicker::getAllRangeParameters()
+                TimeRangePickerTools::getAllRangeParameters()
             )
         );
         $this->handleFormatRequest($dataView);

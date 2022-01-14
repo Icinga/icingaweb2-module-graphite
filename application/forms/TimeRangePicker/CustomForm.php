@@ -5,13 +5,12 @@ namespace Icinga\Module\Graphite\Forms\TimeRangePicker;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
+use Icinga\Module\Graphite\Util\TimeRangePickerTools;
 use Icinga\Module\Graphite\Web\Form\Decorator\Proxy;
 use Icinga\Web\Form;
 
 class CustomForm extends Form
 {
-    use TimeRangePickerTrait;
-
     /**
      * @var string
      */
@@ -99,13 +98,13 @@ class CustomForm extends Form
         $start = $this->formToUrl('start', '00:00');
         $end = $this->formToUrl('end', '23:59', 'PT59S');
         if ($start > $end) {
-            $absoluteRangeParameters = static::getAbsoluteRangeParameters();
+            $absoluteRangeParameters = TimeRangePickerTools::getAbsoluteRangeParameters();
             $this->getRedirectUrl()->getParams()
                 ->set($absoluteRangeParameters['start'], $end)
                 ->set($absoluteRangeParameters['end'], $start);
         }
 
-        $this->getRedirectUrl()->remove(static::getRelativeRangeParameter());
+        $this->getRedirectUrl()->remove(TimeRangePickerTools::getRelativeRangeParameter());
     }
 
     /**
@@ -149,7 +148,7 @@ class CustomForm extends Form
     protected function urlToForm($part, $defaultTimestamp = null)
     {
         $params = $this->getRedirectUrl()->getParams();
-        $absoluteRangeParameters = static::getAbsoluteRangeParameters();
+        $absoluteRangeParameters = TimeRangePickerTools::getAbsoluteRangeParameters();
         $timestamp = $params->get($absoluteRangeParameters[$part], $defaultTimestamp);
 
         if ($timestamp !== null) {
@@ -176,7 +175,7 @@ class CustomForm extends Form
      */
     protected function getRelativeTimestamp()
     {
-        $seconds = $this->getRelativeSeconds($this->getRedirectUrl()->getParams());
+        $seconds = TimeRangePickerTools::getRelativeSeconds($this->getRedirectUrl()->getParams());
         return is_int($seconds) ? $this->getNow()->getTimestamp() - $seconds : null;
     }
 
@@ -194,7 +193,7 @@ class CustomForm extends Form
         $date = $this->getValue("{$part}_date");
         $time = $this->getValue("{$part}_time");
         $params = $this->getRedirectUrl()->getParams();
-        $absoluteRangeParameters = static::getAbsoluteRangeParameters();
+        $absoluteRangeParameters = TimeRangePickerTools::getAbsoluteRangeParameters();
 
         if ($date === '' && $time === '') {
             $params->remove($absoluteRangeParameters[$part]);
