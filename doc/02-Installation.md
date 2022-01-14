@@ -2,8 +2,9 @@
 
 ## Requirements
 
+* PHP (>= 7.2)
 * Icinga 2 (>= 2.4.0)
-* Icinga Web 2 (>= 2.5.0)
+* Icinga Web 2 (>= 2.7)
 * Graphite and Graphite Web
 
 ## Prepare Icinga 2
