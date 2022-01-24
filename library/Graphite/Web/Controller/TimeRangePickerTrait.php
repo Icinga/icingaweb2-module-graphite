@@ -4,7 +4,6 @@ namespace Icinga\Module\Graphite\Web\Controller;
 
 use Icinga\Module\Graphite\Forms\TimeRangePicker\CommonForm;
 use Icinga\Module\Graphite\Forms\TimeRangePicker\CustomForm;
-use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait as TimeRangePicker;
 use Icinga\Web\Request;
 use Icinga\Web\Url;
 use Icinga\Web\View;

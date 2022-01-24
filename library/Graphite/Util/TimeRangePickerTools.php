@@ -1,13 +1,13 @@
 <?php
 
-namespace Icinga\Module\Graphite\Forms\TimeRangePicker;
+namespace Icinga\Module\Graphite\Util;
 
 use Icinga\Application\Config;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Web\Url;
 use Icinga\Web\UrlParams;
 
-trait TimeRangePickerTrait
+final class TimeRangePickerTools
 {
     /**
      * @return string
@@ -50,7 +50,7 @@ trait TimeRangePickerTrait
             $copy = new UrlParams();
         }
 
-        foreach (TimeRangePickerTrait::getAllRangeParameters() as $param) {
+        foreach (self::getAllRangeParameters() as $param) {
             $value = $origin->get($param);
             if ($value !== null) {
                 $copy->set($param, $value);
@@ -67,9 +67,9 @@ trait TimeRangePickerTrait
      *
      * @return  bool|int|null
      */
-    protected function getRelativeSeconds(UrlParams $params)
+    public static function getRelativeSeconds(UrlParams $params)
     {
-        $seconds = $params->get(static::getRelativeRangeParameter());
+        $seconds = $params->get(self::getRelativeRangeParameter());
         if ($seconds === null) {
             return null;
         }

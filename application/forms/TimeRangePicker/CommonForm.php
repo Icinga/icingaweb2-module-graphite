@@ -2,14 +2,12 @@
 
 namespace Icinga\Module\Graphite\Forms\TimeRangePicker;
 
+use Icinga\Module\Graphite\Util\TimeRangePickerTools;
 use Icinga\Web\Form;
-use Zend_Form_Decorator_HtmlTag;
 use Zend_Form_Element_Select;
 
 class CommonForm extends Form
 {
-    use TimeRangePickerTrait;
-
     /**
      * The selectable units with themselves in seconds
      *
@@ -101,7 +99,7 @@ class CommonForm extends Form
     public function onSuccess()
     {
         $this->formToUrl();
-        $this->getRedirectUrl()->remove(array_values(static::getAbsoluteRangeParameters()));
+        $this->getRedirectUrl()->remove(array_values(TimeRangePickerTools::getAbsoluteRangeParameters()));
     }
 
     /**
@@ -145,13 +143,13 @@ class CommonForm extends Form
     protected function urlToForm()
     {
         $params = $this->getRedirectUrl()->getParams();
-        $seconds = $this->getRelativeSeconds($params);
+        $seconds = TimeRangePickerTools::getRelativeSeconds($params);
 
         if ($seconds === null && count(array_intersect_key(
             $params->toArray(false),
-            array_keys($this->getAllRangeParameters())
+            array_keys(TimeRangePickerTools::getAllRangeParameters())
         )) === 0) {
-            $seconds = $this->getDefaultRelativeTimeRange();
+            $seconds = TimeRangePickerTools::getDefaultRelativeTimeRange();
         }
 
         if ($seconds !== null) {
@@ -172,7 +170,7 @@ class CommonForm extends Form
                 }
             }
 
-            $params->remove(static::getRelativeRangeParameter());
+            $params->remove(TimeRangePickerTools::getRelativeRangeParameter());
         }
     }
 
@@ -185,7 +183,7 @@ class CommonForm extends Form
         foreach ($this->rangeFactors as $unit => $factor) {
             if ($formData[$unit] !== '' && $formData[$unit] !== $this->defaultFormData[$unit]) {
                 $this->getRedirectUrl()->setParam(
-                    static::getRelativeRangeParameter(),
+                    TimeRangePickerTools::getRelativeRangeParameter(),
                     (string) ((int) $formData[$unit] * $factor)
                 );
                 return;

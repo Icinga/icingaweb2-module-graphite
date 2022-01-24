@@ -6,14 +6,13 @@ use Icinga\Application\Config;
 use Icinga\Application\Icinga;
 use Icinga\Authentication\Auth;
 use Icinga\Exception\ConfigurationError;
-use Icinga\Module\Graphite\Forms\TimeRangePicker\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Graphing\Chart;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\Graphing\Template;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
+use Icinga\Module\Graphite\Util\TimeRangePickerTools;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Host as HostGraphs;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Service as ServiceGraphs;
-use Icinga\Module\Graphite\Web\Widget\InlineGraphImage;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Module\Monitoring\Object\Service;
@@ -343,7 +342,7 @@ abstract class Graphs extends AbstractWidget
                     $view = $this->view();
 
                     $url = $this->getGraphsListBaseUrl();
-                    TimeRangePickerTrait::copyAllRangeParameters($url->getParams(), $currentUrl->getParams());
+                    TimeRangePickerTools::copyAllRangeParameters($url->getParams(), $currentUrl->getParams());
 
                     $result[] = "<p class='load-more'>{$view->qlink(
                         sprintf($view->translate('Load all %d graphs'), $total),
@@ -418,15 +417,15 @@ abstract class Graphs extends AbstractWidget
     protected function getRangeFromTimeRangePicker(Request $request)
     {
         $params = $request->getUrl()->getParams();
-        $relative = $params->get(TimeRangePickerTrait::getRelativeRangeParameter());
+        $relative = $params->get(TimeRangePickerTools::getRelativeRangeParameter());
         if ($relative !== null) {
             return ["-$relative", null];
         }
 
-        $absolute = TimeRangePickerTrait::getAbsoluteRangeParameters();
+        $absolute = TimeRangePickerTools::getAbsoluteRangeParameters();
         $start = $params->get($absolute['start']);
         return [
-            $start === null ? -TimeRangePickerTrait::getDefaultRelativeTimeRange() : $start,
+            $start === null ? -TimeRangePickerTools::getDefaultRelativeTimeRange() : $start,
             $params->get($absolute['end'])
         ];
     }
