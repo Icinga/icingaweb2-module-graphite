@@ -10,17 +10,21 @@ use Icinga\Exception\NotImplementedError;
 use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
+use Icinga\Module\Icingadb\Common\Macros;
 use Icinga\Module\Monitoring\Object\Macro;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Util\Json;
 use Icinga\Web\Url;
 use InvalidArgumentException;
+use ipl\Orm\Model;
 
 /**
  * Queries a {@link MetricsDataSource}
  */
 class MetricsQuery implements Queryable, Filterable, Fetchable
 {
+    use Macros;
+
     /**
      * @var MetricsDataSource
      */
@@ -41,11 +45,11 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
     protected $filter = [];
 
     /**
-     * The monitored object to render the graphs of
+     * The object to render the graphs for
      *
-     * @var MonitoredObject
+     * @var MonitoredObject|Model
      */
-    protected $monitoredObject;
+    protected $object;
 
     /**
      * Constructor
@@ -128,12 +132,24 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
                 continue;
             }
 
-            $workaroundMacro = str_replace('.', '_', $macro);
-            if ($workaroundMacro === 'service_name') {
-                $workaroundMacro = 'service_description';
-            }
+            if ($this->object instanceof Model) {
+                // icingadb macros
+                $workaroundMacro = $macro;
+                if ($workaroundMacro === 'service.check_command') {
+                    $workaroundMacro = 'service.checkcommand';
+                }
+                if ($workaroundMacro === 'host.check_command') {
+                    $workaroundMacro = 'host.checkcommand';
+                }
+                $result = $this->resolveMacro($workaroundMacro, $this->object);
+            } else {
+                $workaroundMacro = str_replace('.', '_', $macro);
+                if ($workaroundMacro === 'service_name') {
+                    $workaroundMacro = 'service_description';
+                }
 
-            $result = Macro::resolveMacro($workaroundMacro, $this->monitoredObject);
+                $result = Macro::resolveMacro($workaroundMacro, $this->object);
+            }
 
             if ($result !== $workaroundMacro) {
                 $filter[$macro] = $this->escapeMetricStep($result);
@@ -164,15 +180,15 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
     }
 
     /**
-     * Set the monitored object to render the graphs of
+     * Set the object to render the graphs for
      *
-     * @param MonitoredObject $monitoredObject
+     * @param MonitoredObject|Model $object
      *
      * @return $this
      */
-    public function setMonitoredObject($monitoredObject)
+    public function setObject($object)
     {
-        $this->monitoredObject = $monitoredObject;
+        $this->object = $object;
 
         return $this;
     }

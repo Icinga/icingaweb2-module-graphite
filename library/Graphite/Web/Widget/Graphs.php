@@ -20,31 +20,35 @@ use Icinga\Web\Request;
 use Icinga\Web\Url;
 use Icinga\Web\View;
 use Icinga\Web\Widget\AbstractWidget;
+use ipl\Orm\Model;
+use Icinga\Module\Icingadb\Model\Host as IcingadbHost;
+use Icinga\Module\Graphite\Web\Widget\Graphs\Icingadb\IcingadbHost as IcingadbHostGraphs;
+use Icinga\Module\Graphite\Web\Widget\Graphs\Icingadb\IcingadbService as IcingadbServiceGraphs;
 
 abstract class Graphs extends AbstractWidget
 {
     use GraphingTrait;
 
     /**
-     * The Icinga custom variable with the "real" check command (if any) of monitored objects we display graphs for
+     * The Icinga custom variable with the "real" check command (if any) of objects we display graphs for
      *
      * @var string
      */
     protected static $obscuredCheckCommandCustomVar;
 
     /**
-     * The type of the monitored object to render the graphs of
+     * The type of the object to render the graphs for
      *
      * @var string
      */
-    protected $monitoredObjectType;
+    protected $objectType;
 
     /**
-     * The monitored object to render the graphs of
+     * The object to render the graphs for
      *
-     * @var MonitoredObject
+     * @var MonitoredObject|Model
      */
-    protected $monitoredObject;
+    protected $object;
 
     /**
      * Graph image width
@@ -126,7 +130,7 @@ abstract class Graphs extends AbstractWidget
     protected $showNoGraphsFound;
 
     /**
-     * Factory, based on the given object
+     * Factory, based on the given monitoring object
      *
      * @param   MonitoredObject $object
      *
@@ -143,6 +147,22 @@ abstract class Graphs extends AbstractWidget
                 /** @var Service $object */
                 return new ServiceGraphs($object);
         }
+    }
+
+    /**
+     * Factory, based on the given icingadb object
+     *
+     * @param Model $object
+     *
+     * @return static
+     */
+    public static function forIcingadbObject(Model $object)
+    {
+        if ($object instanceof IcingadbHost) {
+            return new IcingadbHostGraphs($object);
+        }
+
+        return new IcingadbServiceGraphs($object);
     }
 
     /**
@@ -163,16 +183,22 @@ abstract class Graphs extends AbstractWidget
     /**
      * Constructor
      *
-     * @param   MonitoredObject $monitoredObject    The monitored object to render the graphs of
+     * @param MonitoredObject|Model $object    The object to render the graphs for
      */
-    public function __construct(MonitoredObject $monitoredObject)
+    public function __construct($object)
     {
-        $this->monitoredObject = $monitoredObject;
-        $this->checkCommand = $monitoredObject->{"{$this->monitoredObjectType}_check_command"};
+        $this->object = $object;
         $this->renderInline = Url::fromRequest()->getParam('format') === 'pdf';
-        $this->obscuredCheckCommand = $monitoredObject->{
-            "_{$this->monitoredObjectType}_" . Graphs::getObscuredCheckCommandCustomVar()
-        };
+
+        if ($object instanceof Model) {
+            $this->checkCommand = $object->checkcommand;
+            $this->obscuredCheckCommand = $object->vars[Graphs::getObscuredCheckCommandCustomVar()] ?? null;
+        } else {
+            $this->checkCommand = $object->{"{$this->objectType}_check_command"};
+            $this->obscuredCheckCommand = $object->{
+                "_{$this->objectType}_" . Graphs::getObscuredCheckCommandCustomVar()
+            };
+        }
     }
 
     /**
@@ -235,13 +261,13 @@ abstract class Graphs extends AbstractWidget
             IPT::indent();
 
             foreach ($templates as $templateName => $template) {
-                if ($this->designedForMyMonitoredObjectType($template)) {
+                if ($this->designedForObjectType($template)) {
                     IPT::recordf('Applying template %s', $templateName);
                     IPT::indent();
 
                     $charts = $template->getCharts(
                         static::getMetricsDataSource(),
-                        $this->monitoredObject,
+                        $this->object,
                         [],
                         $excludeMetrics
                     );
@@ -463,13 +489,13 @@ abstract class Graphs extends AbstractWidget
     abstract protected function filterImageUrl(Url $url);
 
     /**
-     * Return whether the given template is designed for the type of the monitored object we display graphs for
+     * Return whether the given template is designed for the type of the object we display graphs for
      *
      * @param   Template    $template
      *
      * @return  bool
      */
-    abstract protected function designedForMyMonitoredObjectType(Template $template);
+    abstract protected function designedForObjectType(Template $template);
 
     /**
      * Get {@link compact}
