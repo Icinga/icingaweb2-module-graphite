@@ -2,7 +2,9 @@
 
 namespace Icinga\Module\Graphite\Controllers;
 
+use Icinga\Application\Modules\Module;
 use Icinga\Data\Filter\Filter;
+use Icinga\Module\Graphite\ProvidedHook\Icingadb\IcingadbSupport;
 use Icinga\Module\Graphite\Util\TimeRangePickerTools;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
@@ -29,6 +31,14 @@ class ListController extends MonitoringAwareController
 
     public function hostsAction()
     {
+        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
+            if ($hostName = $this->params->shift('host')) {
+                $this->params->set('host.name', $hostName);
+            }
+
+            $this->redirectNow(Url::fromPath('graphite/hosts')->setParams($this->params));
+        }
+
         $this->addTitleTab(
             'hosts',
             mt('monitoring', 'Hosts'),
@@ -69,6 +79,18 @@ class ListController extends MonitoringAwareController
 
     public function servicesAction()
     {
+        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
+            if ($hostName = $this->params->shift('host')) {
+                $this->params->set('host.name', $hostName);
+            }
+
+            if ($serviceName = $this->params->shift('service')) {
+                $this->params->set('service.name', $serviceName);
+            }
+
+            $this->redirectNow(Url::fromPath('graphite/services')->setParams($this->params));
+        }
+
         $this->addTitleTab(
             'services',
             mt('monitoring', 'Services'),
