@@ -9,6 +9,8 @@ use \Icinga\Module\Icingadb\Model\Host;
 
 class IcingadbHost extends Graphs
 {
+    protected $objectType = 'host';
+
     /**
      * The Icingadb host to render the graphs for
      *

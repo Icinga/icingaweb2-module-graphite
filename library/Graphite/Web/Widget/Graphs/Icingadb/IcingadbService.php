@@ -9,6 +9,8 @@ use \Icinga\Module\Icingadb\Model\Service;
 
 class IcingadbService extends Graphs
 {
+    protected $objectType = 'service';
+
     /**
      * The icingadb service to render the graphs for
      *
