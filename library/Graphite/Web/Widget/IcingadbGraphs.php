@@ -81,7 +81,7 @@ class IcingadbGraphs extends BaseHtmlElement
             ['data-base-target' => '_next']
         );
 
-        $serviceLink =  $graph->getObjectType() === 'service'
+        $serviceLink = $graph->getObjectType() === 'service'
             ? new Link(
                 $graph->createServiceTitle(),
                 $graph->createServiceLink($this->serviceBaseUrl),

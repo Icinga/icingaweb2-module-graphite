@@ -4,18 +4,22 @@ namespace Icinga\Module\Graphite\Controllers;
 
 use GuzzleHttp\Psr7\ServerRequest;
 use Icinga\Module\Graphite\Util\TimeRangePickerTools;
+use Icinga\Module\Graphite\Web\Controller\IcingadbGraphiteController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Web\Widget\IcingadbGraphs;
+use Icinga\Module\Icingadb\Common\Auth;
+use Icinga\Module\Icingadb\Common\Database;
+use Icinga\Module\Icingadb\Common\SearchControls;
 use Icinga\Module\Icingadb\Model\Service;
 use Icinga\Module\Icingadb\Web\Control\SearchBar\ObjectSuggestions;
-use Icinga\Module\Icingadb\Web\Controller;
 use ipl\Html\HtmlString;
+use ipl\Orm\Query;
 use ipl\Stdlib\Filter;
 use ipl\Web\Control\LimitControl;
 use ipl\Web\Control\SortControl;
 use ipl\Web\Url;
 
-class ServicesController extends Controller
+class ServicesController extends IcingadbGraphiteController
 {
     use TimeRangePickerTrait;
 
@@ -34,7 +38,7 @@ class ServicesController extends Controller
         $services->filter(Filter::equal('state.performance_data', '*'));
 
         $this->applyRestrictions($services);
-        $this->handleSearchRequest($services);
+
         $hostBaseUrl = Url::fromPath('icingadb/host');
         TimeRangePickerTools::copyAllRangeParameters(
             $hostBaseUrl->getParams(),
