@@ -135,12 +135,17 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
             if ($this->object instanceof Model) {
                 // icingadb macros
                 $workaroundMacro = $macro;
-                if ($workaroundMacro === 'service.check_command') {
+                // convert monitoring customvar
+                if (preg_match('/^(_host_|_service_)(.+)/', $workaroundMacro, $matches)) {
+                    $workaroundMacro = trim($matches[1], '_') . '.vars.' . $matches[2];
+                }
+                elseif ($workaroundMacro === 'service.check_command') {
                     $workaroundMacro = 'service.checkcommand';
                 }
-                if ($workaroundMacro === 'host.check_command') {
+                elseif ($workaroundMacro === 'host.check_command') {
                     $workaroundMacro = 'host.checkcommand';
                 }
+
                 $result = $this->resolveMacro($workaroundMacro, $this->object);
             } else {
                 $workaroundMacro = str_replace('.', '_', $macro);
