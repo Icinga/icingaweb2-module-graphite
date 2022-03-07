@@ -24,6 +24,7 @@ if (! $compact): ?>
 <div class="content">
 <?php
 if (! empty($hosts)) {
+    echo '<div class="graphite-graph-color-registry"></div>';
     echo '<div class="grid">';
     foreach ($hosts as $host) {
         $hostGraphs = (string) (new Host($host))->setPreloadDummy()->handleRequest();

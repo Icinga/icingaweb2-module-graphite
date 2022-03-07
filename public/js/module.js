@@ -1,221 +1,112 @@
+/* Icinga Web 2 | (c) 2022 Icinga GmbH | GPLv2+ */
 
 (function(Icinga) {
 
-    var Graphite = function(module) {
-        /**
-         * YES, we need Icinga
-         */
-        this.module = module;
+    "use strict";
 
-        this.imgClones = {
-            'col1': [],
-            'col2': []
-        };
+    class Graphite extends Icinga.EventListener {
+        constructor(icinga) {
+            super(icinga);
 
-        this.lastImgId = 0;
+            this._colorParams = null;
+            this._resizeTimer = null;
+            this._onResizeBound = this.onResize.bind(this);
+            this._onModeChangeBound = this.onModeChange.bind(this);
+            this._mediaQueryList = window.matchMedia('(prefers-color-scheme: light)');
 
-        this.initialize();
+            this.on('css-reloaded', 'head', this.onCssReloaded, this);
+            this.on('rendered', '#main > .container', this.onRendered, this);
+            window.addEventListener('resize', this._onResizeBound, { passive: true });
+            this._mediaQueryList.addEventListener('change', this._onModeChangeBound, { passive: true });
+        }
 
-        this.timer;
+        get colorParams() {
+            if (this._colorParams === null) {
+                let colorRegistry = document.querySelector('.graphite-graph-color-registry');
+                let registryStyle = window.getComputedStyle(colorRegistry);
 
-        this.module.icinga.logger.debug('Graphite module loaded');
-    };
+                this._colorParams = {
+                    bgcolor: this.rgbToHex(registryStyle.backgroundColor, 'black'),
+                    fgcolor: this.rgbToHex(registryStyle.color, 'white'),
+                    majorGridLineColor: this.rgbToHex(registryStyle.borderTopColor, '0000003F'),
+                    minorGridLineColor: this.rgbToHex(registryStyle.borderBottomColor, 'black')
+                };
+            }
 
-    Graphite.prototype = {
+            return this._colorParams;
+        }
 
-        initialize: function()
-        {
-            this.module.on('rendered', this.onRenderedContainer);
-            this.registerTimer();
-            this.module.icinga.logger.debug('Graphite module initialized');
-        },
+        unbind(emitter) {
+            super.unbind(emitter);
 
-        registerTimer: function () {
-            this.timer = this.module.icinga.timer.register(
-                this.timerTriggered,
-                this,
-                8000
-            );
+            window.removeEventListener('resize', this._onResizeBound);
+            this._mediaQueryList.removeEventListener('change', this._onModeChangeBound);
 
-            return this;
-        },
+            this._onResizeBound = null;
+            this._onModeChangeBound = null;
+            this._mediaQueryList = null;
+        }
 
-        timerTriggered: function () {
-            /// console.log('Graphite timer fired');
-            var self = this;
-            $.each(this.imgClones, this.reloadContainerImgs.bind(self));
-        },
+        onCssReloaded(event) {
+            let _this = event.data.self;
 
-        reloadContainerImgs: function(idx, imgs)
-        {
-            $.each(imgs, this.reloadImg);
-        },
+            _this._colorParams = null;
+            _this.updateImages(document);
+        }
 
-        reloadImg: function(idx, img)
-        {
-            // console.log('Schedule reload for ', img);
-            var realId = img.attr('id').replace(/_clone$/, '');
-            $('#' + realId).attr('src', img.attr('src'));
-            img.attr(
-                'src',
-                img.attr('src').replace(
-                    /\&r=\d+/,
-                    '&r=' + (new Date()).getTime()
-                )
-            );
-        },
+        onRendered(event, autorefresh, scripted, autosubmit) {
+            let _this = event.data.self;
+            let container = event.target;
 
-        onRenderedContainer: function(event) {
-            var $container = $(event.currentTarget);
-            var self = this;
-            var cId = $container.attr('id');
-            self.imgClones[cId] = [];
-            $('#' + cId + ' img.graphiteImg').each(function(idx, img) {
-              var $img = $(img);
-              if (! $img.attr('id')) {
-                self.lastImgId++;
-                $(img).attr('id', 'graphiteImg' + self.lastImgId);
-              }
+            _this.updateImages(container);
+        }
 
-              self.imgClones[cId].push(
-                $(
-                    $img.clone()
-                        .addClass('graphiteClone')
-                        .attr('id', $img.attr('id') + '_clone')
-                        // .data('
-                        .attr(
-                            'src',
-                            $img.attr('src') + '&r=' + (new Date()).getTime()
-                        )
+        onResize() {
+            // Images are not updated instantly, the user might not yet be finished resizing the window
+            if (this._resizeTimer !== null) {
+                clearTimeout(this._resizeTimer);
+            }
 
-                )
-              );
+            this._resizeTimer = setTimeout(() => this.updateImages(document), 200);
+        }
+
+        onModeChange() {
+            this._colorParams = null;
+            this.updateImages(document);
+        }
+
+        updateImages(container) {
+            container.querySelectorAll('img.graphiteImg[data-actualimageurl]').forEach(img => {
+                let params = { ...this.colorParams }; // Theming ftw!
+                params.r = (new Date()).getTime(); // To bypass the browser cache
+                params.width = img.scrollWidth; // It's either fixed or dependent on parent width
+
+                img.src = this.icinga.utils.addUrlParams(img.dataset.actualimageurl, params);
             });
         }
-    };
 
-    Icinga.availableModules.graphite = Graphite;
-
-}(Icinga));
-
-(function(Icinga, $) {
-    'use strict';
-
-    var extractUrlParams = /^([^?]*)\?(.+)$/;
-    var parseUrlParam = /^([^=]+)=(.*)$/;
-
-    function GraphiteCachebusterUpdater(icinga) {
-        Icinga.EventListener.call(this, icinga);
-
-        this.on('rendered', this.onRendered, this);
-    }
-
-    GraphiteCachebusterUpdater.prototype = new Icinga.EventListener();
-
-    GraphiteCachebusterUpdater.prototype.onRendered = function(event) {
-        $(event.target).find('img.graphiteImg').each(function() {
-            var e = $(this);
-            var src = e.attr('src');
-
-            if (typeof(src) !== 'undefined') {
-                var matchParams = extractUrlParams.exec(src);
-
-                if (matchParams !== null) {
-                    var urlParams = Object.create(null);
-
-                    matchParams[2].split('&').forEach(function(urlParam) {
-                        var matchParam = parseUrlParam.exec(urlParam);
-                        if (matchParam !== null) {
-                            urlParams[matchParam[1]] = matchParam[2];
-                        }
-                    });
-
-                    if (typeof(urlParams.cachebuster) !== 'undefined') {
-                        var cachebuster = parseInt(urlParams.cachebuster);
-
-                        if (cachebuster === cachebuster) {
-                            urlParams.cachebuster = (cachebuster + 1).toString();
-
-                            var renderedUrlParams = [];
-
-                            for (var urlParam in urlParams) {
-                                renderedUrlParams.push(urlParam + '=' + urlParams[urlParam]);
-                            }
-
-                            e.attr('src', matchParams[1] + '?' + renderedUrlParams.join('&'));
-                        }
-                    }
-                }
+        rgbToHex(rgb, def) {
+            if (! rgb) {
+                return def;
             }
-        });
-    };
 
-    Icinga.Behaviors = Icinga.Behaviors || {};
-
-    Icinga.Behaviors.GraphiteCachebusterUpdater = GraphiteCachebusterUpdater;
-}(Icinga, jQuery));
-
-(function(Icinga, $) {
-    'use strict';
-
-    var extractUrlParams = /^([^?]*)\?(.+)$/;
-    var parseUrlParam = /^([^=]+)=(.*)$/;
-
-    function updateGraphSizes() {
-        $("div.images.monitored-object-detail-view img.graphiteImg").each(function() {
-            var e = $(this);
-            var src = e.attr("data-actualimageurl");
-
-            if (typeof(src) !== "undefined") {
-                var matchParams = extractUrlParams.exec(src);
-
-                if (matchParams !== null) {
-                    var urlParams = Object.create(null);
-
-                    matchParams[2].split("&").forEach(function(urlParam) {
-                        var matchParam = parseUrlParam.exec(urlParam);
-                        if (matchParam !== null) {
-                            urlParams[matchParam[1]] = matchParam[2];
-                        }
-                    });
-
-                    if (typeof(urlParams.width) !== "undefined") {
-                        var realWidth = e.width().toString();
-
-                        if (urlParams.width !== realWidth) {
-                            urlParams.width = realWidth;
-
-                            var renderedUrlParams = [];
-
-                            for (var urlParam in urlParams) {
-                                renderedUrlParams.push(urlParam + "=" + urlParams[urlParam]);
-                            }
-
-                            src = matchParams[1] + "?" + renderedUrlParams.join("&");
-
-                            e.attr("data-actualimageurl", src);
-                            e.attr("src", src);
-                        }
-                    }
-                }
+            let match = rgb.match(/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?\)/);
+            if (match === null) {
+                return def;
             }
-        });
+
+            let alpha = '';
+            if (typeof match[4] !== 'undefined') {
+                alpha = Math.round(parseFloat(match[4]) * 255).toString(16);
+            }
+
+            return parseInt(match[1], 10).toString(16).padStart(2, '0')
+                + parseInt(match[2], 10).toString(16).padStart(2, '0')
+                + parseInt(match[3], 10).toString(16).padStart(2, '0')
+                + alpha;
+        }
     }
 
-    function MonitoredObjectDetailViewExtensionUpdater(icinga) {
-        Icinga.EventListener.call(this, icinga);
+    Icinga.Behaviors.Graphite = Graphite;
 
-        this.on('rendered', this.onRendered, this);
-    }
-
-    MonitoredObjectDetailViewExtensionUpdater.prototype = Object.create(Icinga.EventListener.prototype);
-
-    MonitoredObjectDetailViewExtensionUpdater.prototype.onRendered = function() {
-        $(window).on('resize', updateGraphSizes);
-        updateGraphSizes();
-    };
-
-    Icinga.Behaviors = Icinga.Behaviors || {};
-
-    Icinga.Behaviors.MonitoredObjectDetailViewGraphiteExtensionUpdater = MonitoredObjectDetailViewExtensionUpdater;
-}(Icinga, jQuery));
+})(Icinga);

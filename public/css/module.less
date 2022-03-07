@@ -125,3 +125,26 @@ p.load-more {
   margin-right: 1em;
   text-align: right;
 }
+
+/* Graph colors */
+
+@graphite-graph-bg-color: @body-bg-color;
+@graphite-graph-fg-color: @text-color;
+@graphite-graph-major-grid-color: @gray-light;
+@graphite-graph-minor-grid-color: @graphite-graph-bg-color;
+
+@light-mode: {
+  --graphite-graph-bg-color: var(--body-bg-color);
+  --graphite-graph-fg-color: var(--text-color);
+  --graphite-graph-major-grid-color: var(--gray-light);
+  --graphite-graph-minor-grid-color: var(--graphite-graph-bg-color);
+};
+
+.graphite-graph-color-registry {
+  display: none;
+
+  background-color: @graphite-graph-bg-color;
+  color: @graphite-graph-fg-color;
+  border-top-color: @graphite-graph-major-grid-color;
+  border-bottom-color: @graphite-graph-minor-grid-color;
+}

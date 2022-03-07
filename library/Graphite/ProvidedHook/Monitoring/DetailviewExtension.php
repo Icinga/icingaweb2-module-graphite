@@ -30,7 +30,9 @@ class DetailviewExtension extends DetailviewExtensionHook
         if ($graphs !== '') {
             $this->handleTimeRangePickerRequest();
             return '<h2>' . mt('graphite', 'Graphs') . '</h2>'
-                . $this->renderTimeRangePicker($this->getView()) . $graphs;
+                . $this->renderTimeRangePicker($this->getView())
+                . '<div class="graphite-graph-color-registry"></div>'
+                . $graphs;
         }
 
         return '';
