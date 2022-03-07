@@ -26,7 +26,7 @@ if (! $compact): ?>
 if (! empty($hosts)) {
     echo '<div class="grid">';
     foreach ($hosts as $host) {
-        $hostGraphs = (string) (new Host($host))->handleRequest();
+        $hostGraphs = (string) (new Host($host))->setPreloadDummy()->handleRequest();
 
         if ($hostGraphs !== '') {
             echo '<div class="grid-item">'

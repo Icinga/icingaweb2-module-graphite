@@ -51,7 +51,7 @@ if (! empty($services)) {
                 )
                 . '</h2>';
 
-            echo (new Service($service))->handleRequest();
+            echo (new Service($service))->setPreloadDummy()->handleRequest();
             echo '</div>';
         }
 
