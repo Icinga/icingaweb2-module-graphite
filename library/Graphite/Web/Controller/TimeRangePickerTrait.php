@@ -46,7 +46,7 @@ trait TimeRangePickerTrait
 
         return '<div class="timerangepicker-container">'
             . $this->getTimeRangePickerCommonForm()
-            . '<div class="flyover flyover-arrow-top" id="'
+            . '<div class="flyover flyover-arrow-top" data-flyover-suspends-auto-refresh id="'
             . $view->protectId('graphite-customrange')
             . '">'
             . $view->qlink(null, '#', null, [
