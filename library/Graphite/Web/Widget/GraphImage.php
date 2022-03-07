@@ -66,6 +66,10 @@ class GraphImage extends AbstractWidget
             $params = (new UrlParams())->addValues([
                 'from'                  => $from,
                 'until'                 => $until,
+                'bgcolor'               => $this->chart->getBackgroundColor() ?? 'black',
+                'fgcolor'               => $this->chart->getForegroundColor() ?? 'white',
+                'majorGridLineColor'    => $this->chart->getMajorGridLineColor() ?? '0000003F',
+                'minorGridLineColor'    => $this->chart->getMinorGridLineColor() ?? 'black',
                 'width'                 => $this->chart->getWidth(),
                 'height'                => $this->chart->getHeight(),
                 'hideLegend'            => (string) ! $this->chart->getShowLegend(),
@@ -75,8 +79,6 @@ class GraphImage extends AbstractWidget
                 'lineMode'              => 'connected',
                 'drawNullAsZero'        => 'false',
                 'graphType'             => 'line',
-                'majorGridLineColor'    => '#0000003F',
-                'minorGridLineColor'    => '#00000000',
                 '_ext'                  => 'whatever.svg'
             ]);
 
