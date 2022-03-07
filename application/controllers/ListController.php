@@ -63,6 +63,8 @@ class ListController extends MonitoringAwareController
         $this->view->timeRangePicker = $this->renderTimeRangePicker($this->view);
         $this->view->hosts = $hosts;
         $this->view->hasMoreHosts = ! $this->view->compact && $hostsQuery->hasMore();
+
+        $this->setAutorefreshInterval(30);
     }
 
     public function servicesAction()
@@ -110,6 +112,8 @@ class ListController extends MonitoringAwareController
         $this->view->timeRangePicker = $this->renderTimeRangePicker($this->view);
         $this->view->services = $services;
         $this->view->hasMoreServices = ! $this->view->compact && $servicesQuery->hasMore();
+
+        $this->setAutorefreshInterval(30);
     }
 
     /**
