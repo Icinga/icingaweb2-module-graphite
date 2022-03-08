@@ -271,6 +271,10 @@ abstract class Graphs extends AbstractWidget
                                     ->setUntil($this->end)
                                     ->setWidth($this->width)
                                     ->setHeight($this->height)
+                                    ->setBackgroundColor('white')
+                                    ->setForegroundColor('black')
+                                    ->setMajorGridLineColor('grey')
+                                    ->setMinorGridLineColor('white')
                                     ->setShowLegend(! $this->compact);
 
                                 $img = new InlineGraphImage($chart);
@@ -280,8 +284,7 @@ abstract class Graphs extends AbstractWidget
                                     ->setParam('start', $this->start)
                                     ->setParam('end', $this->end)
                                     ->setParam('width', $this->width)
-                                    ->setParam('height', $this->height)
-                                    ->setParam('cachebuster', time() * 65536 + mt_rand(0, 65535));
+                                    ->setParam('height', $this->height);
 
                                 if (! $this->compact) {
                                     $imageUrl->setParam('legend', 1);
@@ -295,9 +298,8 @@ abstract class Graphs extends AbstractWidget
                                     $src = $imageUrl;
                                 }
 
-                                $img = '<img id="graphiteImg-'
-                                    . md5((string) $imageUrl->without('cachebuster'))
-                                    . "\" src=\"$src\" data-actualimageurl=\"$imageUrl\" class=\"detach graphiteImg\""
+                                $img = '<img id="graphiteImg-' . md5((string) $imageUrl) . '"'
+                                    . " src=\"$src\" data-actualimageurl=\"$imageUrl\" class=\"detach graphiteImg\""
                                     . " alt=\"\" width=\"$this->width\" height=\"$this->height\""
                                     . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">";
                             }

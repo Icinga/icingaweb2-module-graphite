@@ -26,7 +26,8 @@ class GraphController extends MonitoringAwareController
         'width', 'height',
         'legend',
         'template', 'default_template',
-        'cachebuster'
+        'bgcolor', 'fgcolor',
+        'majorGridLineColor', 'minorGridLineColor'
     ];
 
     /**
@@ -136,6 +137,10 @@ class GraphController extends MonitoringAwareController
                     ->setUntil($this->graphParams['end'])
                     ->setWidth($this->graphParams['width'])
                     ->setHeight($this->graphParams['height'])
+                    ->setBackgroundColor($this->graphParams['bgcolor'])
+                    ->setForegroundColor($this->graphParams['fgcolor'])
+                    ->setMajorGridLineColor($this->graphParams['majorGridLineColor'])
+                    ->setMinorGridLineColor($this->graphParams['minorGridLineColor'])
                     ->setShowLegend((bool) $this->graphParams['legend'])
                     ->serveImage($this->getResponse());
 

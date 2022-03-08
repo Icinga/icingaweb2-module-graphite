@@ -25,6 +25,7 @@ if (! $compact): ?>
 <div class="content">
 <?php
 if (! empty($services)) {
+    echo '<div class="graphite-graph-color-registry"></div>';
     echo '<div class="grid">';
         foreach ($services as $service) {
             echo '<div class="grid-item">'
@@ -51,7 +52,7 @@ if (! empty($services)) {
                 )
                 . '</h2>';
 
-            echo (new Service($service))->handleRequest();
+            echo (new Service($service))->setPreloadDummy()->handleRequest();
             echo '</div>';
         }
 

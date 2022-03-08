@@ -4,7 +4,7 @@
 
 * PHP (>= 7.2)
 * Icinga 2 (>= 2.4.0)
-* Icinga Web 2 (>= 2.7)
+* Icinga Web 2 (>= 2.9)
 * Graphite and Graphite Web
 
 ## Prepare Icinga 2

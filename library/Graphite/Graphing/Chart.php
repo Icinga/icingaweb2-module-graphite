@@ -15,6 +15,18 @@ class Chart
      */
     protected $graphiteWebClient;
 
+    /** @var ?string This chart's background color */
+    protected $bgcolor;
+
+    /** @var ?string This chart's foreground color */
+    protected $fgcolor;
+
+    /** @var ?string This chart's major grid line color */
+    protected $majorGridLineColor;
+
+    /** @var ?string This chart's minor grid line color */
+    protected $minorGridLineColor;
+
     /**
      * This chart's base
      *
@@ -133,6 +145,102 @@ class Chart
     public function getGraphiteWebClient()
     {
         return $this->graphiteWebClient;
+    }
+
+    /**
+     * Get this chart's background color
+     *
+     * @return string|null
+     */
+    public function getBackgroundColor(): ?string
+    {
+        return $this->bgcolor;
+    }
+
+    /**
+     * Set this chart's background color
+     *
+     * @param string|null $color
+     *
+     * @return $this
+     */
+    public function setBackgroundColor(?string $color): self
+    {
+        $this->bgcolor = $color;
+
+        return $this;
+    }
+
+    /**
+     * Get this chart's foreground color
+     *
+     * @return string|null
+     */
+    public function getForegroundColor(): ?string
+    {
+        return $this->fgcolor;
+    }
+
+    /**
+     * Set this chart's foreground color
+     *
+     * @param string|null $color
+     *
+     * @return $this
+     */
+    public function setForegroundColor(?string $color): self
+    {
+        $this->fgcolor = $color;
+
+        return $this;
+    }
+
+    /**
+     * Get this graph's major grid line color
+     *
+     * @return string|null
+     */
+    public function getMajorGridLineColor(): ?string
+    {
+        return $this->majorGridLineColor;
+    }
+
+    /**
+     * Set this graph's major grid line color
+     *
+     * @param string|null $color
+     *
+     * @return $this
+     */
+    public function setMajorGridLineColor(?string $color): self
+    {
+        $this->majorGridLineColor = $color;
+
+        return $this;
+    }
+
+    /**
+     * Get this graph's minor grid line color
+     *
+     * @return string|null
+     */
+    public function getMinorGridLineColor(): ?string
+    {
+        return $this->minorGridLineColor;
+    }
+
+    /**
+     * Set this graph's minor grid line color
+     *
+     * @param string|null $color
+     *
+     * @return $this
+     */
+    public function setMinorGridLineColor(?string $color): self
+    {
+        $this->minorGridLineColor = $color;
+
+        return $this;
     }
 
     /**
