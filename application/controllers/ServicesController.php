@@ -17,6 +17,7 @@ use ipl\Orm\Query;
 use ipl\Stdlib\Filter;
 use ipl\Web\Control\LimitControl;
 use ipl\Web\Control\SortControl;
+use ipl\Web\Filter\QueryString;
 use ipl\Web\Url;
 
 class ServicesController extends IcingadbGraphiteController
@@ -25,8 +26,10 @@ class ServicesController extends IcingadbGraphiteController
 
     public function indexAction()
     {
+        $graphRange = $this->params->shift('graph_range');
+        $baseFilter = $graphRange ? QueryString::parse('graph_range=' . $graphRange) : $this->getFilter();
         // shift graph params to avoid exception
-        foreach (['graphs_limit', 'graph_range', 'graph_start', 'graph_end'] as $param) {
+        foreach (['graphs_limit', 'graph_start', 'graph_end'] as $param) {
             $this->params->shift($param);
         }
 
@@ -38,18 +41,6 @@ class ServicesController extends IcingadbGraphiteController
         $services->filter(Filter::equal('state.performance_data', '*'));
 
         $this->applyRestrictions($services);
-
-        $hostBaseUrl = Url::fromPath('icingadb/host');
-        TimeRangePickerTools::copyAllRangeParameters(
-            $hostBaseUrl->getParams(),
-            $this->getRequest()->getUrl()->getParams()
-        );
-
-        $serviceBaseUrl = Url::fromPath('icingadb/service');
-        TimeRangePickerTools::copyAllRangeParameters(
-            $serviceBaseUrl->getParams(),
-            $this->getRequest()->getUrl()->getParams()
-        );
 
         $limitControl = $this->createLimitControl();
         $paginationControl = $this->createPaginationControl($services);
@@ -84,7 +75,7 @@ class ServicesController extends IcingadbGraphiteController
         $this->handleTimeRangePickerRequest();
         $this->addControl(HtmlString::create($this->renderTimeRangePicker($this->view)));
 
-        $this->addContent((new IcingadbGraphs($services->execute(), $hostBaseUrl, $serviceBaseUrl)));
+        $this->addContent((new IcingadbGraphs($services->execute()))->setBaseFilter($baseFilter));
 
         if (! $searchBar->hasBeenSubmitted() && $searchBar->hasBeenSent()) {
             $this->sendMultipartUpdate();

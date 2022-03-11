@@ -13,6 +13,7 @@ use ipl\Html\HtmlString;
 use ipl\Stdlib\Filter;
 use ipl\Web\Control\LimitControl;
 use ipl\Web\Control\SortControl;
+use ipl\Web\Filter\QueryString;
 use ipl\Web\Url;
 
 class HostsController extends IcingadbGraphiteController
@@ -22,7 +23,9 @@ class HostsController extends IcingadbGraphiteController
     public function indexAction()
     {
         // shift graph params to avoid exception
-        foreach (['graphs_limit', 'graph_range', 'graph_start', 'graph_end'] as $param) {
+        $graphRange = $this->params->shift('graph_range');
+        $baseFilter = $graphRange ? QueryString::parse('graph_range=' . $graphRange) : $this->getFilter();
+        foreach (['graphs_limit', 'graph_start', 'graph_end'] as $param) {
             $this->params->shift($param);
         }
 
@@ -34,12 +37,6 @@ class HostsController extends IcingadbGraphiteController
         $hosts->filter(Filter::equal('state.performance_data', '*'));
 
         $this->applyRestrictions($hosts);
-
-        $baseUrl = Url::fromPath('icingadb/host');
-        TimeRangePickerTools::copyAllRangeParameters(
-            $baseUrl->getParams(),
-            $this->getRequest()->getUrl()->getParams()
-        );
 
         $limitControl = $this->createLimitControl();
         $paginationControl = $this->createPaginationControl($hosts);
@@ -71,7 +68,7 @@ class HostsController extends IcingadbGraphiteController
         $this->handleTimeRangePickerRequest();
         $this->addControl(HtmlString::create($this->renderTimeRangePicker($this->view)));
 
-        $this->addContent(new IcingadbGraphs($hosts->execute(), $baseUrl));
+        $this->addContent((new IcingadbGraphs($hosts->execute()))->setBaseFilter($baseFilter));
 
         if (! $searchBar->hasBeenSubmitted() && $searchBar->hasBeenSent()) {
             $this->sendMultipartUpdate();

@@ -33,11 +33,6 @@ class IcingadbHost extends Graphs
         return $this->object->name;
     }
 
-    public function createHostLink($baseUrl)
-    {
-        return $baseUrl->with(['name' => $this->object->name]);
-    }
-
     public function getObjectType()
     {
         return $this->objectType;
