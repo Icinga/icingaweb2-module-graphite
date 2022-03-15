@@ -40,6 +40,10 @@ The name of a section consists of two parts separated by a dot:
 The first part is the name of the template and the second part the name of one
 of the following configuration topics:
 
+> **Note:**
+>
+> Template file will be ignored if the [graph] or [metric_filters] section is missing.
+
 ### Template Structure: graph <a id="templates-structure-graph"></a>
 
 Supports a single option called `check_command` and should be set to the name
@@ -60,7 +64,6 @@ check_command = "ping, ping4, ping6"
 Define what metric to use and how many curves to display in the resulting graph.
 Each option's key represents the name of a curve. Its value the path to the
 metric in Icinga 2's [graphite naming schema](https://www.icinga.com/docs/icinga2/latest/doc/14-features/#current-graphite-schema).
-If no metrics are given, no graphs are rendered.
 
 Curve names are used to map Graphite functions to metrics. (More on this below)
 However, they are fully arbitrary and have no further meaning outside template
