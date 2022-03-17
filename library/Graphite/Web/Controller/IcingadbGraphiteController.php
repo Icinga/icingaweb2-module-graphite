@@ -1,12 +1,15 @@
 <?php
 
+/* Icinga Graphite Web | (c) 2022 Icinga GmbH | GPLv2 */
+
 namespace Icinga\Module\Graphite\Web\Controller;
 
+use Icinga\Application\Modules\Module;
+use Icinga\Module\Graphite\ProvidedHook\Icingadb\IcingadbSupport;
 use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Common\SearchControls;
 use ipl\Orm\Query;
-use ipl\Orm\UnionQuery;
 use ipl\Stdlib\Contract\Paginatable;
 use ipl\Web\Compat\CompatController;
 use ipl\Web\Control\LimitControl;
@@ -22,11 +25,19 @@ class IcingadbGraphiteController extends CompatController
     use Database;
     use SearchControls;
 
+    /** @var bool Whether to use icingadb as the backend */
+    protected $useIcingadbAsBackend;
+
+    /** @var string[] Graph parameters */
+    protected $graphParams = ['graphs_limit', 'graph_range', 'graph_start', 'graph_end', 'legacyParams'];
+
     /** @var Filter\Rule Filter from query string parameters */
     private $filter;
 
-    /** @var string|null */
-    private $format;
+    protected function moduleInit()
+    {
+        $this->useIcingadbAsBackend = Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend();
+    }
 
     /**
      * Get the filter created from query string parameters
@@ -41,6 +52,7 @@ class IcingadbGraphiteController extends CompatController
 
         return $this->filter;
     }
+
     /**
      * Create and return the LimitControl
      *
@@ -56,24 +68,6 @@ class IcingadbGraphiteController extends CompatController
         $this->params->shift($limitControl->getLimitParam());
 
         return $limitControl;
-    }
-
-    public function filter(Query $query, Filter\Rule $filter = null): self
-    {
-        //TODO don't need format?
-        if ($this->format !== 'sql' || $this->hasPermission('config/authentication/roles/show')) {
-            $this->applyRestrictions($query);
-        }
-
-        if ($query instanceof UnionQuery) {
-            foreach ($query->getUnions() as $query) {
-                $query->filter($filter ?: $this->getFilter());
-            }
-        } else {
-            $query->filter($filter ?: $this->getFilter());
-        }
-
-        return $this;
     }
 
     /**
@@ -112,12 +106,5 @@ class IcingadbGraphiteController extends CompatController
         $this->params->shift($sortControl->getSortParam());
 
         return $sortControl->apply($query);
-    }
-
-    public function preDispatch()
-    {
-        parent::preDispatch();
-
-        $this->format = $this->params->shift('format');
     }
 }

@@ -9,6 +9,9 @@ use Icinga\Module\Monitoring\DataView\DataView;
 
 abstract class MonitoringAwareController extends Controller
 {
+    /** @var bool Whether to use icingadb as the backend */
+    protected $useIcingadbAsBackend = false;
+
     /**
      * Restrict the given monitored object query for the currently authenticated user
      *
@@ -26,6 +29,8 @@ abstract class MonitoringAwareController extends Controller
     protected function moduleInit()
     {
         if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
+            $this->useIcingadbAsBackend = true;
+
             return;
         }
 
