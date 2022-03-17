@@ -11,12 +11,15 @@ use Icinga\Module\Graphite\GraphiteUtil;
 use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
 use Icinga\Module\Icingadb\Common\Macros;
+use Icinga\Module\Icingadb\Compat\UrlMigrator;
+use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Monitoring\Object\Macro;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Util\Json;
 use Icinga\Web\Url;
 use InvalidArgumentException;
 use ipl\Orm\Model;
+use ipl\Stdlib\Filter as IplFilter;
 
 /**
  * Queries a {@link MetricsDataSource}
@@ -132,23 +135,28 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
                 continue;
             }
 
+            $workaroundMacro = str_replace('.', '_', $macro);
             if ($this->object instanceof Model) {
-                // icingadb macros
-                $workaroundMacro = $macro;
-                // convert monitoring customvar
-                if (preg_match('/^(_host_|_service_)(.+)/', $workaroundMacro, $matches)) {
-                    $workaroundMacro = trim($matches[1], '_') . '.vars.' . $matches[2];
+                // icingadb macro
+                $tranformFilter = UrlMigrator::transformFilter(
+                    IplFilter::equal($workaroundMacro, ''),
+                    $this->object instanceof Host ? 'hosts' : 'services'
+                );
+
+                if ($tranformFilter === false) {
+                    continue;
                 }
-                elseif ($workaroundMacro === 'service.check_command') {
-                    $workaroundMacro = 'service.checkcommand';
-                }
-                elseif ($workaroundMacro === 'host.check_command') {
-                    $workaroundMacro = 'host.checkcommand';
+
+                $migratedMacro = $tranformFilter->getColumn();
+
+                if ($migratedMacro === $workaroundMacro) {
+                    $workaroundMacro = $macro;
+                } else {
+                    $workaroundMacro = $migratedMacro;
                 }
 
                 $result = $this->resolveMacro($workaroundMacro, $this->object);
             } else {
-                $workaroundMacro = str_replace('.', '_', $macro);
                 if ($workaroundMacro === 'service_name') {
                     $workaroundMacro = 'service_description';
                 }
