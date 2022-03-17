@@ -1,20 +1,20 @@
 <?php
 
+/* Icinga Graphite Web | (c) 2022 Icinga GmbH | GPLv2 */
+
 namespace Icinga\Module\Graphite\Controllers;
 
 use GuzzleHttp\Psr7\ServerRequest;
-use Icinga\Module\Graphite\Util\TimeRangePickerTools;
 use Icinga\Module\Graphite\Web\Controller\IcingadbGraphiteController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Web\Widget\IcingadbGraphs;
 use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Icingadb\Web\Control\SearchBar\ObjectSuggestions;
+use Icinga\Web\Url;
 use ipl\Html\HtmlString;
 use ipl\Stdlib\Filter;
 use ipl\Web\Control\LimitControl;
 use ipl\Web\Control\SortControl;
-use ipl\Web\Filter\QueryString;
-use ipl\Web\Url;
 
 class HostsController extends IcingadbGraphiteController
 {
@@ -22,10 +22,15 @@ class HostsController extends IcingadbGraphiteController
 
     public function indexAction()
     {
+        if (! $this->useIcingadbAsBackend) {
+            $params = urldecode($this->params->get('legacyParams'));
+            $this->redirectNow(Url::fromPath('graphite/list/hosts')->setQueryString($params));
+        }
+
         // shift graph params to avoid exception
         $graphRange = $this->params->shift('graph_range');
-        $baseFilter = $graphRange ? QueryString::parse('graph_range=' . $graphRange) : $this->getFilter();
-        foreach (['graphs_limit', 'graph_start', 'graph_end'] as $param) {
+        $baseFilter = $graphRange ? Filter::equal('graph_range', $graphRange) : null;
+        foreach ($this->graphParams as $param) {
             $this->params->shift($param);
         }
 
@@ -42,10 +47,13 @@ class HostsController extends IcingadbGraphiteController
         $paginationControl = $this->createPaginationControl($hosts);
         $sortControl = $this->createSortControl($hosts, ['host.display_name' => t('Hostname')]);
 
-        $searchBar = $this->createSearchBar($hosts, [
-            $limitControl->getLimitParam(),
-            $sortControl->getSortParam()
-        ]);
+        $searchBar = $this->createSearchBar(
+            $hosts,
+            array_merge(
+                [$limitControl->getLimitParam(), $sortControl->getSortParam()],
+                $this->graphParams
+            )
+        );
 
         if ($searchBar->hasBeenSent() && ! $searchBar->isValid()) {
             if ($searchBar->hasBeenSubmitted()) {
@@ -59,7 +67,8 @@ class HostsController extends IcingadbGraphiteController
             $filter = $searchBar->getFilter();
         }
 
-        $this->filter($hosts, $filter);
+        $this->applyRestrictions($hosts);
+        $hosts->filter($filter);
 
         $this->addControl($paginationControl);
         $this->addControl($sortControl);
@@ -68,7 +77,10 @@ class HostsController extends IcingadbGraphiteController
         $this->handleTimeRangePickerRequest();
         $this->addControl(HtmlString::create($this->renderTimeRangePicker($this->view)));
 
-        $this->addContent((new IcingadbGraphs($hosts->execute()))->setBaseFilter($baseFilter));
+        $this->addContent(
+            (new IcingadbGraphs($hosts->execute()))
+                ->setBaseFilter($baseFilter)
+        );
 
         if (! $searchBar->hasBeenSubmitted() && $searchBar->hasBeenSent()) {
             $this->sendMultipartUpdate();
@@ -87,7 +99,10 @@ class HostsController extends IcingadbGraphiteController
     {
         $editor = $this->createSearchEditor(
             Host::on($this->getDb()),
-            [LimitControl::DEFAULT_LIMIT_PARAM, SortControl::DEFAULT_SORT_PARAM]
+            array_merge(
+                [LimitControl::DEFAULT_LIMIT_PARAM, SortControl::DEFAULT_SORT_PARAM],
+                $this->graphParams
+            )
         );
 
         $this->getDocument()->add($editor);
