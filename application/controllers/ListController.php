@@ -2,12 +2,11 @@
 
 namespace Icinga\Module\Graphite\Controllers;
 
-use Icinga\Application\Modules\Module;
 use Icinga\Data\Filter\Filter;
-use Icinga\Module\Graphite\ProvidedHook\Icingadb\IcingadbSupport;
 use Icinga\Module\Graphite\Util\TimeRangePickerTools;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
+use Icinga\Module\Icingadb\Compat\UrlMigrator;
 use Icinga\Module\Monitoring\DataView\DataView;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\Service;
@@ -15,6 +14,7 @@ use Icinga\Web\Url;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
 use Icinga\Web\Widget\Tabextension\MenuAction;
 use Icinga\Web\Widget\Tabextension\OutputFormat;
+use ipl\Web\Filter\QueryString;
 
 class ListController extends MonitoringAwareController
 {
@@ -31,12 +31,22 @@ class ListController extends MonitoringAwareController
 
     public function hostsAction()
     {
-        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
-            if ($hostName = $this->params->shift('host')) {
-                $this->params->set('host.name', $hostName);
+        if ($this->useIcingadbAsBackend) {
+            $legacyParams = urlencode($this->params->toString());
+            $params = QueryString::render(
+                UrlMigrator::transformFilter(
+                    QueryString::parse($this->params->toString())
+                )
+            );
+
+            $url =  Url::fromPath('graphite/hosts')
+                ->setQueryString($params);
+
+            if ($legacyParams) {
+                $url->setParam('legacyParams', $legacyParams);
             }
 
-            $this->redirectNow(Url::fromPath('graphite/hosts')->setParams($this->params));
+            $this->redirectNow($url);
         }
 
         $this->addTitleTab(
@@ -79,16 +89,22 @@ class ListController extends MonitoringAwareController
 
     public function servicesAction()
     {
-        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
-            if ($hostName = $this->params->shift('host')) {
-                $this->params->set('host.name', $hostName);
+        if ($this->useIcingadbAsBackend) {
+            $legacyParams = urlencode($this->params->toString());
+            $params = QueryString::render(
+                UrlMigrator::transformFilter(
+                    QueryString::parse($this->params->toString())
+                )
+            );
+
+            $url =  Url::fromPath('graphite/services')
+                ->setQueryString($params);
+
+            if ($legacyParams) {
+                $url->setParam('legacyParams', $legacyParams);
             }
 
-            if ($serviceName = $this->params->shift('service')) {
-                $this->params->set('service.name', $serviceName);
-            }
-
-            $this->redirectNow(Url::fromPath('graphite/services')->setParams($this->params));
+            $this->redirectNow($url);
         }
 
         $this->addTitleTab(
