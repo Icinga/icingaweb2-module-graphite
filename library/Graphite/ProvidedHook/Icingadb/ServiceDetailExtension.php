@@ -36,9 +36,10 @@ class ServiceDetailExtension extends ServiceDetailExtensionHook
 
             $header = Html::tag('h2', [], 'Graphs');
             $timepicker = HtmlString::create($this->renderTimeRangePicker(Icinga::app()->getViewRenderer()->view));
+            $graphColorRegistry = Html::tag('div', ['class' => 'graphite-graph-color-registry']);
             $graphs = HtmlString::create($graphs);
 
-            return HtmlString::create($header . $timepicker . $graphs);
+            return HtmlString::create($header . $timepicker . $graphColorRegistry . $graphs);
         }
 
         return HtmlString::create('');
