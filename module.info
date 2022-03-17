@@ -3,4 +3,4 @@ Version: 1.1.0
 Description: Icinga Graphite module
  This module integrates an existing Graphite installation in your Icinga Web 2
  frontend.
-Depends: monitoring
+Depends: monitoring, icingadb
