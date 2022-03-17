@@ -57,3 +57,28 @@ Example result of the first URL:
 ```
 {"results": ["icinga2.icinga_com.host.hostalive.perfdata.rta.value"]}
 ```
+
+## Special chars in host or service name
+
+Graphite cannot work with special characters. The host and service name should
+therefore only contain Latin characters. If you want to use special characters
+in host and service names, please set a `display_name` for the object.
+
+### Example
+
+```
+object Host "Only latin chars here" {
+  display_name = "Special chars are welcome"
+  ...
+}
+
+object Service "Only latin chars here" {
+  display_name = "Special chars are welcome"
+  ...
+}
+
+apply Service "Only latin chars here" {
+  display_name = "Special chars are welcome"
+  ...
+}
+```
