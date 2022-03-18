@@ -2,19 +2,29 @@
 
 namespace Icinga\Module\Graphite\Controllers;
 
+use Icinga\Application\Modules\Module;
 use Icinga\Exception\Http\HttpBadRequestException;
 use Icinga\Exception\Http\HttpNotFoundException;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
+use Icinga\Module\Graphite\ProvidedHook\Icingadb\IcingadbSupport;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
+use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Module\Monitoring\Object\Service;
 use Icinga\Web\UrlParams;
+use Icinga\Module\Icingadb\Common\Database;
+use Icinga\Module\Icingadb\Model\Service as IcingadbService;
+use Icinga\Module\Icingadb\Model\Host as IcingadbHost;
+use ipl\Orm\Model;
+use ipl\Stdlib\Filter;
 
 class GraphController extends MonitoringAwareController
 {
     use GraphingTrait;
+    use Database;
+    use Auth;
 
     /**
      * The URL parameters for the graph
@@ -57,6 +67,11 @@ class GraphController extends MonitoringAwareController
 
     public function hostAction()
     {
+        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
+            $this->icingadbHost();
+            return;
+        }
+
         $hostName = $this->filterParams->getRequired('host.name');
         $checkCommandColumn = '_host_' . Graphs::getObscuredCheckCommandCustomVar();
         $host = $this->applyMonitoringRestriction(
@@ -75,6 +90,11 @@ class GraphController extends MonitoringAwareController
 
     public function serviceAction()
     {
+        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
+            $this->icingadbService();
+            return;
+        }
+
         $hostName = $this->filterParams->getRequired('host.name');
         $serviceName = $this->filterParams->getRequired('service.name');
         $checkCommandColumn = '_service_' . Graphs::getObscuredCheckCommandCustomVar();
@@ -97,15 +117,70 @@ class GraphController extends MonitoringAwareController
         );
     }
 
+    private function icingadbService()
+    {
+        $hostName = $this->filterParams->getRequired('host.name');
+        $serviceName = $this->filterParams->getRequired('service.name');
+
+        $query = IcingadbService::on($this->getDb())->with(['state', 'host']);
+
+        $query->filter(Filter::all(
+            Filter::equal('service.name', $serviceName),
+            Filter::equal('service.host.name', $hostName)
+        ));
+
+        $this->applyRestrictions($query);
+
+        /** @var IcingadbService $service */
+        $service = $query->first();
+
+        if ($service === null) {
+            throw new HttpNotFoundException($this->translate('No such service'));
+        }
+
+        $checkCommandColumn = $service->vars[Graphs::getObscuredCheckCommandCustomVar()] ?? null;
+
+        $this->supplyImage(
+            $service,
+            $service->checkcommand,
+            $checkCommandColumn
+        );
+    }
+
+    private function icingadbHost()
+    {
+        $hostName = $this->filterParams->getRequired('host.name');
+
+        $query = IcingadbHost::on($this->getDb())->with(['state']);
+        $query->filter(Filter::equal('host.name', $hostName));
+
+        $this->applyRestrictions($query);
+
+        /** @var IcingadbHost $host */
+        $host = $query->first();
+
+        if ($host === null) {
+            throw new HttpNotFoundException($this->translate('No such host'));
+        }
+
+        $checkCommandColumn = $host->vars[Graphs::getObscuredCheckCommandCustomVar()] ?? null;
+
+        $this->supplyImage(
+            $host,
+            $host->checkcommand,
+            $checkCommandColumn
+        );
+    }
+
     /**
      * Do all monitored object type independend actions
      *
-     * @param MonitoredObject $monitoredObject      The monitored object to render the graphs of
-     * @param string          $checkCommand         The check command of the monitored object we supply an image for
-     * @param string|null     $obscuredCheckCommand The "real" check command (if any) of the monitored object
-     *                                              we display graphs for
+     * @param MonitoredObject|Model     $object                 The object to render the graphs for
+     * @param string                    $checkCommand           The check command of the object we supply an image for
+     * @param string|null               $obscuredCheckCommand   The "real" check command (if any) of the  object we
+     *                                                          display graphs for
      */
-    protected function supplyImage(MonitoredObject $monitoredObject, $checkCommand, $obscuredCheckCommand)
+    protected function supplyImage($object, $checkCommand, $obscuredCheckCommand)
     {
         if (isset($this->graphParams['default_template'])) {
             $urlParam = 'default_template';
@@ -123,7 +198,7 @@ class GraphController extends MonitoringAwareController
 
         $charts = $templates[$this->graphParams[$urlParam]]->getCharts(
             static::getMetricsDataSource(),
-            $monitoredObject,
+            $object,
             array_map('rawurldecode', $this->filterParams->toArray(false))
         );
 

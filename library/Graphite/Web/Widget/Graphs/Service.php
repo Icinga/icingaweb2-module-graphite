@@ -9,14 +9,14 @@ use Icinga\Web\Url;
 
 class Service extends Graphs
 {
-    protected $monitoredObjectType = 'service';
+    protected $objectType = 'service';
 
     /**
-     * The service to render the graphs of
+     * The service to render the graphs for
      *
      * @var MonitoredService
      */
-    protected $monitoredObject;
+    protected $object;
 
     protected function getImageBaseUrl()
     {
@@ -27,23 +27,23 @@ class Service extends Graphs
     {
         return Url::fromPath(
             'graphite/list/services',
-            ['host' => $this->monitoredObject->getHost()->getName(), 'service' => $this->monitoredObject->getName()]
+            ['host' => $this->object->getHost()->getName(), 'service' => $this->object->getName()]
         );
     }
 
     protected function filterImageUrl(Url $url)
     {
         return $url
-            ->setParam('host.name', $this->monitoredObject->getHost()->getName())
-            ->setParam('service.name', $this->monitoredObject->getName());
+            ->setParam('host.name', $this->object->getHost()->getName())
+            ->setParam('service.name', $this->object->getName());
     }
 
     protected function getMonitoredObjectIdentifier()
     {
-        return $this->monitoredObject->getHost()->getName() . ':' . $this->monitoredObject->getName();
+        return $this->object->getHost()->getName() . ':' . $this->object->getName();
     }
 
-    protected function designedForMyMonitoredObjectType(Template $template)
+    protected function designedForObjectType(Template $template)
     {
         foreach ($template->getCurves() as $curve) {
             if (in_array('service_name_template', $curve[0]->getMacros())) {

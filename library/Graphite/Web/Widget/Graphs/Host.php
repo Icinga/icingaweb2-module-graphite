@@ -9,14 +9,14 @@ use Icinga\Web\Url;
 
 class Host extends Graphs
 {
-    protected $monitoredObjectType = 'host';
+    protected $objectType = 'host';
 
     /**
      * The host to render the graphs of
      *
      * @var MonitoredHost
      */
-    protected $monitoredObject;
+    protected $object;
 
     protected function getImageBaseUrl()
     {
@@ -25,20 +25,20 @@ class Host extends Graphs
 
     protected function getGraphsListBaseUrl()
     {
-        return Url::fromPath('graphite/list/hosts', ['host' => $this->monitoredObject->getName()]);
+        return Url::fromPath('graphite/list/hosts', ['host' => $this->object->getName()]);
     }
 
     protected function filterImageUrl(Url $url)
     {
-        return $url->setParam('host.name', $this->monitoredObject->getName());
+        return $url->setParam('host.name', $this->object->getName());
     }
 
     protected function getMonitoredObjectIdentifier()
     {
-        return $this->monitoredObject->getName();
+        return $this->object->getName();
     }
 
-    protected function designedForMyMonitoredObjectType(Template $template)
+    protected function designedForObjectType(Template $template)
     {
         foreach ($template->getCurves() as $curve) {
             if (in_array('host_name_template', $curve[0]->getMacros())) {

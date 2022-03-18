@@ -22,7 +22,7 @@ class DetailviewExtension extends DetailviewExtensionHook
         $graphs = (string) Graphs::forMonitoredObject($object)
             ->setWidth(440)
             ->setHeight(220)
-            ->setClasses(['monitored-object-detail-view'])
+            ->setClasses(['object-detail-view'])
             ->setPreloadDummy()
             ->setShowNoGraphsFound(false)
             ->handleRequest();

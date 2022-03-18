@@ -6,6 +6,7 @@ use Icinga\Data\Filter\Filter;
 use Icinga\Module\Graphite\Util\TimeRangePickerTools;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
+use Icinga\Module\Icingadb\Compat\UrlMigrator;
 use Icinga\Module\Monitoring\DataView\DataView;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\Service;
@@ -13,6 +14,7 @@ use Icinga\Web\Url;
 use Icinga\Web\Widget\Tabextension\DashboardAction;
 use Icinga\Web\Widget\Tabextension\MenuAction;
 use Icinga\Web\Widget\Tabextension\OutputFormat;
+use ipl\Web\Filter\QueryString;
 
 class ListController extends MonitoringAwareController
 {
@@ -29,6 +31,24 @@ class ListController extends MonitoringAwareController
 
     public function hostsAction()
     {
+        if ($this->useIcingadbAsBackend) {
+            $legacyParams = urlencode($this->params->toString());
+            $params = QueryString::render(
+                UrlMigrator::transformFilter(
+                    QueryString::parse($this->params->toString())
+                )
+            );
+
+            $url =  Url::fromPath('graphite/hosts')
+                ->setQueryString($params);
+
+            if ($legacyParams) {
+                $url->setParam('legacyParams', $legacyParams);
+            }
+
+            $this->redirectNow($url);
+        }
+
         $this->addTitleTab(
             'hosts',
             mt('monitoring', 'Hosts'),
@@ -69,6 +89,24 @@ class ListController extends MonitoringAwareController
 
     public function servicesAction()
     {
+        if ($this->useIcingadbAsBackend) {
+            $legacyParams = urlencode($this->params->toString());
+            $params = QueryString::render(
+                UrlMigrator::transformFilter(
+                    QueryString::parse($this->params->toString())
+                )
+            );
+
+            $url =  Url::fromPath('graphite/services')
+                ->setQueryString($params);
+
+            if ($legacyParams) {
+                $url->setParam('legacyParams', $legacyParams);
+            }
+
+            $this->redirectNow($url);
+        }
+
         $this->addTitleTab(
             'services',
             mt('monitoring', 'Services'),

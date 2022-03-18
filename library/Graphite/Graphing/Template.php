@@ -8,6 +8,7 @@ use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use InvalidArgumentException;
+use ipl\Orm\Model;
 
 class Template
 {
@@ -63,16 +64,16 @@ class Template
      * Get all charts based on this template and applicable to the metrics
      * from the given data source restricted by the given filter
      *
-     * @param   MetricsDataSource   $dataSource
-     * @param   MonitoredObject     $monitoredObject    The monitored object to render the graphs of
-     * @param   string[]            $filter
-     * @param   MacroTemplate[]     $excludeMetrics
+     * @param   MetricsDataSource       $dataSource
+     * @param   MonitoredObject|Model   $object    The object to render the graphs for
+     * @param   string[]                $filter
+     * @param   MacroTemplate[]         $excludeMetrics
      *
      * @return  Chart[]
      */
     public function getCharts(
         MetricsDataSource $dataSource,
-        MonitoredObject $monitoredObject,
+        $object,
         array $filter,
         array &$excludeMetrics = []
     ) {
@@ -83,7 +84,7 @@ class Template
         foreach ($this->getFullCurves() as $curveName => $curve) {
             $fullMetricTemplate = $curve[0];
 
-            $query = $dataSource->select()->setMonitoredObject($monitoredObject)->from($fullMetricTemplate);
+            $query = $dataSource->select()->setObject($object)->from($fullMetricTemplate);
 
             foreach ($filter as $key => $value) {
                 $query->where($key, $value);
