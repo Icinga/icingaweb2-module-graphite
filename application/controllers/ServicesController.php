@@ -32,7 +32,7 @@ class ServicesController extends IcingadbGraphiteController
             $this->params->shift($param);
         }
 
-        $this->setTitle(t('Services'));
+        $this->addTitleTab(t('Services'));
 
         $db = $this->getDb();
 

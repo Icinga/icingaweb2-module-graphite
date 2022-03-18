@@ -34,7 +34,7 @@ class HostsController extends IcingadbGraphiteController
             $this->params->shift($param);
         }
 
-        $this->setTitle(t('Hosts'));
+        $this->addTitleTab(t('Hosts'));
 
         $db = $this->getDb();
 
