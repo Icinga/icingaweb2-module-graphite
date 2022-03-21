@@ -87,12 +87,6 @@ class GraphImage extends AbstractWidget
             }
 
             $metrics = $this->chart->getMetrics();
-
-            foreach ($metrics as &$metric) {
-                $metric = $graphiteWebClient->escapeMetricPath($metric);
-            }
-            unset($metric);
-
             $allVars = [];
 
             foreach ($template->getCurves() as $curveName => $curve) {
