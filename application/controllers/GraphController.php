@@ -7,14 +7,13 @@ use Icinga\Exception\Http\HttpBadRequestException;
 use Icinga\Exception\Http\HttpNotFoundException;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
 use Icinga\Module\Graphite\ProvidedHook\Icingadb\IcingadbSupport;
+use Icinga\Module\Graphite\Util\IcingadbUtils;
 use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
-use Icinga\Module\Icingadb\Common\Auth;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Module\Monitoring\Object\Service;
 use Icinga\Web\UrlParams;
-use Icinga\Module\Icingadb\Common\Database;
 use Icinga\Module\Icingadb\Model\Service as IcingadbService;
 use Icinga\Module\Icingadb\Model\Host as IcingadbHost;
 use ipl\Orm\Model;
@@ -23,8 +22,6 @@ use ipl\Stdlib\Filter;
 class GraphController extends MonitoringAwareController
 {
     use GraphingTrait;
-    use Database;
-    use Auth;
 
     /**
      * The URL parameters for the graph
@@ -121,15 +118,15 @@ class GraphController extends MonitoringAwareController
     {
         $hostName = $this->filterParams->getRequired('host.name');
         $serviceName = $this->filterParams->getRequired('service.name');
-
-        $query = IcingadbService::on($this->getDb())->with(['state', 'host']);
+        $icingadbUtils = IcingadbUtils::getInstance();
+        $query = IcingadbService::on($icingadbUtils->getDb())->with(['state', 'host']);
 
         $query->filter(Filter::all(
             Filter::equal('service.name', $serviceName),
             Filter::equal('service.host.name', $hostName)
         ));
 
-        $this->applyRestrictions($query);
+        $icingadbUtils->applyRestrictions($query);
 
         /** @var IcingadbService $service */
         $service = $query->first();
@@ -150,11 +147,11 @@ class GraphController extends MonitoringAwareController
     private function icingadbHost()
     {
         $hostName = $this->filterParams->getRequired('host.name');
-
-        $query = IcingadbHost::on($this->getDb())->with(['state']);
+        $icingadbUtils = IcingadbUtils::getInstance();
+        $query = IcingadbHost::on($icingadbUtils->getDb())->with(['state']);
         $query->filter(Filter::equal('host.name', $hostName));
 
-        $this->applyRestrictions($query);
+        $icingadbUtils->applyRestrictions($query);
 
         /** @var IcingadbHost $host */
         $host = $query->first();

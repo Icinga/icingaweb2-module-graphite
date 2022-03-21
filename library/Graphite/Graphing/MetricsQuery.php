@@ -8,9 +8,9 @@ use Icinga\Data\Filterable;
 use Icinga\Data\Queryable;
 use Icinga\Exception\NotImplementedError;
 use Icinga\Module\Graphite\GraphiteUtil;
+use Icinga\Module\Graphite\Util\IcingadbUtils;
 use Icinga\Module\Graphite\Util\MacroTemplate;
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
-use Icinga\Module\Icingadb\Common\Macros;
 use Icinga\Module\Icingadb\Compat\UrlMigrator;
 use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Monitoring\Object\Macro;
@@ -26,8 +26,6 @@ use ipl\Stdlib\Filter as IplFilter;
  */
 class MetricsQuery implements Queryable, Filterable, Fetchable
 {
-    use Macros;
-
     /**
      * @var MetricsDataSource
      */
@@ -155,7 +153,8 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
                     $workaroundMacro = $migratedMacro;
                 }
 
-                $result = $this->resolveMacro($workaroundMacro, $this->object);
+                $icingadbMacros = IcingadbUtils::getInstance();
+                $result = $icingadbMacros->resolveMacro($workaroundMacro, $this->object);
             } else {
                 if ($workaroundMacro === 'service_name') {
                     $workaroundMacro = 'service_description';
