@@ -67,7 +67,6 @@ class HostsController extends IcingadbGraphiteController
             $filter = $searchBar->getFilter();
         }
 
-        $this->applyRestrictions($hosts);
         $hosts->filter($filter);
 
         $this->addControl($paginationControl);

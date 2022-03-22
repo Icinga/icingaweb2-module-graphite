@@ -68,7 +68,6 @@ class ServicesController extends IcingadbGraphiteController
             $filter = $searchBar->getFilter();
         }
 
-        $this->applyRestrictions($services);
         $services->filter($filter);
 
         $this->addControl($paginationControl);
