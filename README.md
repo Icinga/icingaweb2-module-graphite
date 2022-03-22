@@ -1,9 +1,13 @@
-# Graphite - Icinga Web 2 Module
+# Icinga Module for Graphite
 
-![Icinga Logo](https://www.icinga.com/wp-content/uploads/2014/06/icinga_logo.png)
+[![PHP Support](https://img.shields.io/badge/php-%3E%3D%207.2-777BB4?logo=PHP)](https://php.net/)
+![Build Status](https://github.com/icinga/icingaweb2-module-graphite/workflows/PHP%20Tests/badge.svg?branch=master)
+[![Github Tag](https://img.shields.io/github/tag/Icinga/icingaweb2-module-graphite.svg)](https://github.com/Icinga/icingaweb2-module-graphite)
+
+![Icinga Logo](https://icinga.com/wp-content/uploads/2014/06/icinga_logo.png)
 
 This module integrates an existing [Graphite](https://graphite.readthedocs.io/en/latest/)
-installation in your [Icinga Web 2](https://www.icinga.com/products/icinga-web-2/)
+installation in your [Icinga Web 2](https://icinga.com/products/infrastructure-monitoring/)
 frontend.
 
 ![Service List](doc/img/service-list.png)
