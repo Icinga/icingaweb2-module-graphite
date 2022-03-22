@@ -86,24 +86,6 @@ class GraphiteWebClient
     }
 
     /**
-     * Escape special characters in the given Graphite metric path
-     *
-     * @param   string  $metricPath
-     *
-     * @return  string
-     */
-    public function escapeMetricPath($metricPath)
-    {
-        return preg_replace_callback(
-            '/[[\]]/',
-            function (array $matches) {
-                return "[$matches[0]]";
-            },
-            $metricPath
-        );
-    }
-
-    /**
      * Complete the given relative URL according to the base URL
      *
      * @param   Url $url

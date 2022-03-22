@@ -170,7 +170,7 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
 
         $client = $this->dataSource->getClient();
         $url = Url::fromPath('metrics/expand', [
-            'query' => $client->escapeMetricPath($this->base->resolve($filter, '*'))
+            'query' => $this->base->resolve($filter, '*')
         ]);
         $res = Json::decode($client->request($url));
         natsort($res->results);

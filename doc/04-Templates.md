@@ -86,10 +86,21 @@ macro in place for the actual perfdata-label:
 
     $host_name_template$.perfdata.$perfdata_label$.value
 
+You can also use wildcards. To define a wildcard, please use the following syntax:
+
+    $macro:wildcard syntax here$
+    
+  Some Examples:
+
+    $perfdata_label:{abc,def}$
+    $perfdata_label:{a*c,de*}$
+    $perfdata_label:{a[vbn]c,def}$
+
 > **Note:**
 >
 > The name of the macro for the perfdata-label is also arbitrary. You may as
-> well use a more descriptive name such as `$disk$` for the disk check.
+> well use a more descriptive name such as `$disk$` for the disk check. `$disk$` 
+> is the same as `$disk:*$`.
 
 ### Template Structure: urlparams <a id="templates-structure-urlparams"></a>
 

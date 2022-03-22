@@ -31,6 +31,20 @@ class MacroTemplate
     protected $reverseResolvePattern;
 
     /**
+     * Wildcards
+     *
+     * @var string[]
+     */
+    protected $wildCards;
+
+    /**
+     * The original raw template
+     *
+     * @var string
+     */
+    protected $orgTemplate;
+
+    /**
      * Constructor
      *
      * @param   string  $template           The raw template
@@ -38,8 +52,16 @@ class MacroTemplate
      */
     public function __construct($template, $macroCharacter = '$')
     {
+        $this->orgTemplate = $template;
         $this->macroCharacter = $macroCharacter;
         $this->template = explode($macroCharacter, $template);
+        foreach ($this->template as $key => $value) {
+            if (preg_match('/([^:]+):(.+)/', $value, $match)) {
+                $wildCardKey = $match[1];
+                $this->template[$key] = $wildCardKey;
+                $this->wildCards[$wildCardKey] = $match[2];
+            }
+        }
 
         if (! (count($this->template) % 2)) {
             throw new InvalidArgumentException(
@@ -72,9 +94,19 @@ class MacroTemplate
                 } elseif ($default === null) {
                     $result[] = $this->macroCharacter;
                     $result[] = $part;
+                    // add wildcards to result before they are
+                    // overwritten from Template::getFullCurves()
+                    if (isset($this->wildCards[$part])) {
+                        $result[] = ':' . $this->wildCards[$part];
+                    }
+
                     $result[] = $this->macroCharacter;
                 } else {
-                    $result[] = $default;
+                    if (isset($this->wildCards[$part])) {
+                        $result[] = $this->wildCards[$part];
+                    } else {
+                        $result[] = $default;
+                    }
                 }
             } else {
                 $result[] = $part;
@@ -131,7 +163,7 @@ class MacroTemplate
      */
     public function __toString()
     {
-        return implode($this->macroCharacter, $this->template);
+        return $this->orgTemplate;
     }
 
     /**
