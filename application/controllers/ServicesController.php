@@ -86,6 +86,8 @@ class ServicesController extends IcingadbGraphiteController
         if (! $searchBar->hasBeenSubmitted() && $searchBar->hasBeenSent()) {
             $this->sendMultipartUpdate();
         }
+
+        $this->setAutorefreshInterval(30);
     }
 
     public function completeAction()
