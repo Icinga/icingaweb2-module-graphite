@@ -119,7 +119,9 @@ class GraphController extends MonitoringAwareController
         $hostName = $this->filterParams->getRequired('host.name');
         $serviceName = $this->filterParams->getRequired('service.name');
         $icingadbUtils = IcingadbUtils::getInstance();
-        $query = IcingadbService::on($icingadbUtils->getDb())->with(['state', 'host']);
+        $query = IcingadbService::on($icingadbUtils->getDb())
+            ->with('state')
+            ->with('host');
 
         $query->filter(Filter::all(
             Filter::equal('service.name', $serviceName),
@@ -148,7 +150,7 @@ class GraphController extends MonitoringAwareController
     {
         $hostName = $this->filterParams->getRequired('host.name');
         $icingadbUtils = IcingadbUtils::getInstance();
-        $query = IcingadbHost::on($icingadbUtils->getDb())->with(['state']);
+        $query = IcingadbHost::on($icingadbUtils->getDb())->with('state');
         $query->filter(Filter::equal('host.name', $hostName));
 
         $icingadbUtils->applyRestrictions($query);
