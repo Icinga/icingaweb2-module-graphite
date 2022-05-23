@@ -39,7 +39,7 @@ class HostsController extends IcingadbGraphiteController
         $db = $this->getDb();
 
         $hosts = Host::on($db)->with('state');
-        $hosts->filter(Filter::equal('state.performance_data', '*'));
+        $hosts->filter(Filter::like('state.performance_data', '*'));
 
         $this->applyRestrictions($hosts);
 
