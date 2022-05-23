@@ -39,7 +39,7 @@ class ServicesController extends IcingadbGraphiteController
         $services = Service::on($db)
             ->with('state')
             ->with('host');
-        $services->filter(Filter::equal('state.performance_data', '*'));
+        $services->filter(Filter::like('state.performance_data', '*'));
 
         $this->applyRestrictions($services);
 
