@@ -191,7 +191,7 @@ abstract class Graphs extends AbstractWidget
         $this->renderInline = Url::fromRequest()->getParam('format') === 'pdf';
 
         if ($object instanceof Model) {
-            $this->checkCommand = $object->checkcommand;
+            $this->checkCommand = $object->checkcommand_name;
             $this->obscuredCheckCommand = $object->vars[Graphs::getObscuredCheckCommandCustomVar()] ?? null;
         } else {
             $this->checkCommand = $object->{"{$this->objectType}_check_command"};
