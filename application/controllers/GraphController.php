@@ -141,7 +141,7 @@ class GraphController extends MonitoringAwareController
 
         $this->supplyImage(
             $service,
-            $service->checkcommand,
+            $service->checkcommand_name,
             $checkCommandColumn
         );
     }
@@ -166,7 +166,7 @@ class GraphController extends MonitoringAwareController
 
         $this->supplyImage(
             $host,
-            $host->checkcommand,
+            $host->checkcommand_name,
             $checkCommandColumn
         );
     }
