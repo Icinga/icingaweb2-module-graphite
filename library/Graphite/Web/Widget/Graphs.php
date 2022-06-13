@@ -292,11 +292,27 @@ abstract class Graphs extends AbstractWidget
                             }
                             unset($graph);
 
+                            $urlParams = $template->getUrlParams();
+                            if (array_key_exists("height", $urlParams)) {
+                                $actheight = $urlParams["height"]->resolve(['height']);
+                                if ($actheight < $this->height) {
+                                    $actheight = $this->height;
+                                }
+                            } else {
+                                $actheight = $this->height;
+                            }
+                            $actwidth = $this->width;
+                            $actwidthfix = "";
+                            if (array_key_exists("width", $urlParams)) {
+                                $actwidth = $urlParams["width"]->resolve(['width']);
+                                $actwidthfix = "width: {$actwidth}px; ";
+                            }
+
                             if ($this->renderInline) {
                                 $chart->setFrom($this->start)
                                     ->setUntil($this->end)
-                                    ->setWidth($this->width)
-                                    ->setHeight($this->height)
+                                    ->setWidth($actwidth)
+                                    ->setHeight($actheight)
                                     ->setBackgroundColor('white')
                                     ->setForegroundColor('black')
                                     ->setMajorGridLineColor('grey')
@@ -309,8 +325,8 @@ abstract class Graphs extends AbstractWidget
                                     ->setParam($urlParam, $templateName)
                                     ->setParam('start', $this->start)
                                     ->setParam('end', $this->end)
-                                    ->setParam('width', $this->width)
-                                    ->setParam('height', $this->height);
+                                    ->setParam('width', $actwidth)
+                                    ->setParam('height', $actheight);
 
                                 if (! $this->compact) {
                                     $imageUrl->setParam('legend', 1);
@@ -326,8 +342,8 @@ abstract class Graphs extends AbstractWidget
 
                                 $img = '<img id="graphiteImg-' . md5((string) $imageUrl) . '"'
                                     . " src=\"$src\" data-actualimageurl=\"$imageUrl\" class=\"detach graphiteImg\""
-                                    . " alt=\"\" width=\"$this->width\" height=\"$this->height\""
-                                    . " style=\"min-width: {$this->width}px; min-height: {$this->height}px;\">";
+                                    . " alt=\"\" width=\"$actwidth\" height=\"$actheight\""
+                                    . " style=\"min-width: {$actwidth}px; $actwidthfix min-height: {$actheight}px;\">";
                             }
 
                             $currentGraphs[] = [$img, $metricVariables, $bestPos];
