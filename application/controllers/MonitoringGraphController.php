@@ -5,16 +5,14 @@ namespace Icinga\Module\Graphite\Controllers;
 use Icinga\Exception\Http\HttpBadRequestException;
 use Icinga\Exception\Http\HttpNotFoundException;
 use Icinga\Module\Graphite\Graphing\GraphingTrait;
-use Icinga\Module\Graphite\Util\IcingadbUtils;
+use Icinga\Module\Graphite\Web\Controller\MonitoringAwareController;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
-use Icinga\Module\Icingadb\Model\Host;
-use Icinga\Module\Icingadb\Model\Service;
-use Icinga\Web\Controller;
+use Icinga\Module\Monitoring\Object\Host;
+use Icinga\Module\Monitoring\Object\MonitoredObject;
+use Icinga\Module\Monitoring\Object\Service;
 use Icinga\Web\UrlParams;
-use ipl\Orm\Model;
-use ipl\Stdlib\Filter;
 
-class GraphController extends Controller
+class MonitoringGraphController extends MonitoringAwareController
 {
     use GraphingTrait;
 
@@ -57,70 +55,55 @@ class GraphController extends Controller
         }
     }
 
+    public function hostAction()
+    {
+        $hostName = $this->filterParams->getRequired('host.name');
+        $checkCommandColumn = '_host_' . Graphs::getObscuredCheckCommandCustomVar();
+        $host = $this->applyMonitoringRestriction(
+            $this->backend->select()->from('hoststatus', ['host_check_command', $checkCommandColumn])
+        )
+            ->where('host_name', $hostName)
+            ->limit(1) // just to be sure to save a few CPU cycles
+            ->fetchRow();
+
+        if ($host === false) {
+            throw new HttpNotFoundException('%s', $this->translate('No such host'));
+        }
+
+        $this->supplyImage(new Host($this->backend, $hostName), $host->host_check_command, $host->$checkCommandColumn);
+    }
+
     public function serviceAction()
     {
         $hostName = $this->filterParams->getRequired('host.name');
         $serviceName = $this->filterParams->getRequired('service.name');
-        $icingadbUtils = IcingadbUtils::getInstance();
-        $query = Service::on($icingadbUtils->getDb())
-            ->with('state')
-            ->with('host');
+        $checkCommandColumn = '_service_' . Graphs::getObscuredCheckCommandCustomVar();
+        $service = $this->applyMonitoringRestriction(
+            $this->backend->select()->from('servicestatus', ['service_check_command', $checkCommandColumn])
+        )
+            ->where('host_name', $hostName)
+            ->where('service_description', $serviceName)
+            ->limit(1) // just to be sure to save a few CPU cycles
+            ->fetchRow();
 
-        $query->filter(Filter::all(
-            Filter::equal('service.name', $serviceName),
-            Filter::equal('service.host.name', $hostName)
-        ));
-
-        $icingadbUtils->applyRestrictions($query);
-
-        /** @var Service $service */
-        $service = $query->first();
-
-        if ($service === null) {
-            throw new HttpNotFoundException($this->translate('No such service'));
+        if ($service === false) {
+            throw new HttpNotFoundException('%s', $this->translate('No such service'));
         }
 
-        $checkCommandColumn = $service->vars[Graphs::getObscuredCheckCommandCustomVar()] ?? null;
-
         $this->supplyImage(
-            $service,
-            $service->checkcommand_name,
-            $checkCommandColumn
-        );
-    }
-
-    public function hostAction()
-    {
-        $hostName = $this->filterParams->getRequired('host.name');
-        $icingadbUtils = IcingadbUtils::getInstance();
-        $query = Host::on($icingadbUtils->getDb())->with('state');
-        $query->filter(Filter::equal('host.name', $hostName));
-
-        $icingadbUtils->applyRestrictions($query);
-
-        /** @var Host $host */
-        $host = $query->first();
-
-        if ($host === null) {
-            throw new HttpNotFoundException($this->translate('No such host'));
-        }
-
-        $checkCommandColumn = $host->vars[Graphs::getObscuredCheckCommandCustomVar()] ?? null;
-
-        $this->supplyImage(
-            $host,
-            $host->checkcommand_name,
-            $checkCommandColumn
+            new Service($this->backend, $hostName, $serviceName),
+            $service->service_check_command,
+            $service->$checkCommandColumn
         );
     }
 
     /**
-     * Do all monitored object type independent actions
+     * Do all monitored object type independend actions
      *
-     * @param Model         $object                 The object to render the graphs for
-     * @param string        $checkCommand           The check command of the object we supply an image for
-     * @param string|null   $obscuredCheckCommand   The "real" check command (if any) of the  object we
-     *                                              display graphs for
+     * @param MonitoredObject   $object                 The object to render the graphs for
+     * @param string            $checkCommand           The check command of the object we supply an image for
+     * @param string|null       $obscuredCheckCommand   The "real" check command (if any) of the  object we
+     *                                                  display graphs for
      */
     protected function supplyImage($object, $checkCommand, $obscuredCheckCommand)
     {
@@ -161,7 +144,7 @@ class GraphController extends Controller
                     ->setShowLegend((bool) $this->graphParams['legend'])
                     ->serveImage($this->getResponse());
 
-                // not falling through, serveImage exits
+            // not falling through, serveImage exits
             default:
                 throw new HttpBadRequestException('%s', $this->translate(
                     'Graphite Web yields more than one metric for the given filter.'
