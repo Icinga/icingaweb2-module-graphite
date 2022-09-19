@@ -145,10 +145,13 @@ class CommonForm extends Form
         $params = $this->getRedirectUrl()->getParams();
         $seconds = TimeRangePickerTools::getRelativeSeconds($params);
 
-        if ($seconds === null && count(array_intersect_key(
-            $params->toArray(false),
-            array_keys(TimeRangePickerTools::getAllRangeParameters())
-        )) === 0) {
+        if (
+            $seconds === null
+            && count(array_intersect_key(
+                $params->toArray(false),
+                array_keys(TimeRangePickerTools::getAllRangeParameters())
+            )) === 0
+        ) {
             $seconds = TimeRangePickerTools::getDefaultRelativeTimeRange();
         }
 

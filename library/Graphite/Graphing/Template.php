@@ -134,7 +134,8 @@ class Template
                         if (! isset($handledCurves[$curveName2])) {
                             foreach ($metrics1 as $metric1 => & $vars1) {
                                 foreach ($metrics2 as $metric2 => & $vars2) {
-                                    if (count(array_intersect_assoc($vars1, $vars2))
+                                    if (
+                                        count(array_intersect_assoc($vars1, $vars2))
                                         === count(array_intersect_key($vars1, $vars2))
                                     ) {
                                         $possibleCombinations[$curveName1][$curveName2][$metric1][$metric2] = true;

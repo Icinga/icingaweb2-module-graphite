@@ -5,7 +5,7 @@ namespace Icinga\Module\Graphite\Web\Widget\Graphs\Icingadb;
 use Icinga\Module\Graphite\Graphing\Template;
 use Icinga\Module\Graphite\Web\Widget\Graphs;
 use Icinga\Web\Url;
-use \Icinga\Module\Icingadb\Model\Host;
+use Icinga\Module\Icingadb\Model\Host;
 
 class IcingadbHost extends Graphs
 {
