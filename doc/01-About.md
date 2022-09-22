@@ -1,4 +1,4 @@
-# Icinga Module for Graphite
+# Icinga Web Graphite Integration
 
 This module integrates an existing [Graphite](https://graphite.readthedocs.io/en/latest/)
 installation in your [Icinga Web](https://icinga.com/products/infrastructure-monitoring/)

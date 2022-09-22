@@ -36,11 +36,12 @@ Example debug log for the host "icinga.com":
 ++ Not applying template 'default-service'
 ```
 
-The log describes how the Graphite module assembled the displayed graphs (or why
-no graphs could be assembled). The plus signs indent the performed actions to
-visualize their hierarchy, e.g. all actions below `Applying templates for check
-command 'hostalive'` indented with more than one plus sign (until `Applying
-default templates, (...)`) are sub-actions of the above one.
+The log describes how the Icinga Web Graphite Integration assembled the
+displayed graphs (or why no graphs could be assembled). The plus signs indent
+the performed actions to visualize their hierarchy, e.g. all actions below
+`Applying templates for check command 'hostalive'` indented with more than one
+plus sign (until `Applying default templates, (...)`) are sub-actions of the
+above one.
 
 #### Details
 

@@ -1,4 +1,4 @@
-# Icinga Module for Graphite
+# Icinga Web Graphite Integration
 
 [![PHP Support](https://img.shields.io/badge/php-%3E%3D%207.2-777BB4?logo=PHP)](https://php.net/)
 ![Build Status](https://github.com/icinga/icingaweb2-module-graphite/workflows/PHP%20Tests/badge.svg?branch=master)

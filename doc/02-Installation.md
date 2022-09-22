@@ -34,7 +34,7 @@ However, some templates look better if they are able to render a max
 value or similar.
 
 
-## Install the Graphite Module
+## Install the Icinga Web Graphite Integration
 
 Install it [like any other module](https://icinga.com/docs/icinga-web-2/latest/doc/08-Modules/#installation).
 Use `graphite` as name.
