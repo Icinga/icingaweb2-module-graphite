@@ -246,10 +246,12 @@ abstract class Graphs extends AbstractWidget
         IPT::recordf("Icinga check command: %s", $this->checkCommand);
         IPT::recordf("Obscured check command: %s", $this->obscuredCheckCommand);
 
-        foreach ([
+        foreach (
+            [
             ['template', $concreteTemplates, []],
             ['default_template', $allTemplates->getDefaultTemplates(), $excludedMetrics],
-        ] as $templateSet) {
+            ] as $templateSet
+        ) {
             list($urlParam, $templates, $excludeMetrics) = $templateSet;
 
             if ($urlParam === 'template') {

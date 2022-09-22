@@ -71,14 +71,16 @@ class Templates
      */
     public function loadDir($path)
     {
-        foreach (new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
-                $path,
-                RecursiveDirectoryIterator::KEY_AS_PATHNAME | RecursiveDirectoryIterator::CURRENT_AS_FILEINFO
+        foreach (
+            new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator(
+                    $path,
+                    RecursiveDirectoryIterator::KEY_AS_PATHNAME | RecursiveDirectoryIterator::CURRENT_AS_FILEINFO
                     | RecursiveDirectoryIterator::SKIP_DOTS | RecursiveDirectoryIterator::FOLLOW_SYMLINKS
-            ),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        ) as $filepath => $fileinfo) {
+                ),
+                RecursiveIteratorIterator::LEAVES_ONLY
+            ) as $filepath => $fileinfo
+        ) {
             /** @var SplFileInfo $fileinfo */
 
             if ($fileinfo->isFile() && preg_match('/\A[^.].*\.ini\z/si', $fileinfo->getFilename())) {
@@ -171,10 +173,12 @@ class Templates
                         );
                     }
 
-                    if (count(array_intersect(
-                        $curves[$curve][0]->getMacros(),
-                        ['host_name_template', 'service_name_template']
-                    )) !== 1) {
+                    if (
+                        count(array_intersect(
+                            $curves[$curve][0]->getMacros(),
+                            ['host_name_template', 'service_name_template']
+                        )) !== 1
+                    ) {
                         throw new ConfigurationError(
                             'Bad metrics filter "%s" for curve "%s" of template "%s" in file "%s": must include'
                             . ' either the macro $host_name_template$ or $service_name_template$, but not both',

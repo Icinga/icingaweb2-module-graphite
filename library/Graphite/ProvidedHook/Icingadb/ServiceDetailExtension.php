@@ -3,7 +3,6 @@
 namespace Icinga\Module\Graphite\ProvidedHook\Icingadb;
 
 use Icinga\Application\Icinga;
-
 use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Web\Widget\Graphs;

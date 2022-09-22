@@ -1,4 +1,5 @@
 <?php
+
 /* Icinga Web 2 | (c) 2018 Icinga Development Team | GPLv2+ */
 
 namespace Icinga\Module\Graphite\Clicommands;
@@ -124,11 +125,13 @@ EOT
                     $macros['service_name_template'] = [''];
 
                     foreach ($this->cartesianProduct($macros) as $macroValues) {
-                        if (preg_match(
-                            '/\A\.[^.]+\.(.+)\.[^.]+\z/',
-                            $metricFilter->resolve($macroValues),
-                            $match
-                        )) {
+                        if (
+                            preg_match(
+                                '/\A\.[^.]+\.(.+)\.[^.]+\z/',
+                                $metricFilter->resolve($macroValues),
+                                $match
+                            )
+                        ) {
                             $perfdata[$match[1]] = $max;
                         }
                     }

@@ -39,4 +39,4 @@ jobs:
 
       - name: PHP CodeSniffer
         if: success() || matrix.allow_failure
-        run: phpcs
+        run: phpcs -wps --colors
