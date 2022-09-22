@@ -19,7 +19,7 @@ the monitoring module.
 
 ## Documentation
 
-* [Installation](doc/02-Installation.md)
+* [Installation](https://icinga.com/docs/icinga-web-graphite-integration/latest/doc/02-Installation/)
 * [Configuration](doc/03-Configuration.md)
 * [Templates](doc/04-Templates.md)
 * [Development](doc/06-Development.md)
