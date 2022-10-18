@@ -134,6 +134,61 @@ p.load-more {
   text-align: right;
 }
 
+// TODO: Remove once ipl-web v0.7.0 is required
+.controls:not(.default-layout) {
+  .box-shadow(0, 0, 0, 1px, @gray-lighter);
+
+  .pagination-control {
+    float: left;
+  }
+
+  .sort-control,
+  .limit-control {
+    float: right;
+    margin-left: .5em;
+  }
+
+  .sort-control {
+    display: flex;
+    justify-content: flex-end;
+
+    :not(.form-element) > label {
+      margin-right: 0;
+    }
+
+    .control-button {
+      margin: 0;
+    }
+  }
+
+  > :not(:only-child) {
+    margin-bottom: 0.5em;
+  }
+
+  .search-suggestions {
+    margin-bottom: 2.5em;
+  }
+
+  .search-controls,
+  .filter {
+    clear: both;
+    display: flex;
+    min-width: 100%;
+
+    .search-bar {
+      flex: 1 1 auto;
+
+      & ~ .control-button:last-child {
+        margin-right: -.5em;
+      }
+
+      & ~ .control-button {
+        margin-left: .5em;
+      }
+    }
+  }
+}
+
 /* Graph colors */
 
 @graphite-graph-bg-color: @body-bg-color;
@@ -155,66 +210,4 @@ p.load-more {
   color: @graphite-graph-fg-color;
   border-top-color: @graphite-graph-major-grid-color;
   border-bottom-color: @graphite-graph-minor-grid-color;
-}
-
-// icingadb controls
-.controls {
-  .box-shadow(0, 0, 0, 1px, @gray-lighter);
-  flex-shrink: 0;
-
-  > :not(:only-child) {
-    margin-bottom: .5em;
-  }
-
-  .filter {
-    display: flex;
-    min-width: 100%;
-
-    .search-bar {
-      flex: 1 1 auto;
-    }
-  }
-
-  .pagination-control {
-    float: left;
-  }
-
-  .limit-control,
-  .sort-control {
-    margin-left: .5em;
-    float: right;
-  }
-
-  .control-button {
-    margin-left: .5em;
-  }
-
-  .search-editor-opener {
-    &:last-child {
-      margin-right: -.5em;
-    }
-  }
-
-  .search-suggestions {
-    margin-bottom: 2.5em;
-  }
-
-  .sort-control {
-    display: flex;
-    justify-content: flex-end;
-
-    // Icinga Web 2 override
-    label {
-      margin-right: 0;
-    }
-
-    // Icinga Web 2 override
-    .spinner {
-      height: 100%;
-    }
-
-    .control-button {
-      margin: 0;
-    }
-  }
 }
