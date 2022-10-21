@@ -1,4 +1,4 @@
-# <a id="Demonstration"></a>Demonstration
+# Development
 
 This module provides a CLI command for demonstrating
 graph templates (useful for developing them):
