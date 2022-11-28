@@ -2,7 +2,7 @@
 
 ## Basics
 
-Open up the Icinga Web 2 frontend and navigate to:
+Open up the Icinga Web frontend and navigate to:
 
 `Configuration > Modules > graphite > Backend`
 
@@ -13,7 +13,7 @@ if your Graphite Web is protected by such a mechanism.
 
 ## Advanced
 
-Open up the Icinga Web 2 frontend and navigate to:
+Open up the Icinga Web frontend and navigate to:
 
 `Configuration > Modules > graphite > Advanced`
 

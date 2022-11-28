@@ -1,8 +1,8 @@
 # Templates <a id="templates"></a>
 
 A template defines what kind of data a graph visualizes, which kind of graph to
-use and its style. Essentially this module is using templates to tell Graphite
-how to render which graphs.
+use and its style. Essentially the Icinga Web Graphite Integration is using
+templates to tell Graphite how to render which graphs.
 
 * [Location](04-Templates.md#templates-location)
 * [Structure](04-Templates.md#templates-structure)
@@ -15,8 +15,8 @@ how to render which graphs.
 
 ## Template Location <a id="templates-location"></a>
 
-There are a bunch of templates already shipped with this module, located in
-its installation path. (e.g. `/usr/share/icingaweb2/modules/graphite`)
+There are a bunch of templates already included, located in
+the installation path. (e.g. `/usr/share/icingaweb2/modules/graphite`)
 
 To add additional/customized templates, place them in its configuration path.
 (e.g. `/etc/icingaweb2/modules/graphite/templates`) These will either extend
@@ -26,7 +26,7 @@ templates of its parent folders.
 
 > **Note:**
 >
-> Hidden files and directories (with a leading dot) are ignored by this module.
+> Hidden files and directories (with a leading dot) are ignored.
 
 ## Template Structure <a id="templates-structure"></a>
 
@@ -115,8 +115,8 @@ here as well:
 
     title = "Disk usage on $disk$"
 
-You may also define URL parameters once for all templates (including the ones
-shipped with this module) in the `default_url_params` section in
+You may also define URL parameters once for all templates
+(including the shipped ones) in the `default_url_params` section in
 `/etc/icingaweb2/modules/graphite/config.ini`:
 
     [default_url_params]

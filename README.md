@@ -1,4 +1,4 @@
-# Icinga Module for Graphite
+# Icinga Web Graphite Integration
 
 [![PHP Support](https://img.shields.io/badge/php-%3E%3D%207.2-777BB4?logo=PHP)](https://php.net/)
 ![Build Status](https://github.com/icinga/icingaweb2-module-graphite/workflows/PHP%20Tests/badge.svg?branch=master)
@@ -19,7 +19,7 @@ the monitoring module.
 
 ## Documentation
 
-* [Installation](doc/02-Installation.md)
-* [Configuration](doc/03-Configuration.md)
-* [Templates](doc/04-Templates.md)
-* [Development](doc/06-Development.md)
+* [Installation](https://icinga.com/docs/icinga-web-graphite-integration/latest/doc/02-Installation/)
+* [Configuration](https://icinga.com/docs/icinga-web-graphite-integration/latest/doc/03-Configuration/)
+* [Templates](https://icinga.com/docs/icinga-web-graphite-integration/latest/doc/04-Templates/)
+* [Development](https://icinga.com/docs/icinga-web-graphite-integration/latest/doc/06-Development/)

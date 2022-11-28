@@ -3,6 +3,6 @@ Version: 1.2.1
 Requires:
   Libraries: icinga-php-library (>=0.9.0), icinga-php-thirdparty (>=0.10.0)
   Modules: monitoring (>=2.9.0), icingadb (>=1.0.0)
-Description: Icinga Graphite module
- This module integrates an existing Graphite installation in your Icinga Web 2
+Description: Icinga Web Graphite Integration
+ This module integrates an existing Graphite installation in your Icinga Web
  frontend.

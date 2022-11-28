@@ -1,15 +1,24 @@
-# Installation
+<!-- {% if index %} -->
+# Installing Icinga Web Graphite Integration
 
-## Requirements
+It is recommended to use prebuilt packages
+for all supported platforms from our official release repository.
+Of course [Icinga Web](https://icinga.com/docs/icinga-web) itself
+is required to run its Graphite integration.
+The latter uses Graphite Web, so that is required as well.
+If they are not already set up, it is best to do this first.
 
-* PHP (>= 7.2)
-* Icinga Web 2 (>= 2.9)
-* Icinga Web 2 libraries:
-  * [Icinga PHP Library (ipl)](https://github.com/Icinga/icinga-php-library) (>= 0.9)
-  * [Icinga PHP Thirdparty](https://github.com/Icinga/icinga-php-thirdparty) (>= 0.11)
-* Icinga Web 2 modules:
-  * The `monitoring` or `icingadb` module needs to be configured and enabled.
-* Graphite and Graphite Web
+The following steps will guide you through installing
+and setting up Icinga Web Graphite Integration.
+<!-- {% else %} -->
+<!-- {% if not icingaDocs %} -->
+
+## Installing the Package
+
+If the [repository](https://packages.icinga.com) is not configured yet, please add it first.
+Then use your distribution's package manager to install the `icinga-graphite` package
+or install [from source](02-Installation.md.d/From-Source.md).
+<!-- {% endif %} --><!-- {# end if not icingaDocs #} -->
 
 ## Prepare Icinga 2
 
@@ -33,15 +42,7 @@ And then restart Icinga2. Enabling thresholds is not a hard requirement.
 However, some templates look better if they are able to render a max
 value or similar.
 
+## Configuring the Icinga Web Graphite Integration
 
-## Install the Graphite Module
-
-Install it [like any other module](https://icinga.com/docs/icinga-web-2/latest/doc/08-Modules/#installation).
-Use `graphite` as name.
-
-
-## Further reading
-
-* [Configuration](03-Configuration.md)
-* [Templates](04-Templates.md)
-* [Troubleshooting](05-Troubleshooting.md)
+For required additional steps see the [Configuration](03-Configuration.md) chapter.
+<!-- {% endif %} --><!-- {# end else if index #} -->
