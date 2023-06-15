@@ -4,7 +4,6 @@
 
 namespace Icinga\Module\Graphite\Web\Widget;
 
-use Icinga\Data\Filter\Filter;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Icingadb\IcingadbHost;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Icingadb\IcingadbService;
 use Icinga\Module\Icingadb\Common\Links;
@@ -71,7 +70,9 @@ class IcingadbGraphs extends BaseHtmlElement
         $hostUrl = Links::host($hostObj);
 
         if ($this->hasBaseFilter()) {
-            $hostUrl->addFilter(Filter::fromQueryString(QueryString::render($this->getBaseFilter())));
+            $hostUrlParams = $hostUrl->getParams()->toArray(false);
+            $hostUrl->setQueryString(QueryString::render($this->getBaseFilter()))
+                ->addParams($hostUrlParams);
         }
 
         $hostLink =  new Link(
@@ -85,7 +86,9 @@ class IcingadbGraphs extends BaseHtmlElement
             $serviceUrl = Links::service($object, $hostObj);
 
             if ($this->hasBaseFilter()) {
-                $serviceUrl->addFilter(Filter::fromQueryString(QueryString::render($this->getBaseFilter())));
+                $serviceUrlParams = $serviceUrl->getParams()->toArray(false);
+                $serviceUrl->setQueryString(QueryString::render($this->getBaseFilter()))
+                    ->addParams($serviceUrlParams);
             }
 
             $serviceLink = new Link(
