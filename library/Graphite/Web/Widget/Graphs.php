@@ -134,7 +134,7 @@ abstract class Graphs extends AbstractWidget
      *
      * @param   MonitoredObject $object
      *
-     * @return  static
+     * @return  ?static
      */
     public static function forMonitoredObject(MonitoredObject $object)
     {

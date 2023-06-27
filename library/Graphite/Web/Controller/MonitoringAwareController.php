@@ -22,6 +22,9 @@ abstract class MonitoringAwareController extends Controller
     /** @var bool Whether to use icingadb as the backend */
     protected $useIcingadbAsBackend = false;
 
+    /** @var  MonitoringBackend */
+    protected $backend;
+
     /**
      * Restrict the given monitored object query for the currently authenticated user
      *
