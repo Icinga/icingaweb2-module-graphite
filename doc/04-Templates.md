@@ -184,7 +184,7 @@ pl.value = "alias(color($metric$, '#1a7dd7'), 'Packet loss (%)')"
 ## Default Template Settings <a id="templates-default-settings"></a>
 
 Next to maintaining templates for specific commands, you can
-specify the default template settings in the [default.ini](https://github.com/Icinga/icingaweb2-module-graphite/blob/master/templates/default.ini)
+specify the default template settings in the [default.ini](https://github.com/Icinga/icingaweb2-module-graphite/blob/main/templates/default.ini)
 configuration file.
 
 The following example adjusts the background and foreground colors
