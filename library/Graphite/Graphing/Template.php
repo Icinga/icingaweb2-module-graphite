@@ -203,6 +203,7 @@ class Template
                 }
             }
             unset($_);
+            assert(isset($nextCurveName), 'loop did not initialize variable $nextCurveName');
 
             $allowedNextCurveMetricsPerCurrentCurveName = [];
             foreach ($currentCombination as $currentCurveName => $currentCurveMetric) {
