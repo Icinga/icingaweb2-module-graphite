@@ -1,0 +1,9 @@
+parameters:
+    level: 1
+    paths:
+        - application
+        - library
+    scanDirectories:
+        - vendor
+    ignoreErrors:
+        - '#Unsafe usage of new static\(\)#'

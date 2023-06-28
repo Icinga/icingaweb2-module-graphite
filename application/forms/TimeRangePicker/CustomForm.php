@@ -126,6 +126,9 @@ class CustomForm extends Form
             ]);
         }
 
+        assert(isset($elementDecorators), '$elementDecorators not initialized in the loop');
+        assert(isset($element), '$element not initialized in the loop');
+
         $decorators = [];
         foreach ($elementDecorators as $key => $decorator) {
             if ($key === 'Zend_Form_Decorator_ViewHelper') {

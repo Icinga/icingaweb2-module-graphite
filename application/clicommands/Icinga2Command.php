@@ -138,6 +138,8 @@ EOT
                 }
             }
 
+            assert(isset($service), '$service not initialized in the loop');
+
             $monObj = $service
                 ? [
                     "apply Service \"{$icinga2CfgObjPrefix}_{$checkCommand}\" {",
