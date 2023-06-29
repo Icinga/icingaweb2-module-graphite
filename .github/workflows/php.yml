@@ -32,7 +32,7 @@ jobs:
 
       - name: Setup dependencies
         run: composer require -n --no-progress overtrue/phplint
-          && git clone --single-branch --branch master https://github.com/Icinga/icingaweb2.git vendor/icingaweb2
+          && git clone --single-branch --branch remove-t-and-mt-from-basetestcase https://github.com/Icinga/icingaweb2.git vendor/icingaweb2
           && git clone --single-branch --branch master https://github.com/Icinga/icingadb-web.git vendor/icingadb-web
           && git clone --single-branch --branch snapshot/nightly https://github.com/Icinga/icinga-php-library.git vendor/icinga-php-library
           && git clone --single-branch --branch snapshot/nightly https://github.com/Icinga/icinga-php-thirdparty.git vendor/icinga-php-thirdparty
