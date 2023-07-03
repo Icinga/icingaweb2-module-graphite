@@ -79,7 +79,15 @@
             container.querySelectorAll('img.graphiteImg[data-actualimageurl]').forEach(img => {
                 let params = { ...this.colorParams }; // Theming ftw!
                 params.r = (new Date()).getTime(); // To bypass the browser cache
-                params.width = img.scrollWidth; // It's either fixed or dependent on parent width
+                params.width = img.scrollWidth;
+                if ('width' in img.dataset) {
+                    // If the width is defined in the data attributes, it has been explicitly defined in a template and
+                    // therefore must be handled specially. In detail areas the image must not be scaled to 100% and
+                    // in the other views it must not exceed the width of the parent container.
+                    // Note the `+str` which will convert str to number.
+                    params.width = Math.min(+img.dataset.width, img.parentElement.clientWidth);
+                    img.style.width = params.width + 'px';
+                }
 
                 img.src = this.icinga.utils.addUrlParams(img.dataset.actualimageurl, params);
             });

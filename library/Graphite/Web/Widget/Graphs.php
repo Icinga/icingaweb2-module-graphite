@@ -304,10 +304,10 @@ abstract class Graphs extends AbstractWidget
                                 $actheight = $this->height;
                             }
                             $actwidth = $this->width;
-                            $actwidthfix = "";
+                            $explicitWidth = false;
                             if (array_key_exists("width", $urlParams)) {
                                 $actwidth = $urlParams["width"]->resolve(['width']);
-                                $actwidthfix = "width: {$actwidth}px; ";
+                                $explicitWidth = $actwidth;
                             }
 
                             if ($this->renderInline) {
@@ -344,8 +344,12 @@ abstract class Graphs extends AbstractWidget
 
                                 $img = '<img id="graphiteImg-' . md5((string) $imageUrl) . '"'
                                     . " src=\"$src\" data-actualimageurl=\"$imageUrl\" class=\"detach graphiteImg\""
-                                    . " alt=\"\" width=\"$actwidth\" height=\"$actheight\""
-                                    . " style=\"min-width: {$actwidth}px; $actwidthfix min-height: {$actheight}px;\">";
+                                    . " alt=\"\" width=\"$actwidth\" height=\"$actheight\"";
+                                if ($explicitWidth !== false) {
+                                    $img .= " data-width=\"$explicitWidth\"";
+                                }
+
+                                $img .= '>';
                             }
 
                             $currentGraphs[] = [$img, $metricVariables, $bestPos];
