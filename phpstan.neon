@@ -1,5 +1,5 @@
 parameters:
-    level: 1
+    level: 2
     paths:
         - application
         - library
@@ -7,3 +7,7 @@ parameters:
         - vendor
     ignoreErrors:
         - '#Unsafe usage of new static\(\)#'
+    universalObjectCratesClasses:
+        - Icinga\Web\View
+        - ipl\Orm\Model
+        - Icinga\Data\ConfigObject
