@@ -28,8 +28,8 @@ class IcingadbGraphiteController extends CompatController
     /** @var bool Whether to use icingadb as the backend */
     protected $useIcingadbAsBackend;
 
-    /** @var string[] Graph parameters */
-    protected $graphParams = ['graphs_limit', 'graph_range', 'graph_start', 'graph_end', 'legacyParams'];
+    /** @var string[] Preserved graph parameters */
+    protected $preservedParams = ['graphs_limit', 'graph_range', 'graph_start', 'graph_end', 'legacyParams', 'format'];
 
     /** @var Filter\Rule Filter from query string parameters */
     private $filter;
