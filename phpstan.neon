@@ -1,7 +1,21 @@
 parameters:
-    level: 1
+    level: max
+
+    checkFunctionNameCase: true
+    checkInternalClassCaseSensitivity: true
+    treatPhpDocTypesAsCertain: false
+
     paths:
         - application
         - library
+
     scanDirectories:
         - vendor
+
+    ignoreErrors:
+        - '#. but return statement is missing#'
+
+    universalObjectCratesClasses: # to ignore magic property errors
+        - ipl\Orm\Model
+        - Icinga\Web\View
+        - Icinga\Data\ConfigObject
