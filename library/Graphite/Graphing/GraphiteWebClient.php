@@ -2,10 +2,10 @@
 
 namespace Icinga\Module\Graphite\Graphing;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Request;
 use Icinga\Web\Url;
-use iplx\Http\Client;
-use iplx\Http\ClientInterface;
-use iplx\Http\Request;
 
 /**
  * HTTP interface to Graphite Web
