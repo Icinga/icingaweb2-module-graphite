@@ -126,7 +126,7 @@ class GraphImage extends AbstractWidget
                         // Try to render a higher time range, but give up
                         // once our default (1h) has been reached (non successfully).
                         if ($diff < 3600) {
-                            $url->setParam('from', $until - $diff * 2);
+                            $url->setParam('from', sprintf('%F', ($until - $diff * 2)));
                             continue;
                         }
                     }

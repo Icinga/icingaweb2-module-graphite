@@ -100,8 +100,8 @@ class CustomForm extends Form
         if ($start > $end) {
             $absoluteRangeParameters = TimeRangePickerTools::getAbsoluteRangeParameters();
             $this->getRedirectUrl()->getParams()
-                ->set($absoluteRangeParameters['start'], $end)
-                ->set($absoluteRangeParameters['end'], $start);
+                ->set($absoluteRangeParameters['start'], (string) $end)
+                ->set($absoluteRangeParameters['end'], (string) $start);
         }
 
         $this->getRedirectUrl()->remove(TimeRangePickerTools::getRelativeRangeParameter());

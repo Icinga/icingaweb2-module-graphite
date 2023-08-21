@@ -23,8 +23,8 @@ class HostDetailExtension extends HostDetailExtensionHook
         }
 
         $graphs = (string) Graphs::forIcingadbObject($host)
-            ->setWidth(440)
-            ->setHeight(220)
+            ->setWidth('440')
+            ->setHeight('220')
             ->setClasses(['object-detail-view'])
             ->setPreloadDummy()
             ->setShowNoGraphsFound(false)

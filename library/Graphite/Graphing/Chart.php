@@ -107,9 +107,9 @@ class Chart
         $response
             ->setHeader('Content-Type', 'image/png', true)
             ->setHeader('Content-Disposition', 'inline; filename="graph.png"', true)
-            ->setHeader('Cache-Control', null, true)
-            ->setHeader('Expires', null, true)
-            ->setHeader('Pragma', null, true)
+            ->setHeader('Cache-Control', '', true)
+            ->setHeader('Expires', '', true)
+            ->setHeader('Pragma', '', true)
             ->setBody($image)
             ->sendResponse();
 

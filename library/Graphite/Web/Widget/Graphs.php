@@ -331,7 +331,7 @@ abstract class Graphs extends AbstractWidget
                                     ->setParam('height', $actheight);
 
                                 if (! $this->compact) {
-                                    $imageUrl->setParam('legend', 1);
+                                    $imageUrl->setParam('legend', '1');
                                 }
 
                                 if ($this->preloadDummy) {
