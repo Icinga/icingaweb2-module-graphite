@@ -5,5 +5,3 @@ parameters:
         - library
     scanDirectories:
         - vendor
-    ignoreErrors:
-        - '#Unsafe usage of new static\(\)#'
