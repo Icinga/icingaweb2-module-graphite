@@ -135,8 +135,8 @@ class MonitoringGraphController extends MonitoringAwareController
                 $charts[0]
                     ->setFrom($this->graphParams['start'])
                     ->setUntil($this->graphParams['end'])
-                    ->setWidth($this->graphParams['width'])
-                    ->setHeight($this->graphParams['height'])
+                    ->setWidth((int) $this->graphParams['width'])
+                    ->setHeight((int) $this->graphParams['height'])
                     ->setBackgroundColor($this->graphParams['bgcolor'])
                     ->setForegroundColor($this->graphParams['fgcolor'])
                     ->setMajorGridLineColor($this->graphParams['majorGridLineColor'])
