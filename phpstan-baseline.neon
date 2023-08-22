@@ -1,0 +1,866 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Clicommands\\\\Icinga2Command\\:\\:cartesianProduct\\(\\) has parameter \\$input with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: application/clicommands/Icinga2Command.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Clicommands\\\\Icinga2Command\\:\\:cartesianProduct\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: application/clicommands/Icinga2Command.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Clicommands\\\\Icinga2Command\\:\\:configAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/clicommands/Icinga2Command.php
+
+		-
+			message: "#^Parameter \\#1 \\$insecure of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setInsecure\\(\\) expects bool, mixed given\\.$#"
+			count: 1
+			path: application/clicommands/Icinga2Command.php
+
+		-
+			message: "#^Parameter \\#1 \\$password of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setPassword\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: application/clicommands/Icinga2Command.php
+
+		-
+			message: "#^Parameter \\#1 \\$url of static method Icinga\\\\Web\\\\Url\\:\\:fromPath\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: application/clicommands/Icinga2Command.php
+
+		-
+			message: "#^Parameter \\#1 \\$user of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setUser\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: application/clicommands/Icinga2Command.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ConfigController\\:\\:advancedAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ConfigController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ConfigController\\:\\:backendAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ConfigController.php
+
+		-
+			message: "#^Cannot access offset string on mixed\\.$#"
+			count: 2
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\GraphController\\:\\:hostAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\GraphController\\:\\:serviceAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\GraphController\\:\\:supplyImage\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Parameter \\#1 \\$insecure of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setInsecure\\(\\) expects bool, mixed given\\.$#"
+			count: 1
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Parameter \\#1 \\$password of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setPassword\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Parameter \\#1 \\$url of static method Icinga\\\\Web\\\\Url\\:\\:fromPath\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Parameter \\#1 \\$user of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setUser\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Parameter \\#2 \\$checkCommand of method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\GraphController\\:\\:supplyImage\\(\\) expects string, mixed given\\.$#"
+			count: 2
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Parameter \\#2 \\$value of static method ipl\\\\Stdlib\\\\Filter\\:\\:equal\\(\\) expects array\\|bool\\|float\\|int\\|string, mixed given\\.$#"
+			count: 3
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Parameter \\#3 \\$obscuredCheckCommand of method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\GraphController\\:\\:supplyImage\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 2
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\GraphController\\:\\:\\$graphParams \\(array\\<string\\>\\) does not accept array\\.$#"
+			count: 1
+			path: application/controllers/GraphController.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Web\\\\View\\:\\:protectId\\(\\)\\.$#"
+			count: 1
+			path: application/controllers/HostsController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\HostsController\\:\\:completeAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/HostsController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\HostsController\\:\\:indexAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/HostsController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\HostsController\\:\\:searchEditorAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/HostsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function urldecode expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/HostsController.php
+
+		-
+			message: "#^Parameter \\#2 \\$value of static method ipl\\\\Stdlib\\\\Filter\\:\\:equal\\(\\) expects array\\|bool\\|float\\|int\\|string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/HostsController.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Web\\\\View\\:\\:protectId\\(\\)\\.$#"
+			count: 1
+			path: application/controllers/ListController.php
+
+		-
+			message: "#^Cannot access property \\$host_name on mixed\\.$#"
+			count: 2
+			path: application/controllers/ListController.php
+
+		-
+			message: "#^Cannot access property \\$service_description on mixed\\.$#"
+			count: 1
+			path: application/controllers/ListController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ListController\\:\\:addTitleTab\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ListController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ListController\\:\\:filterQuery\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ListController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ListController\\:\\:hostsAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ListController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ListController\\:\\:servicesAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ListController.php
+
+		-
+			message: "#^Parameter \\#1 \\$rule of static method ipl\\\\Web\\\\Filter\\\\QueryString\\:\\:render\\(\\) expects ipl\\\\Stdlib\\\\Filter\\\\Rule, ipl\\\\Stdlib\\\\Filter\\\\Rule\\|false given\\.$#"
+			count: 2
+			path: application/controllers/ListController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\MonitoringGraphController\\:\\:hostAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\MonitoringGraphController\\:\\:serviceAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\MonitoringGraphController\\:\\:supplyImage\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Parameter \\#1 \\$insecure of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setInsecure\\(\\) expects bool, mixed given\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Parameter \\#1 \\$password of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setPassword\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Parameter \\#1 \\$url of static method Icinga\\\\Web\\\\Url\\:\\:fromPath\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Parameter \\#1 \\$user of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setUser\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Parameter \\#2 \\$host of class Icinga\\\\Module\\\\Monitoring\\\\Object\\\\Host constructor expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Parameter \\#2 \\$host of class Icinga\\\\Module\\\\Monitoring\\\\Object\\\\Service constructor expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Parameter \\#3 \\$service of class Icinga\\\\Module\\\\Monitoring\\\\Object\\\\Service constructor expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\MonitoringGraphController\\:\\:\\$graphParams \\(array\\<string\\>\\) does not accept array\\.$#"
+			count: 1
+			path: application/controllers/MonitoringGraphController.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Web\\\\View\\:\\:protectId\\(\\)\\.$#"
+			count: 1
+			path: application/controllers/ServicesController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ServicesController\\:\\:completeAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ServicesController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ServicesController\\:\\:indexAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ServicesController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ServicesController\\:\\:searchEditorAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/controllers/ServicesController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function urldecode expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/ServicesController.php
+
+		-
+			message: "#^Parameter \\#2 \\$value of static method ipl\\\\Stdlib\\\\Filter\\:\\:equal\\(\\) expects array\\|bool\\|float\\|int\\|string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/ServicesController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\Config\\\\AdvancedForm\\:\\:createElements\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/Config/AdvancedForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\Config\\\\AdvancedForm\\:\\:createElements\\(\\) has parameter \\$formData with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: application/forms/Config/AdvancedForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\Config\\\\BackendForm\\:\\:createElements\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/Config/BackendForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\Config\\\\BackendForm\\:\\:createElements\\(\\) has parameter \\$formData with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: application/forms/Config/BackendForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CommonForm\\:\\:createElements\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CommonForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CommonForm\\:\\:createElements\\(\\) has parameter \\$formData with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CommonForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CommonForm\\:\\:createSelect\\(\\) should return Zend_Form_Element_Select but returns Zend_Form_Element\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CommonForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CommonForm\\:\\:formToUrl\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CommonForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CommonForm\\:\\:urlToForm\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CommonForm.php
+
+		-
+			message: "#^Offset \\(int\\|string\\) does not exist on array\\<string\\>\\|null\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CommonForm.php
+
+		-
+			message: "#^Cannot access property \\$class on Zend_Form_Element\\|null\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Cannot call method getDecorators\\(\\) on Zend_Form_DisplayGroup\\|null\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Cannot call method getElements\\(\\) on Zend_Form_DisplayGroup\\|null\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Cannot call method setDecorators\\(\\) on Zend_Form_DisplayGroup\\|null\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Cannot call method setTimezone\\(\\) on DateTime\\|false\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Cannot call method setValue\\(\\) on Zend_Form_Element\\|null\\.$#"
+			count: 2
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CustomForm\\:\\:createElements\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CustomForm\\:\\:createElements\\(\\) has parameter \\$formData with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CustomForm\\:\\:groupDateTime\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Forms\\\\TimeRangePicker\\\\CustomForm\\:\\:urlToForm\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Parameter \\#2 \\$datetime of static method DateTime\\:\\:createFromFormat\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Parameter \\#2 \\$subject of function preg_match expects string, mixed given\\.$#"
+			count: 1
+			path: application/forms/TimeRangePicker/CustomForm.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Chart\\:\\:serveImage\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Chart.php
+
+		-
+			message: "#^Call to an undefined method ipl\\\\Stdlib\\\\Filter\\\\Rule\\:\\:getColumn\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Cannot access property \\$results on mixed\\.$#"
+			count: 3
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:addFilter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:applyFilter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:escapeMetricStep\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:fetchAll\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:fetchColumn\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:fetchPairs\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:from\\(\\) has parameter \\$fields with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:getFilter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:setFilter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:where\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:where\\(\\) has parameter \\$condition with no type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\MetricsQuery\\:\\:where\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Data\\\\Fetchable\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Template.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Template\\:\\:combineMetrics\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Template.php
+
+		-
+			message: "#^Parameter \\#1 \\$template of class Icinga\\\\Module\\\\Graphite\\\\Util\\\\MacroTemplate constructor expects string, mixed given\\.$#"
+			count: 2
+			path: library/Graphite/Graphing/Template.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of function array_unique expects array, array\\<int, string\\>\\|false given\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Templates.php
+
+		-
+			message: "#^Parameter \\#1 \\$path of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Templates\\:\\:loadIni\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Templates.php
+
+		-
+			message: "#^Parameter \\#1 \\$template of class Icinga\\\\Module\\\\Graphite\\\\Util\\\\MacroTemplate constructor expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Templates.php
+
+		-
+			message: "#^Parameter \\#1 \\$urlParams of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Template\\:\\:setUrlParams\\(\\) expects array\\<Icinga\\\\Module\\\\Graphite\\\\Util\\\\MacroTemplate\\>, array\\<Icinga\\\\Module\\\\Graphite\\\\Util\\\\MacroTemplate\\|string\\> given\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Templates.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Templates\\:\\:\\$defaultTemplates \\(array\\<Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Template\\>\\) does not accept array\\<array\\<array\\>\\|Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Template\\>\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Templates.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Templates\\:\\:\\$templates \\(array\\<array\\<Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Template\\>\\>\\) does not accept array\\<array\\<array\\<array\\>\\|Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Template\\>\\>\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Templates.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Application\\\\ApplicationBootstrap\\:\\:getRequest\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Icingadb/HostDetailExtension.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Application\\\\ApplicationBootstrap\\:\\:getViewRenderer\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Icingadb/HostDetailExtension.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Web\\\\View\\:\\:protectId\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Icingadb/HostDetailExtension.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Application\\\\ApplicationBootstrap\\:\\:getRequest\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Icingadb/ServiceDetailExtension.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Application\\\\ApplicationBootstrap\\:\\:getViewRenderer\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Icingadb/ServiceDetailExtension.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Web\\\\View\\:\\:protectId\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Icingadb/ServiceDetailExtension.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Application\\\\ApplicationBootstrap\\:\\:getRequest\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Monitoring/DetailviewExtension.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Web\\\\View\\:\\:protectId\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Monitoring/DetailviewExtension.php
+
+		-
+			message: "#^Cannot call method setWidth\\(\\) on Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\|null\\.$#"
+			count: 1
+			path: library/Graphite/ProvidedHook/Monitoring/DetailviewExtension.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Util\\\\IcingadbUtils\\:\\:\\$instance has no type specified\\.$#"
+			count: 1
+			path: library/Graphite/Util/IcingadbUtils.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Util\\\\InternalProcessTracker\\:\\:clear\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Util/InternalProcessTracker.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Util\\\\InternalProcessTracker\\:\\:enable\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Util/InternalProcessTracker.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Util\\\\InternalProcessTracker\\:\\:indent\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Util/InternalProcessTracker.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Util\\\\InternalProcessTracker\\:\\:recordf\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Util/InternalProcessTracker.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Util\\\\InternalProcessTracker\\:\\:unindent\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Util/InternalProcessTracker.php
+
+		-
+			message: "#^Parameter \\#1 \\$separator of function explode expects non\\-empty\\-string, string given\\.$#"
+			count: 1
+			path: library/Graphite/Util/MacroTemplate.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 2
+			path: library/Graphite/Util/TimeRangePickerTools.php
+
+		-
+			message: "#^Parameter \\#2 \\$subject of function preg_match expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Util/TimeRangePickerTools.php
+
+		-
+			message: "#^Parameter \\#2 \\$value of method Icinga\\\\Web\\\\UrlParams\\:\\:set\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Util/TimeRangePickerTools.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Controller\\\\IcingadbGraphiteController\\:\\:createSortControl\\(\\) has parameter \\$columns with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/IcingadbGraphiteController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Controller\\\\IcingadbGraphiteController\\:\\:moduleInit\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/IcingadbGraphiteController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Controller\\\\MonitoringAwareController\\:\\:handleFormatRequest\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/MonitoringAwareController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Controller\\\\MonitoringAwareController\\:\\:handleFormatRequest\\(\\) has parameter \\$query with no type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/MonitoringAwareController.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Controller\\\\MonitoringAwareController\\:\\:moduleInit\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/MonitoringAwareController.php
+
+		-
+			message: "#^Parameter \\#1 \\$name of static method Icinga\\\\Module\\\\Monitoring\\\\Backend\\\\MonitoringBackend\\:\\:instance\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/MonitoringAwareController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function strtolower expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/MonitoringAwareController.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Form\\\\Validator\\\\CustomErrorMessagesValidator\\:\\:validate\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Form/Validator/CustomErrorMessagesValidator.php
+
+		-
+			message: "#^Parameter \\#1 \\$haystack of function strpos expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Form/Validator/HttpUserValidator.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 2
+			path: library/Graphite/Web/Widget/GraphImage.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\GraphImage\\:\\:render\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/GraphImage.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Application\\\\ApplicationBootstrap\\:\\:getRequest\\(\\)\\.$#"
+			count: 2
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Call to an undefined method Zend_View_Abstract\\:\\:qlink\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Call to an undefined method Zend_View_Abstract\\:\\:translate\\(\\)\\.$#"
+			count: 3
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Cannot access offset string on mixed\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Comparison operation \"\\>\\=\" between int\\<0, max\\> and \\-1 is always true\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:forIcingadbObject\\(\\) should return static\\(Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\) but returns Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbHost\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:forIcingadbObject\\(\\) should return static\\(Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\) but returns Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbService\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:forMonitoredObject\\(\\) should return static\\(Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\)\\|null but returns Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Host\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:forMonitoredObject\\(\\) should return static\\(Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\)\\|null but returns Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Service\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:getObscuredCheckCommandCustomVar\\(\\) should return string but returns mixed\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:getRangeFromTimeRangePicker\\(\\) should return array\\<string\\> but returns array\\<int, mixed\\>\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:getRangeFromTimeRangePicker\\(\\) should return array\\<string\\> but returns array\\<int, string\\|null\\>\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:render\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of function implode expects array\\<string\\>, array\\<int, array\\<int, array\\<string\\>\\|Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\InlineGraphImage\\|string\\>\\|string\\> given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Parameter \\#1 \\$format of function vsprintf expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Parameter \\#1 \\$insecure of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setInsecure\\(\\) expects bool, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Parameter \\#1 \\$password of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setPassword\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Parameter \\#1 \\$url of static method Icinga\\\\Web\\\\Url\\:\\:fromPath\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Parameter \\#1 \\$user of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setUser\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Part \\$relative \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Part \\$view\\-\\>escape\\(\\$e\\-\\>getMessage\\(\\)\\) \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Part \\$view\\-\\>escape\\(\\$view\\-\\>translate\\('Graphs assembling process record'\\)\\) \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Part \\$view\\-\\>escape\\(\\$view\\-\\>translate\\('No graphs found'\\)\\) \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Part \\$view\\-\\>escape\\(\\\\Icinga\\\\Module\\\\Graphite\\\\Util\\\\InternalProcessTracker\\:\\:dump\\(\\)\\) \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:\\$checkCommand \\(string\\) does not accept mixed\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:\\$obscuredCheckCommand \\(string\\|null\\) does not accept mixed\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Static property Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\:\\:\\$obscuredCheckCommandCustomVar \\(string\\) does not accept mixed\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbHost\\:\\:createHostTitle\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbHost.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbHost\\:\\:getMonitoredObjectIdentifier\\(\\) should return string but returns mixed\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbHost.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbHost\\:\\:getObjectType\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbHost.php
+
+		-
+			message: "#^Parameter \\#2 \\$value of method Icinga\\\\Web\\\\Url\\:\\:setParam\\(\\) expects array\\|bool\\|string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbHost.php
+
+		-
+			message: "#^Cannot access property \\$name on mixed\\.$#"
+			count: 4
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbService.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbService\\:\\:createHostTitle\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbService.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbService\\:\\:createServiceTitle\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbService.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbService\\:\\:designedforObjectType\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbService.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbService\\:\\:getObjectType\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbService.php
+
+		-
+			message: "#^Parameter \\#2 \\$value of method Icinga\\\\Web\\\\Url\\:\\:setParam\\(\\) expects array\\|bool\\|string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbService.php
+
+		-
+			message: "#^Call to an undefined method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbHost\\|Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbService\\:\\:createServiceTitle\\(\\)\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/IcingadbGraphs.php
+
+		-
+			message: "#^Cannot call method hasResult\\(\\) on iterable\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/IcingadbGraphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\IcingadbGraphs\\:\\:assemble\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/IcingadbGraphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\IcingadbGraphs\\:\\:createGridItem\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/IcingadbGraphs.php
+
+		-
+			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\IcingadbGraphs\\:\\:createGridItem\\(\\) has parameter \\$object with no type specified\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/IcingadbGraphs.php
+
+		-
+			message: "#^Parameter \\#1 \\$rule of static method ipl\\\\Web\\\\Filter\\\\QueryString\\:\\:render\\(\\) expects ipl\\\\Stdlib\\\\Filter\\\\Rule, ipl\\\\Stdlib\\\\Filter\\\\Rule\\|null given\\.$#"
+			count: 2
+			path: library/Graphite/Web/Widget/IcingadbGraphs.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\IcingadbGraphs\\:\\:\\$defaultAttributes type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/IcingadbGraphs.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\IcingadbGraphs\\:\\:\\$objects type has no value type specified in iterable type iterable\\.$#"
+			count: 1
+			path: library/Graphite/Web/Widget/IcingadbGraphs.php
