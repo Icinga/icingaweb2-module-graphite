@@ -16,7 +16,11 @@ parameters:
         - vendor
 
     ignoreErrors:
-        - '#. but return statement is missing#'
+        -
+            messages:
+                - '#Unsafe usage of new static\(\)#'
+                - '#. but return statement is missing#'
+            reportUnmatched: false
 
     universalObjectCratesClasses: # to ignore magic property errors
         - ipl\Orm\Model
