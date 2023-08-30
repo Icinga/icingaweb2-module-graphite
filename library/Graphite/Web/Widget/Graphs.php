@@ -313,8 +313,8 @@ abstract class Graphs extends AbstractWidget
                             if ($this->renderInline) {
                                 $chart->setFrom($this->start)
                                     ->setUntil($this->end)
-                                    ->setWidth($actwidth)
-                                    ->setHeight($actheight)
+                                    ->setWidth((int) $actwidth)
+                                    ->setHeight((int) $actheight)
                                     ->setBackgroundColor('white')
                                     ->setForegroundColor('black')
                                     ->setMajorGridLineColor('grey')
@@ -331,7 +331,7 @@ abstract class Graphs extends AbstractWidget
                                     ->setParam('height', $actheight);
 
                                 if (! $this->compact) {
-                                    $imageUrl->setParam('legend', 1);
+                                    $imageUrl->setParam('legend', '1');
                                 }
 
                                 if ($this->preloadDummy) {

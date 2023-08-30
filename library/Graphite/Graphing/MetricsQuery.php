@@ -71,7 +71,7 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
         try {
             $this->base = $target instanceof MacroTemplate ? $target : new MacroTemplate((string) $target);
         } catch (InvalidArgumentException $e) {
-            throw new InvalidArgumentException('Bad target', $e);
+            throw new InvalidArgumentException('Bad target', $e->getCode(), $e);
         }
 
         return $this;

@@ -165,7 +165,7 @@ class CommonForm extends Form
                     unset($options['']);
 
                     foreach ($options as $option => $_) {
-                        if ($seconds === $option * $factor) {
+                        if ($seconds === (int) $option * $factor) {
                             $element->setValue((string) $option);
                             return;
                         }

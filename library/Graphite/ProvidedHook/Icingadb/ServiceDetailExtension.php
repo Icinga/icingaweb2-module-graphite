@@ -23,8 +23,8 @@ class ServiceDetailExtension extends ServiceDetailExtensionHook
         }
 
         $graphs = (string) Graphs::forIcingadbObject($service)
-            ->setWidth(440)
-            ->setHeight(220)
+            ->setWidth('440')
+            ->setHeight('220')
             ->setClasses(['object-detail-view'])
             ->setPreloadDummy()
             ->setShowNoGraphsFound(false)

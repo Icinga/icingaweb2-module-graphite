@@ -67,7 +67,7 @@ class MonitoringGraphController extends MonitoringAwareController
             ->fetchRow();
 
         if ($host === false) {
-            throw new HttpNotFoundException('%s', $this->translate('No such host'));
+            throw new HttpNotFoundException($this->translate('No such host'));
         }
 
         $this->supplyImage(new Host($this->backend, $hostName), $host->host_check_command, $host->$checkCommandColumn);
@@ -87,7 +87,7 @@ class MonitoringGraphController extends MonitoringAwareController
             ->fetchRow();
 
         if ($service === false) {
-            throw new HttpNotFoundException('%s', $this->translate('No such service'));
+            throw new HttpNotFoundException($this->translate('No such service'));
         }
 
         $this->supplyImage(
@@ -135,8 +135,8 @@ class MonitoringGraphController extends MonitoringAwareController
                 $charts[0]
                     ->setFrom($this->graphParams['start'])
                     ->setUntil($this->graphParams['end'])
-                    ->setWidth($this->graphParams['width'])
-                    ->setHeight($this->graphParams['height'])
+                    ->setWidth((int) $this->graphParams['width'])
+                    ->setHeight((int) $this->graphParams['height'])
                     ->setBackgroundColor($this->graphParams['bgcolor'])
                     ->setForegroundColor($this->graphParams['fgcolor'])
                     ->setMajorGridLineColor($this->graphParams['majorGridLineColor'])
@@ -146,7 +146,7 @@ class MonitoringGraphController extends MonitoringAwareController
 
             // not falling through, serveImage exits
             default:
-                throw new HttpBadRequestException('%s', $this->translate(
+                throw new HttpBadRequestException($this->translate(
                     'Graphite Web yields more than one metric for the given filter.'
                     . ' Please specify a more precise filter.'
                 ));
