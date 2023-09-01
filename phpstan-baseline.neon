@@ -846,11 +846,6 @@ parameters:
 			path: library/Graphite/Web/Widget/IcingadbGraphs.php
 
 		-
-			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\IcingadbGraphs\\:\\:\\$defaultAttributes type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: library/Graphite/Web/Widget/IcingadbGraphs.php
-
-		-
 			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\IcingadbGraphs\\:\\:\\$objects type has no value type specified in iterable type iterable\\.$#"
 			count: 1
 			path: library/Graphite/Web/Widget/IcingadbGraphs.php
