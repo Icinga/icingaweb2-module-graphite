@@ -28,7 +28,7 @@ class ServicesController extends IcingadbGraphiteController
         // shift graph params to avoid exception
         $graphRange = $this->params->shift('graph_range');
         $baseFilter = $graphRange ? Filter::equal('graph_range', $graphRange) : null;
-        foreach ($this->graphParams as $param) {
+        foreach ($this->preservedParams as $param) {
             $this->params->shift($param);
         }
 
@@ -54,7 +54,7 @@ class ServicesController extends IcingadbGraphiteController
             $services,
             array_merge(
                 [$limitControl->getLimitParam(), $sortControl->getSortParam()],
-                $this->graphParams
+                $this->preservedParams
             )
         );
 
@@ -105,7 +105,7 @@ class ServicesController extends IcingadbGraphiteController
             Service::on($this->getDb()),
             array_merge(
                 [LimitControl::DEFAULT_LIMIT_PARAM, SortControl::DEFAULT_SORT_PARAM],
-                $this->graphParams
+                $this->preservedParams
             )
         );
 
