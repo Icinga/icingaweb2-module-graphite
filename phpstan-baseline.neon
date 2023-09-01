@@ -846,11 +846,6 @@ parameters:
 			path: library/Graphite/Web/Widget/IcingadbGraphs.php
 
 		-
-			message: "#^Parameter \\#1 \\$rule of static method ipl\\\\Web\\\\Filter\\\\QueryString\\:\\:render\\(\\) expects ipl\\\\Stdlib\\\\Filter\\\\Rule, ipl\\\\Stdlib\\\\Filter\\\\Rule\\|null given\\.$#"
-			count: 2
-			path: library/Graphite/Web/Widget/IcingadbGraphs.php
-
-		-
 			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\IcingadbGraphs\\:\\:\\$defaultAttributes type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: library/Graphite/Web/Widget/IcingadbGraphs.php

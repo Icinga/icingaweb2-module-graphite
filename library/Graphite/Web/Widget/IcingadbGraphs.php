@@ -15,7 +15,6 @@ use ipl\Html\HtmlDocument;
 use ipl\Html\HtmlString;
 use ipl\Orm\ResultSet;
 use ipl\Stdlib\BaseFilter;
-use ipl\Web\Filter\QueryString;
 use ipl\Web\Widget\Link;
 
 /**
@@ -68,11 +67,10 @@ class IcingadbGraphs extends BaseHtmlElement
         }
 
         $hostUrl = Links::host($hostObj);
+        $baseFilter = $this->getBaseFilter();
 
-        if ($this->hasBaseFilter()) {
-            $hostUrlParams = $hostUrl->getParams()->toArray(false);
-            $hostUrl->setQueryString(QueryString::render($this->getBaseFilter()))
-                ->addParams($hostUrlParams);
+        if ($baseFilter !== null) {
+            $hostUrl->setFilter($baseFilter);
         }
 
         $hostLink =  new Link(
@@ -85,10 +83,8 @@ class IcingadbGraphs extends BaseHtmlElement
         if ($graph->getObjectType() === 'service') {
             $serviceUrl = Links::service($object, $hostObj);
 
-            if ($this->hasBaseFilter()) {
-                $serviceUrlParams = $serviceUrl->getParams()->toArray(false);
-                $serviceUrl->setQueryString(QueryString::render($this->getBaseFilter()))
-                    ->addParams($serviceUrlParams);
+            if ($baseFilter !== null) {
+                $serviceUrl->setFilter($baseFilter);
             }
 
             $serviceLink = new Link(
