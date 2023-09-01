@@ -586,11 +586,6 @@ parameters:
 			path: library/Graphite/Util/TimeRangePickerTools.php
 
 		-
-			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Controller\\\\IcingadbGraphiteController\\:\\:createSortControl\\(\\) has parameter \\$columns with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: library/Graphite/Web/Controller/IcingadbGraphiteController.php
-
-		-
 			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Controller\\\\IcingadbGraphiteController\\:\\:moduleInit\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: library/Graphite/Web/Controller/IcingadbGraphiteController.php
