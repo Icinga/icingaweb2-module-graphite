@@ -10,5 +10,5 @@ Make sure you use `graphite` as the module name. The following requirements must
 * [Icinga Web](https://github.com/Icinga/icingaweb2) (≥2.9)
 * [Icinga DB Web](https://github.com/Icinga/icingadb-web) (≥1.0)
 * [Icinga PHP Library (ipl)](https://github.com/Icinga/icinga-php-library) (≥0.13)
-* [Icinga PHP Thirdparty](https://github.com/Icinga/icinga-php-thirdparty) (≥0.11)
+* [Icinga PHP Thirdparty](https://github.com/Icinga/icinga-php-thirdparty) (≥0.12)
 <!-- {% include "02-Installation.md" %} -->
