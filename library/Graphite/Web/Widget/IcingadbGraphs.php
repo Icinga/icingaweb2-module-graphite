@@ -7,7 +7,6 @@ namespace Icinga\Module\Graphite\Web\Widget;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Icingadb\IcingadbHost;
 use Icinga\Module\Graphite\Web\Widget\Graphs\Icingadb\IcingadbService;
 use Icinga\Module\Icingadb\Common\Links;
-use Icinga\Module\Icingadb\Widget\EmptyState;
 use Icinga\Module\Icingadb\Model\Host;
 use ipl\Html\BaseHtmlElement;
 use ipl\Html\Html;
@@ -15,6 +14,7 @@ use ipl\Html\HtmlDocument;
 use ipl\Html\HtmlString;
 use ipl\Orm\ResultSet;
 use ipl\Stdlib\BaseFilter;
+use ipl\Web\Widget\EmptyState;
 use ipl\Web\Widget\Link;
 
 /**
