@@ -41,6 +41,13 @@ class GraphiteWebClient
     protected $insecure = false;
 
     /**
+     * Timeout for every Graphite Web HTTP request
+     *
+     * @var ?int
+     */
+    protected $timeout;
+
+    /**
      * HTTP client
      *
      * @var ClientInterface
@@ -79,9 +86,12 @@ class GraphiteWebClient
         // TODO(ak): keep connections alive (TCP handshakes are a bit expensive and TLS handshakes are very expensive)
         return (string) $this->httpClient->send(
             new Request($method, $this->completeUrl($url)->getAbsoluteUrl(), $headers, $body),
-            ['curl' => [
-                CURLOPT_SSL_VERIFYPEER => ! $this->insecure
-            ]]
+            [
+                'curl' => [
+                    CURLOPT_SSL_VERIFYPEER => ! $this->insecure
+                ],
+                'timeout' => $this->timeout ?? 10
+            ]
         )->getBody();
     }
 
@@ -192,6 +202,30 @@ class GraphiteWebClient
     public function setInsecure($insecure = true)
     {
         $this->insecure = $insecure;
+
+        return $this;
+    }
+
+    /**
+     * Get the HTTP request timeout
+     *
+     * @return ?int
+     */
+    public function getTimeout(): ?int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * Set the HTTP request timeout
+     *
+     * @param ?int $timeout
+     *
+     * @return $this
+     */
+    public function setTimeout(?int $timeout): self
+    {
+        $this->timeout = $timeout;
 
         return $this;
     }
