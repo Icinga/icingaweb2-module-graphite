@@ -73,6 +73,7 @@ trait GraphingTrait
                     ->setUser($graphite->user)
                     ->setPassword($graphite->password)
                     ->setInsecure((bool) $graphite->insecure)
+                    ->setTimeout(isset($graphite->timeout) ? intval($graphite->timeout) : 10)
             );
         }
 

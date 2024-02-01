@@ -53,6 +53,16 @@ class BackendForm extends ConfigForm
                     'label'         => $this->translate('Connect insecurely'),
                     'description'   => $this->translate('Check this to not verify the remote\'s TLS certificate')
                 ]
+            ],
+            [
+                'number',
+                'graphite_timeout',
+                [
+                    'label'         => $this->translate('Request timeout'),
+                    'description'   => $this->translate('The timeout for HTTP requests to Graphite Web'),
+                    'min'           => 0,
+                    'placeholder'   => 10
+                ]
             ]
         ]);
     }
