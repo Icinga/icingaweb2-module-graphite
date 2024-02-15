@@ -4,6 +4,7 @@ namespace Icinga\Module\Graphite\Graphing;
 
 use Icinga\Application\Config;
 use Icinga\Application\Icinga;
+use Icinga\Data\ConfigObject;
 use Icinga\Exception\ConfigurationError;
 use Icinga\Module\Graphite\Web\FakeSchemeRequest;
 use Icinga\Web\Url;
@@ -61,6 +62,7 @@ trait GraphingTrait
     {
         if (static::$metricsDataSource === null) {
             $config = Config::module('graphite');
+            /** @var ConfigObject<string> $graphite */
             $graphite = $config->getSection('graphite');
             if (! isset($graphite->url)) {
                 throw new ConfigurationError('Missing "graphite.url" in "%s"', $config->getConfigFile());
@@ -70,7 +72,7 @@ trait GraphingTrait
                 (new GraphiteWebClient(Url::fromPath($graphite->url, [], new FakeSchemeRequest())))
                     ->setUser($graphite->user)
                     ->setPassword($graphite->password)
-                    ->setInsecure($graphite->insecure)
+                    ->setInsecure((bool) $graphite->insecure)
             );
         }
 
