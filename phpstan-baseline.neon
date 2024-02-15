@@ -16,26 +16,6 @@ parameters:
 			path: application/clicommands/Icinga2Command.php
 
 		-
-			message: "#^Parameter \\#1 \\$insecure of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setInsecure\\(\\) expects bool, mixed given\\.$#"
-			count: 1
-			path: application/clicommands/Icinga2Command.php
-
-		-
-			message: "#^Parameter \\#1 \\$password of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setPassword\\(\\) expects string\\|null, mixed given\\.$#"
-			count: 1
-			path: application/clicommands/Icinga2Command.php
-
-		-
-			message: "#^Parameter \\#1 \\$url of static method Icinga\\\\Web\\\\Url\\:\\:fromPath\\(\\) expects string, mixed given\\.$#"
-			count: 1
-			path: application/clicommands/Icinga2Command.php
-
-		-
-			message: "#^Parameter \\#1 \\$user of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setUser\\(\\) expects string\\|null, mixed given\\.$#"
-			count: 1
-			path: application/clicommands/Icinga2Command.php
-
-		-
 			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ConfigController\\:\\:advancedAction\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: application/controllers/ConfigController.php
@@ -62,26 +42,6 @@ parameters:
 
 		-
 			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\GraphController\\:\\:supplyImage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: application/controllers/GraphController.php
-
-		-
-			message: "#^Parameter \\#1 \\$insecure of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setInsecure\\(\\) expects bool, mixed given\\.$#"
-			count: 1
-			path: application/controllers/GraphController.php
-
-		-
-			message: "#^Parameter \\#1 \\$password of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setPassword\\(\\) expects string\\|null, mixed given\\.$#"
-			count: 1
-			path: application/controllers/GraphController.php
-
-		-
-			message: "#^Parameter \\#1 \\$url of static method Icinga\\\\Web\\\\Url\\:\\:fromPath\\(\\) expects string, mixed given\\.$#"
-			count: 1
-			path: application/controllers/GraphController.php
-
-		-
-			message: "#^Parameter \\#1 \\$user of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setUser\\(\\) expects string\\|null, mixed given\\.$#"
 			count: 1
 			path: application/controllers/GraphController.php
 
@@ -187,26 +147,6 @@ parameters:
 
 		-
 			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\MonitoringGraphController\\:\\:supplyImage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: application/controllers/MonitoringGraphController.php
-
-		-
-			message: "#^Parameter \\#1 \\$insecure of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setInsecure\\(\\) expects bool, mixed given\\.$#"
-			count: 1
-			path: application/controllers/MonitoringGraphController.php
-
-		-
-			message: "#^Parameter \\#1 \\$password of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setPassword\\(\\) expects string\\|null, mixed given\\.$#"
-			count: 1
-			path: application/controllers/MonitoringGraphController.php
-
-		-
-			message: "#^Parameter \\#1 \\$url of static method Icinga\\\\Web\\\\Url\\:\\:fromPath\\(\\) expects string, mixed given\\.$#"
-			count: 1
-			path: application/controllers/MonitoringGraphController.php
-
-		-
-			message: "#^Parameter \\#1 \\$user of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setUser\\(\\) expects string\\|null, mixed given\\.$#"
 			count: 1
 			path: application/controllers/MonitoringGraphController.php
 
@@ -461,6 +401,11 @@ parameters:
 			path: library/Graphite/Graphing/Template.php
 
 		-
+			message: "#^PHPDoc tag @var for variable \\$options contains generic class Icinga\\\\Data\\\\ConfigObject but does not specify its types\\: TValue$#"
+			count: 1
+			path: library/Graphite/Graphing/Templates.php
+
+		-
 			message: "#^Parameter \\#1 \\$array of function array_unique expects array, array\\<int, string\\>\\|false given\\.$#"
 			count: 1
 			path: library/Graphite/Graphing/Templates.php
@@ -472,11 +417,16 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$template of class Icinga\\\\Module\\\\Graphite\\\\Util\\\\MacroTemplate constructor expects string, mixed given\\.$#"
-			count: 1
+			count: 4
 			path: library/Graphite/Graphing/Templates.php
 
 		-
 			message: "#^Parameter \\#1 \\$urlParams of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\Template\\:\\:setUrlParams\\(\\) expects array\\<Icinga\\\\Module\\\\Graphite\\\\Util\\\\MacroTemplate\\>, array\\<Icinga\\\\Module\\\\Graphite\\\\Util\\\\MacroTemplate\\|string\\> given\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/Templates.php
+
+		-
+			message: "#^Parameter \\#2 \\$subject of function preg_split expects string, mixed given\\.$#"
 			count: 1
 			path: library/Graphite/Graphing/Templates.php
 
@@ -707,26 +657,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$format of function vsprintf expects string, mixed given\\.$#"
-			count: 1
-			path: library/Graphite/Web/Widget/Graphs.php
-
-		-
-			message: "#^Parameter \\#1 \\$insecure of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setInsecure\\(\\) expects bool, mixed given\\.$#"
-			count: 1
-			path: library/Graphite/Web/Widget/Graphs.php
-
-		-
-			message: "#^Parameter \\#1 \\$password of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setPassword\\(\\) expects string\\|null, mixed given\\.$#"
-			count: 1
-			path: library/Graphite/Web/Widget/Graphs.php
-
-		-
-			message: "#^Parameter \\#1 \\$url of static method Icinga\\\\Web\\\\Url\\:\\:fromPath\\(\\) expects string, mixed given\\.$#"
-			count: 1
-			path: library/Graphite/Web/Widget/Graphs.php
-
-		-
-			message: "#^Parameter \\#1 \\$user of method Icinga\\\\Module\\\\Graphite\\\\Graphing\\\\GraphiteWebClient\\:\\:setUser\\(\\) expects string\\|null, mixed given\\.$#"
 			count: 1
 			path: library/Graphite/Web/Widget/Graphs.php
 
