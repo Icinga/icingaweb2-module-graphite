@@ -1,0 +1,36 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$str of function urldecode expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/HostsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function urldecode expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/ServicesController.php
+
+		-
+			message: "#^Argument of an invalid type array\\<int, string\\>\\|false supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: library/Graphite/Util/MacroTemplate.php
+
+		-
+			message: "#^Cannot access offset int on non\\-empty\\-array\\<int, string\\>\\|false\\.$#"
+			count: 1
+			path: library/Graphite/Util/MacroTemplate.php
+
+		-
+			message: "#^Parameter \\#1 \\$var of function count expects array\\|Countable, array\\<int, string\\>\\|false given\\.$#"
+			count: 1
+			path: library/Graphite/Util/MacroTemplate.php
+
+		-
+			message: "#^Property Icinga\\\\Module\\\\Graphite\\\\Util\\\\MacroTemplate\\:\\:\\$template \\(array\\<string\\>\\) does not accept array\\<int, string\\>\\|false\\.$#"
+			count: 1
+			path: library/Graphite/Util/MacroTemplate.php
+
+		-
+			message: "#^Parameter \\#1 \\$str of function strtolower expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/MonitoringAwareController.php

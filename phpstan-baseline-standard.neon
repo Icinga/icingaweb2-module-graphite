@@ -81,11 +81,6 @@ parameters:
 			path: application/controllers/HostsController.php
 
 		-
-			message: "#^Parameter \\#1 \\$string of function urldecode expects string, mixed given\\.$#"
-			count: 1
-			path: application/controllers/HostsController.php
-
-		-
 			message: "#^Parameter \\#2 \\$value of static method ipl\\\\Stdlib\\\\Filter\\:\\:equal\\(\\) expects array\\|bool\\|float\\|int\\|string, mixed given\\.$#"
 			count: 1
 			path: application/controllers/HostsController.php
@@ -182,11 +177,6 @@ parameters:
 
 		-
 			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\ServicesController\\:\\:searchEditorAction\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: application/controllers/ServicesController.php
-
-		-
-			message: "#^Parameter \\#1 \\$string of function urldecode expects string, mixed given\\.$#"
 			count: 1
 			path: application/controllers/ServicesController.php
 
@@ -516,11 +506,6 @@ parameters:
 			path: library/Graphite/Util/InternalProcessTracker.php
 
 		-
-			message: "#^Parameter \\#1 \\$separator of function explode expects non\\-empty\\-string, string given\\.$#"
-			count: 1
-			path: library/Graphite/Util/MacroTemplate.php
-
-		-
 			message: "#^Cannot cast mixed to int\\.$#"
 			count: 2
 			path: library/Graphite/Util/TimeRangePickerTools.php
@@ -557,11 +542,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$name of static method Icinga\\\\Module\\\\Monitoring\\\\Backend\\\\MonitoringBackend\\:\\:instance\\(\\) expects string\\|null, mixed given\\.$#"
-			count: 1
-			path: library/Graphite/Web/Controller/MonitoringAwareController.php
-
-		-
-			message: "#^Parameter \\#1 \\$string of function strtolower expects string, mixed given\\.$#"
 			count: 1
 			path: library/Graphite/Web/Controller/MonitoringAwareController.php
 

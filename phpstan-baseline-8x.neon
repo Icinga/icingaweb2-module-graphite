@@ -1,0 +1,21 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Parameter \\#1 \\$string of function urldecode expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/HostsController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function urldecode expects string, mixed given\\.$#"
+			count: 1
+			path: application/controllers/ServicesController.php
+
+		-
+			message: "#^Parameter \\#1 \\$separator of function explode expects non\\-empty\\-string, string given\\.$#"
+			count: 1
+			path: library/Graphite/Util/MacroTemplate.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function strtolower expects string, mixed given\\.$#"
+			count: 1
+			path: library/Graphite/Web/Controller/MonitoringAwareController.php
