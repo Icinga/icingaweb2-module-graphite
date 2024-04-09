@@ -46,11 +46,6 @@ parameters:
 			path: application/controllers/GraphController.php
 
 		-
-			message: "#^Parameter \\#2 \\$checkCommand of method Icinga\\\\Module\\\\Graphite\\\\Controllers\\\\GraphController\\:\\:supplyImage\\(\\) expects string, mixed given\\.$#"
-			count: 2
-			path: application/controllers/GraphController.php
-
-		-
 			message: "#^Parameter \\#2 \\$value of static method ipl\\\\Stdlib\\\\Filter\\:\\:equal\\(\\) expects array\\|bool\\|float\\|int\\|string, mixed given\\.$#"
 			count: 3
 			path: application/controllers/GraphController.php
@@ -386,6 +381,11 @@ parameters:
 			path: library/Graphite/Graphing/MetricsQuery.php
 
 		-
+			message: "#^Parameter \\#2 \\$object of method Icinga\\\\Module\\\\Graphite\\\\Util\\\\IcingadbUtils\\:\\:resolveMacro\\(\\) expects Icinga\\\\Module\\\\Icingadb\\\\Compat\\\\CompatHost\\|Icinga\\\\Module\\\\Icingadb\\\\Compat\\\\CompatService\\|Icinga\\\\Module\\\\Icingadb\\\\Model\\\\Host\\|Icinga\\\\Module\\\\Icingadb\\\\Model\\\\Service, ipl\\\\Orm\\\\Model given\\.$#"
+			count: 1
+			path: library/Graphite/Graphing/MetricsQuery.php
+
+		-
 			message: "#^Call to an undefined method Icinga\\\\Data\\\\Fetchable\\:\\:where\\(\\)\\.$#"
 			count: 1
 			path: library/Graphite/Graphing/Template.php
@@ -706,17 +706,7 @@ parameters:
 			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbHost.php
 
 		-
-			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbHost\\:\\:getMonitoredObjectIdentifier\\(\\) should return string but returns mixed\\.$#"
-			count: 1
-			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbHost.php
-
-		-
 			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbHost\\:\\:getObjectType\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbHost.php
-
-		-
-			message: "#^Parameter \\#2 \\$value of method Icinga\\\\Web\\\\Url\\:\\:setParam\\(\\) expects array\\|bool\\|string, mixed given\\.$#"
 			count: 1
 			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbHost.php
 
@@ -742,11 +732,6 @@ parameters:
 
 		-
 			message: "#^Method Icinga\\\\Module\\\\Graphite\\\\Web\\\\Widget\\\\Graphs\\\\Icingadb\\\\IcingadbService\\:\\:getObjectType\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbService.php
-
-		-
-			message: "#^Parameter \\#2 \\$value of method Icinga\\\\Web\\\\Url\\:\\:setParam\\(\\) expects array\\|bool\\|string, mixed given\\.$#"
 			count: 1
 			path: library/Graphite/Web/Widget/Graphs/Icingadb/IcingadbService.php
 
