@@ -207,8 +207,13 @@ class Template
 
             $allowedNextCurveMetricsPerCurrentCurveName = [];
             foreach ($currentCombination as $currentCurveName => $currentCurveMetric) {
-                $allowedNextCurveMetricsPerCurrentCurveName[$currentCurveName]
-                    = $possibleCombinations[$currentCurveName][$nextCurveName][$currentCurveMetric];
+                if (isset($possibleCombinations[$currentCurveName][$nextCurveName][$currentCurveMetric])) {
+                    $allowedNextCurveMetricsPerCurrentCurveName[$currentCurveName]
+                        = $possibleCombinations[$currentCurveName][$nextCurveName][$currentCurveMetric];
+                } else {
+                    $metricsCombinations[] = $currentCombination;
+                    return;
+                }
             }
 
             $allowedNextCurveMetrics = $allowedNextCurveMetricsPerCurrentCurveName[$currentCurveName];
