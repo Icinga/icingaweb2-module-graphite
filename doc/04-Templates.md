@@ -223,4 +223,4 @@ parameters to the render API.
 
 ## Further reading
 
-* [Troubleshooting](06-Troubleshooting.md)
+* [Troubleshooting](05-Troubleshooting.md)
