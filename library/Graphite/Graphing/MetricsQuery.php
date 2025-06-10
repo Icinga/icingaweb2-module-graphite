@@ -169,15 +169,21 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
         }
 
         $client = $this->dataSource->getClient();
-        $url = Url::fromPath('metrics/expand', [
+        $url = Url::fromPath('metrics/find', [
             'query' => $this->base->resolve($filter, '*')
         ]);
         $res = Json::decode($client->request($url));
-        natsort($res->results);
 
-        IPT::recordf('Fetched %s metric(s) from %s', count($res->results), (string) $client->completeUrl($url));
+        $results = [];
+        foreach ($res as $item) {
+            $results[] = $item->id;
+        }
 
-        return array_values($res->results);
+        natsort($results);
+
+        IPT::recordf('Fetched %s metric(s) from %s', count($results), (string) $client->completeUrl($url));
+
+        return array_values($results);
     }
 
     public function fetchOne()
