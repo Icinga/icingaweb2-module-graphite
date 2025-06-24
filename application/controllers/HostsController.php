@@ -5,6 +5,7 @@
 namespace Icinga\Module\Graphite\Controllers;
 
 use GuzzleHttp\Psr7\ServerRequest;
+use Icinga\Module\Graphite\Util\InternalProcessTracker as IPT;
 use Icinga\Module\Graphite\Web\Controller\IcingadbGraphiteController;
 use Icinga\Module\Graphite\Web\Controller\TimeRangePickerTrait;
 use Icinga\Module\Graphite\Web\Widget\IcingadbGraphs;
@@ -28,7 +29,13 @@ class HostsController extends IcingadbGraphiteController
         }
 
         // shift graph params to avoid exception
+        $graphDebug = $this->params->shift('graph_debug');
         $graphRange = $this->params->shift('graph_range');
+
+        if ($graphDebug) {
+            IPT::enable();
+        }
+
         $baseFilter = $graphRange ? Filter::equal('graph_range', $graphRange) : null;
         foreach ($this->preservedParams as $param) {
             $this->params->shift($param);
