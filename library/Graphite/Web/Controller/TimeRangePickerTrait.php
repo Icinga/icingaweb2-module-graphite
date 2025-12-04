@@ -23,11 +23,11 @@ trait TimeRangePickerTrait
     /**
      * Process the given request using the forms
      *
-     * @param   Request $request    The request to be processed
+     * @param   ?Request $request    The request to be processed
      *
      * @return  Request             The request supposed to be processed
      */
-    protected function handleTimeRangePickerRequest(Request $request = null)
+    protected function handleTimeRangePickerRequest(?Request $request = null)
     {
         $this->getTimeRangePickerCommonForm()->handleRequest($request);
         return $this->getTimeRangePickerCustomForm()->handleRequest($request);

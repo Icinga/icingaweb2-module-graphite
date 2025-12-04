@@ -41,7 +41,7 @@ final class TimeRangePickerTools
      *
      * @return  UrlParams               The copy
      */
-    public static function copyAllRangeParameters(UrlParams $copy = null, UrlParams $origin = null)
+    public static function copyAllRangeParameters(?UrlParams $copy = null, ?UrlParams $origin = null)
     {
         if ($origin === null) {
             $origin = Url::fromRequest()->getParams();
