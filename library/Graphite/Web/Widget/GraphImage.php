@@ -90,7 +90,7 @@ class GraphImage extends AbstractWidget
             $allVars = [];
 
             foreach ($template->getCurves() as $curveName => $curve) {
-                if (!isset($metrics[$curveName])) {
+                if (! isset($metrics[$curveName])) {
                     continue;
                 }
 
