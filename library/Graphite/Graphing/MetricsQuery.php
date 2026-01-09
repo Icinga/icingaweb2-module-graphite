@@ -62,7 +62,7 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
         $this->dataSource = $dataSource;
     }
 
-    public function from($target, array $fields = null)
+    public function from($target, ?array $fields = null)
     {
         if ($fields !== null) {
             throw new InvalidArgumentException('Fields are not applicable to this kind of query');

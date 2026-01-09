@@ -204,11 +204,11 @@ abstract class Graphs extends AbstractWidget
     /**
      * Process the given request using this widget
      *
-     * @param   Request $request    The request to be processed
+     * @param   ?Request $request    The request to be processed
      *
      * @return  $this
      */
-    public function handleRequest(Request $request = null)
+    public function handleRequest(?Request $request = null)
     {
         if ($request === null) {
             $request = Icinga::app()->getRequest();
