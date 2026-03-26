@@ -7,7 +7,7 @@ Make sure you use `graphite` as the module name. The following requirements must
 ## Requirements
 
 * PHP ≥ 8.2
-* [Icinga Web](https://github.com/Icinga/icingaweb2) ≥ 2.9
+* [Icinga Web](https://github.com/Icinga/icingaweb2) ≥ 2.12.5
 * [Icinga DB Web](https://github.com/Icinga/icingadb-web) ≥ 1.0
 * [Icinga PHP Library (ipl)](https://github.com/Icinga/icinga-php-library) ≥ 0.19.0
 * [Icinga PHP Thirdparty](https://github.com/Icinga/icinga-php-thirdparty) ≥ 0.15.0
