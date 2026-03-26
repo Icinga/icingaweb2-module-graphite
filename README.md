@@ -1,8 +1,5 @@
 # Icinga Web Graphite Integration
 
-![Build Status](https://github.com/icinga/icingaweb2-module-graphite/workflows/PHP%20Tests/badge.svg?branch=main)
-[![Github Tag](https://img.shields.io/github/tag/Icinga/icingaweb2-module-graphite.svg)](https://github.com/Icinga/icingaweb2-module-graphite)
-
 ![Icinga Logo](https://icinga.com/wp-content/uploads/2014/06/icinga_logo.png)
 
 This module integrates an existing [Graphite](https://graphite.readthedocs.io/en/latest/)
