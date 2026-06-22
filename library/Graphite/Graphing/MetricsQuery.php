@@ -5,6 +5,7 @@
 
 namespace Icinga\Module\Graphite\Graphing;
 
+use GuzzleHttp\Exception\ServerException;
 use Icinga\Data\Fetchable;
 use Icinga\Data\Filter\Filter;
 use Icinga\Data\Filterable;
@@ -175,7 +176,13 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
         $url = Url::fromPath('metrics/expand', [
             'query' => $this->base->resolve($filter, '*')
         ]);
-        $res = Json::decode($client->request($url));
+        try {
+            $res = Json::decode($client->request($url));
+        } catch (ServerException $e) {
+            IPT::recordf('Fetched 0 metric(s) from %s: %s', (string) $client->completeUrl($url), $e->getMessage());
+
+            return [];
+        }
         natsort($res->results);
 
         IPT::recordf('Fetched %s metric(s) from %s', count($res->results), (string) $client->completeUrl($url));
