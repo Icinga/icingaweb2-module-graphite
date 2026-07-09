@@ -5,12 +5,11 @@
 
 namespace Icinga\Module\Graphite\Graphing;
 
+use GuzzleHttp\Psr7\Uri;
 use Icinga\Application\Config;
 use Icinga\Application\Icinga;
 use Icinga\Data\ConfigObject;
 use Icinga\Exception\ConfigurationError;
-use Icinga\Module\Graphite\Web\FakeSchemeRequest;
-use Icinga\Web\Url;
 
 trait GraphingTrait
 {
@@ -72,7 +71,7 @@ trait GraphingTrait
             }
 
             static::$metricsDataSource = new MetricsDataSource(
-                (new GraphiteWebClient(Url::fromPath($graphite->url, [], new FakeSchemeRequest())))
+                (new GraphiteWebClient(new Uri($graphite->url)))
                     ->setUser($graphite->user)
                     ->setPassword($graphite->password)
                     ->setInsecure((bool) $graphite->insecure)

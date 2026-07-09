@@ -8,7 +8,7 @@ namespace Icinga\Module\Graphite\Graphing;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Request;
-use Icinga\Web\Url;
+use Psr\Http\Message\UriInterface;
 
 /**
  * HTTP interface to Graphite Web
@@ -18,9 +18,9 @@ class GraphiteWebClient
     /**
      * Base URL of every Graphite Web HTTP request
      *
-     * @var Url
+     * @var UriInterface
      */
-    protected $baseUrl;
+    protected $baseUri;
 
     /**
      * HTTP basic auth user for every Graphite Web HTTP request
@@ -60,26 +60,26 @@ class GraphiteWebClient
     /**
      * Constructor
      *
-     * @param   Url $baseUrl    Base URL of every Graphite Web HTTP request
+     * @param UriInterface $baseUrl    Base URL of every Graphite Web HTTP request
      */
-    public function __construct(Url $baseUrl)
+    public function __construct(UriInterface $baseUrl)
     {
         $this->httpClient = new Client();
 
-        $this->setBaseUrl($baseUrl);
+        $this->setBaseUri($baseUrl);
     }
 
     /**
      * Send an HTTP request to the configured Graphite Web and return the response's body
      *
-     * @param   Url         $url
-     * @param   string      $method
-     * @param   string[]    $headers
-     * @param   string      $body
+     * @param UriInterface $uri
+     * @param string $method
+     * @param string[] $headers
+     * @param string $body
      *
      * @return  string
      */
-    public function request(Url $url, $method = 'GET', array $headers = [], $body = null)
+    public function request(UriInterface $uri, $method = 'GET', array $headers = [], $body = null)
     {
         $headers['User-Agent'] = 'icingaweb2-module-graphite';
         if ($this->user !== null) {
@@ -88,7 +88,7 @@ class GraphiteWebClient
 
         // TODO(ak): keep connections alive (TCP handshakes are a bit expensive and TLS handshakes are very expensive)
         return (string) $this->httpClient->send(
-            new Request($method, $this->completeUrl($url)->getAbsoluteUrl(), $headers, $body),
+            new Request($method, $this->completeUri($uri), $headers, $body),
             [
                 'curl' => [
                     CURLOPT_SSL_VERIFYPEER => ! $this->insecure
@@ -101,38 +101,42 @@ class GraphiteWebClient
     /**
      * Complete the given relative URL according to the base URL
      *
-     * @param   Url $url
+     * @param UriInterface $uri
      *
-     * @return  Url
+     * @return UriInterface
      */
-    public function completeUrl(Url $url)
+    public function completeUri(UriInterface $uri)
     {
-        $completeUrl = clone $this->baseUrl;
-        return $completeUrl
-            ->setPath(ltrim(rtrim($completeUrl->getPath(), '/') . '/' . ltrim($url->getPath(), '/'), '/'))
-            ->setParams($url->getParams());
+        parse_str($this->baseUri->getQuery(), $originalParams);
+        parse_str($uri->getQuery(), $newParams);
+
+        $uri = $this->baseUri
+            ->withPath(ltrim(rtrim($this->baseUri->getPath(), '/') . '/' . ltrim($uri->getPath(), '/'), '/'))
+            ->withQuery(http_build_query(array_merge($originalParams, $newParams)));
+
+        return $uri;
     }
 
     /**
      * Get the base URL of every Graphite Web HTTP request
      *
-     * @return Url
+     * @return UriInterface
      */
-    public function getBaseUrl()
+    public function getBaseUri()
     {
-        return $this->baseUrl;
+        return $this->baseUri;
     }
 
     /**
      * Set the base URL of every Graphite Web HTTP request
      *
-     * @param Url $baseUrl
+     * @param UriInterface $baseUri
      *
      * @return $this
      */
-    public function setBaseUrl(Url $baseUrl)
+    public function setBaseUri(UriInterface $baseUri)
     {
-        $this->baseUrl = $baseUrl;
+        $this->baseUri = $baseUri;
 
         return $this;
     }
