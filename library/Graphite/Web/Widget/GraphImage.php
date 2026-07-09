@@ -5,8 +5,8 @@
 
 namespace Icinga\Module\Graphite\Web\Widget;
 
+use GuzzleHttp\Psr7\Uri;
 use Icinga\Module\Graphite\Graphing\Chart;
-use Icinga\Web\Url;
 use Icinga\Web\UrlParams;
 use Icinga\Web\Widget\AbstractWidget;
 use RuntimeException;
@@ -109,7 +109,7 @@ class GraphImage extends AbstractWidget
                 $params->add('target', $template->getCurves()[$curveName][1]->resolve($allVars));
             }
 
-            $url = Url::fromPath('/render')->setParams($params);
+            $uri = new Uri('/render?' . $params->toString());
             $headers = [
                 'Accept-language'   => 'en',
                 'Content-type'      => 'application/x-www-form-urlencoded'
@@ -117,19 +117,20 @@ class GraphImage extends AbstractWidget
 
             for (;;) {
                 try {
-                    $this->rendered = $graphiteWebClient->request($url, 'GET', $headers);
+                    $this->rendered = $graphiteWebClient->request($uri, 'GET', $headers);
                 } catch (RuntimeException $e) {
                     if (preg_match('/\b500\b/', $e->getMessage())) {
                         // A 500 Internal Server Error, probably because of
                         // a division by zero because of a too low time range to render.
 
-                        $until = (int) $url->getParam('until');
-                        $diff = $until - (int) $url->getParam('from');
+                        $until = (int) $params['until'];
+                        $diff = $until - (int) $params['from'];
 
                         // Try to render a higher time range, but give up
                         // once our default (1h) has been reached (non successfully).
                         if ($diff < 3600) {
-                            $url->setParam('from', sprintf('%F', ($until - $diff * 2)));
+                            $params['from'] = sprintf('%F', ($until - $diff * 2));
+                            $uri = $uri->withQuery(http_build_query($params));
                             continue;
                         }
                     }

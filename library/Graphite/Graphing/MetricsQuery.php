@@ -6,6 +6,7 @@
 namespace Icinga\Module\Graphite\Graphing;
 
 use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Psr7\Uri;
 use Icinga\Data\Fetchable;
 use Icinga\Data\Filter\Filter;
 use Icinga\Data\Filterable;
@@ -20,7 +21,6 @@ use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Monitoring\Object\Macro;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Util\Json;
-use Icinga\Web\Url;
 use InvalidArgumentException;
 use ipl\Orm\Model;
 use ipl\Stdlib\Filter as IplFilter;
@@ -173,19 +173,17 @@ class MetricsQuery implements Queryable, Filterable, Fetchable
         }
 
         $client = $this->dataSource->getClient();
-        $url = Url::fromPath('metrics/expand', [
-            'query' => $this->base->resolve($filter, '*')
-        ]);
+        $uri = new Uri('metrics/expand?' . http_build_query(['query' => $this->base->resolve($filter, '*')]));
         try {
-            $res = Json::decode($client->request($url));
+            $res = Json::decode($client->request($uri));
         } catch (ServerException $e) {
-            IPT::recordf('Fetched 0 metric(s) from %s: %s', (string) $client->completeUrl($url), $e->getMessage());
+            IPT::recordf('Fetched 0 metric(s) from %s: %s', (string) $client->completeUri($uri), $e->getMessage());
 
             return [];
         }
         natsort($res->results);
 
-        IPT::recordf('Fetched %s metric(s) from %s', count($res->results), (string) $client->completeUrl($url));
+        IPT::recordf('Fetched %s metric(s) from %s', count($res->results), (string) $client->completeUri($uri));
 
         return array_values($res->results);
     }
